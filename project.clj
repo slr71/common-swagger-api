@@ -1,8 +1,10 @@
-(defproject org.iplantc/common-swagger-api "5.2.8.0"
+(defproject org.cyverse/common-swagger-api "2.8.0"
   :description "Common library for Swagger documented RESTful APIs"
-  :url "https://github.com/iPlantCollaborativeOpenSource/DE"
+  :url "https://github.com/cyverse-de/common-swagger-api"
   :license {:name "BSD"
             :url "http://iplantcollaborative.org/sites/default/files/iPLANT-LICENSE.txt"}
+  :deploy-repositories [["releases" :clojars]
+                        ["snapshots" :clojars]]
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [cheshire "5.5.0"
                   :exclusions [[com.fasterxml.jackson.dataformat/jackson-dataformat-cbor]
