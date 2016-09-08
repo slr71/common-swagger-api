@@ -11,25 +11,24 @@
   [compojure.api.sweet
    api
    defapi
-   middlewares
 
    describe
 
-   swagger-ui
-   swagger-docs
-   swaggered
+   swagger-routes
 
-   defroutes*
-   context*
+   defroutes
+   undocumented
+   middleware
+   context
 
-   GET*
-   ANY*
-   HEAD*
-   PATCH*
-   DELETE*
-   OPTIONS*
-   POST*
-   PUT*])
+   GET
+   ANY
+   HEAD
+   PATCH
+   DELETE
+   OPTIONS
+   POST
+   PUT])
 
 ;; extend schema/Any so that these params still display in the swagger docs.
 (extend-type schema.core.AnythingSchema
