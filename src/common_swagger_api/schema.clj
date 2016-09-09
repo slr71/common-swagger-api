@@ -30,12 +30,6 @@
    POST
    PUT])
 
-;; extend schema/Any so that these params still display in the swagger docs.
-(extend-type schema.core.AnythingSchema
-  json-schema/JsonSchema
-  (json-schema/convert [_ _]
-    {:type "any"}))
-
 (def ->required-key s/explicit-schema-key)
 
 (defn ->required-param
