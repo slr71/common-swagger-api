@@ -1,3 +1,4 @@
+#!groovy
 def repo = "common-swagger-api"
 def dockerUser = "discoenv"
 
