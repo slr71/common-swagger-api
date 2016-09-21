@@ -7,10 +7,5 @@
                         ["snapshots" :clojars]]
   :plugins [[test2junit "1.2.2"]]
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [cheshire "5.6.3"
-                  :exclusions [[com.fasterxml.jackson.dataformat/jackson-dataformat-cbor]
-                               [com.fasterxml.jackson.dataformat/jackson-dataformat-smile]
-                               [com.fasterxml.jackson.core/jackson-annotations]
-                               [com.fasterxml.jackson.core/jackson-databind]
-                               [com.fasterxml.jackson.core/jackson-core]]]
+                 [cheshire "5.6.3"]
                  [metosin/compojure-api "1.1.8"]])
