@@ -5,6 +5,7 @@
             :url "http://iplantcollaborative.org/sites/default/files/iPLANT-LICENSE.txt"}
   :deploy-repositories [["releases" :clojars]
                         ["snapshots" :clojars]]
+  :plugins [[test2junit "1.2.2"]]
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [cheshire "5.6.3"
                   :exclusions [[com.fasterxml.jackson.dataformat/jackson-dataformat-cbor]
