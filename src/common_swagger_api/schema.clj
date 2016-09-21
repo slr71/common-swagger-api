@@ -1,5 +1,6 @@
 (ns common-swagger-api.schema
   (:use [clojure.string :only [blank?]]
+        [clojure-commons.error-codes]
         [potemkin :only [import-vars]])
   (:require compojure.api.sweet
             [ring.swagger.json-schema :as json-schema]
@@ -96,6 +97,14 @@
 (s/defschema ErrorResponse
   {:error_code              (describe NonBlankString "The code identifying the type of error")
    (s/optional-key :reason) (describe NonBlankString "A brief description of the reason for the error")})
+
+(s/defschema ErrorResponseIllegalArgument
+  (assoc ErrorResponse
+    :error_code (describe (s/enum ERR_ILLEGAL_ARGUMENT) "Illegal Argument error code")))
+
+(s/defschema ErrorResponseUnchecked
+  (assoc ErrorResponse
+    :error_code (describe (s/enum ERR_UNCHECKED_EXCEPTION) "Unchecked error code")))
 
 (defrecord DocOnly [schema-real schema-doc]
   s/Schema
