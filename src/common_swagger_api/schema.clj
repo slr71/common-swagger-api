@@ -103,8 +103,9 @@
     :error_code (describe (s/enum ERR_ILLEGAL_ARGUMENT) "Illegal Argument error code")))
 
 (s/defschema ErrorResponseUnchecked
-  (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_UNCHECKED_EXCEPTION) "Unchecked error code")))
+  {:error_code              (describe (s/enum ERR_UNCHECKED_EXCEPTION ERR_SCHEMA_VALIDATION)
+                                      "Response schema validation and Unchecked error codes")
+   (s/optional-key :reason) (describe s/Any "A brief text or object describing the reason for the error")})
 
 (defrecord DocOnly [schema-real schema-doc]
   s/Schema
