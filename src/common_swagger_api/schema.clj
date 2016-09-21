@@ -98,6 +98,10 @@
   {:error_code              (describe NonBlankString "The code identifying the type of error")
    (s/optional-key :reason) (describe NonBlankString "A brief description of the reason for the error")})
 
+(s/defschema ErrorResponseNotFound
+  (assoc ErrorResponse
+    :error_code (describe (s/enum ERR_NOT_FOUND) "Not Found error code")))
+
 (s/defschema ErrorResponseIllegalArgument
   (assoc ErrorResponse
     :error_code (describe (s/enum ERR_ILLEGAL_ARGUMENT) "Illegal Argument error code")))
