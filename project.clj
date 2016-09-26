@@ -9,4 +9,4 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [cheshire "5.6.3"]
                  [metosin/compojure-api "1.1.8"]
-                 [org.cyverse/clojure-commons "2.8.1-SNAPSHOT"]])
+                 [org.cyverse/clojure-commons "2.8.1"]])
