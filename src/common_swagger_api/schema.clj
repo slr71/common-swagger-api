@@ -32,6 +32,7 @@
    PUT])
 
 (def ->required-key s/explicit-schema-key)
+(def optional-key->keyword s/explicit-schema-key)
 
 (defn ->required-param
   "Removes an optional param from the given schema and re-adds it as a required param."
