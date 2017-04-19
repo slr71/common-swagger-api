@@ -99,6 +99,18 @@
   {:error_code              (describe NonBlankString "The code identifying the type of error")
    (s/optional-key :reason) (describe NonBlankString "A brief description of the reason for the error")})
 
+(s/defschema ErrorResponseExists
+  (assoc ErrorResponse
+    :error_code (describe (s/enum ERR_EXISTS) "Exists error code")))
+
+(s/defschema ErrorResponseNotWritable
+  (assoc ErrorResponse
+    :error_code (describe (s/enum ERR_NOT_WRITEABLE) "Not Writeable error code")))
+
+(s/defschema ErrorResponseForbidden
+  (assoc ErrorResponse
+    :error_code (describe (s/enum ERR_FORBIDDEN) "Insufficient privileges error code")))
+
 (s/defschema ErrorResponseNotFound
   (assoc ErrorResponse
     :error_code (describe (s/enum ERR_NOT_FOUND) "Not Found error code")))
@@ -111,6 +123,12 @@
   {:error_code              (describe (s/enum ERR_UNCHECKED_EXCEPTION ERR_SCHEMA_VALIDATION)
                                       "Response schema validation and Unchecked error codes")
    (s/optional-key :reason) (describe s/Any "A brief text or object describing the reason for the error")})
+
+(def CommonResponses
+  {500      {:schema      ErrorResponseUnchecked
+             :description "Unchecked errors"}
+   :default {:schema      ErrorResponse
+             :description "All other errors"}})
 
 (defrecord DocOnly [schema-real schema-doc]
   s/Schema
