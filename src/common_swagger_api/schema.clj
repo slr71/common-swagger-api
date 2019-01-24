@@ -17,6 +17,7 @@
 
    swagger-routes
 
+   routes
    defroutes
    undocumented
    middleware
