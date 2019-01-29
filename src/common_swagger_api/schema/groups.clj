@@ -3,6 +3,8 @@
   (:require [common-swagger-api.schema.subjects :as subjects]
             [schema.core :as s]))
 
+(def ValidGroupPrivileges (s/enum "view" "read" "update" "admin" "optin" "optout" "groupAttrRead" "groupAttrUpdate"))
+
 (defn base-group [group-descriptor]
   {:name
    (describe String (str "The internal " group-descriptor " name"))
