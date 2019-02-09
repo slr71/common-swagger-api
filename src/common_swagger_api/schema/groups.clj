@@ -3,6 +3,8 @@
   (:require [common-swagger-api.schema.subjects :as subjects]
             [schema.core :as s]))
 
+(def ValidGroupPrivileges (s/enum "view" "read" "update" "admin" "optin" "optout" "groupAttrRead" "groupAttrUpdate"))
+
 (defn base-group [group-descriptor]
   {:name
    (describe String (str "The internal " group-descriptor " name"))
@@ -100,13 +102,46 @@
    (describe Boolean "True if the user was added successfully")
 
    :subject_id
-   (describe NonBlankString "The subject ID.")
+   (describe NonBlankString "The subject ID")
 
    :source_id
-   (describe NonBlankString "The subject source ID.")
+   (describe NonBlankString "The subject source ID")
 
    (s/optional-key :subject_name)
-   (describe NonBlankString "The subject name.")})
+   (describe NonBlankString "The subject name")})
 
 (s/defschema GroupMembersUpdateResponse
-  {:results (describe [GroupMemberSubjectUpdateResponse] "The list of membership update results.")})
+  {:results (describe [GroupMemberSubjectUpdateResponse] "The list of membership update results")})
+
+(s/defschema GroupPrivilegeUpdate
+  {:subject_id (describe String "The subject ID")
+   :privileges (describe [ValidGroupPrivileges] "The group privileges to assign")})
+
+(s/defschema GroupPrivilegeUpdates
+  {:updates (describe [GroupPrivilegeUpdate] "The privilege updates to process")})
+
+(s/defschema GroupPrivilegeRemoval
+  {:subject_id (describe String "The subject ID")
+   :privileges (describe [ValidGroupPrivileges] "The group privileges to remove")})
+
+(s/defschema GroupPrivilegeRemovals
+  {:updates (describe [GroupPrivilegeRemoval] "The privilege updates to process")})
+
+(s/defschema Privilege
+  {:type
+   (describe String "The general type of privilege")
+
+   :name
+   (describe String "The privilege name, under the type")
+
+   (s/optional-key :allowed)
+   (describe Boolean "Whether the privilege is marked allowed")
+
+   (s/optional-key :revokable)
+   (describe Boolean "Whether the privilege is marked revokable")
+
+   :subject
+   (describe subjects/Subject "The subject/user with the privilege")})
+
+(s/defschema Privileges
+  {:privileges (describe [Privilege] "The list of privileges")})
