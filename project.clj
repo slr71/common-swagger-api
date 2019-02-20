@@ -8,7 +8,8 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [cheshire "5.6.3"]
                  [metosin/compojure-api "1.1.8"]
-                 [org.cyverse/clojure-commons "2.8.1"]]
+                 [org.cyverse/clojure-commons "2.8.1"]
+                 [org.cyverse/heuristomancer "2.8.6"]]
   :eastwood {:linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[test2junit "1.2.2"]
             [jonase/eastwood "0.3.4"]])
