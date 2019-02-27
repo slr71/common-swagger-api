@@ -1,5 +1,5 @@
 (ns common-swagger-api.schema.badges
-  (:use [common-swagger-api.schema :only [describe]])
+  (:use [common-swagger-api.schema :only [describe NonBlankString]])
   (:require [schema.core :as s]
             [common-swagger-api.schema.apps :refer [AnalysisSubmission]])
   (:import [java.util UUID]))
@@ -19,7 +19,7 @@
    (describe UUID "The UUID for the badge")
 
    :user
-   (describe String "The username of the user that owns the object")
+   (describe NonBlankString "The username of the user that owns the object")
 
    :submission
    AnalysisSubmission})
