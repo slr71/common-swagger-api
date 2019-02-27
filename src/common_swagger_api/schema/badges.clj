@@ -14,21 +14,17 @@
    SubmissionField})
 
 (s/defschema NewSubmission
-  {:submission SubmissionField})
+  (dissoc Submission :id))
 
 (s/defschema Badge
   {:id
    (describe UUID "The UUID for the badge")
 
-   :username
+   :user
    UsernameField
 
    :submission
    SubmissionField})
 
 (s/defschema NewBadge
-  {:user
-   (describe String "The username the badge belongs to")
-
-   :submission
-   SubmissionField})
+  (dissoc Badge :id))
