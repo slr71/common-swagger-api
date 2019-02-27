@@ -4,7 +4,6 @@
   (:import [java.util UUID]))
 
 (def SubmissionField (describe String "The JSON-encoded submission"))
-(def UsernameField (describe String "The username of the user that owns the object"))
 
 (s/defschema Submission
   {:id
@@ -21,7 +20,7 @@
    (describe UUID "The UUID for the badge")
 
    :user
-   UsernameField
+   (describe String "The username of the user that owns the object")
 
    :submission
    SubmissionField})
