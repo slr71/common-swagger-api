@@ -1,16 +1,15 @@
 (ns common-swagger-api.schema.badges
   (:use [common-swagger-api.schema :only [describe]])
-  (:require [schema.core :as s])
+  (:require [schema.core :as s]
+            [common-swagger-api.schema.apps :refer [AnalysisSubmission]])
   (:import [java.util UUID]))
-
-(def SubmissionField (describe String "The JSON-encoded submission"))
 
 (s/defschema Submission
   {:id
    (describe UUID "The UUID for this submission")
 
    :submission
-   SubmissionField})
+   AnalysisSubmission})
 
 (s/defschema NewSubmission
   (dissoc Submission :id))
@@ -23,7 +22,7 @@
    (describe String "The username of the user that owns the object")
 
    :submission
-   SubmissionField})
+   AnalysisSubmission})
 
 (s/defschema NewBadge
   (dissoc Badge :id))
