@@ -28,4 +28,7 @@
    AnalysisSubmission})
 
 (s/defschema NewBadge
-  (dissoc Badge :id))
+  (dissoc Badge :id :user)) ;user should be included in the request query params
+
+(s/defschema UpdateBadge
+  (dissoc Badge :id)) ;user and name should be updatable, but not id
