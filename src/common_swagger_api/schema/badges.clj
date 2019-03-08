@@ -1,6 +1,7 @@
 (ns common-swagger-api.schema.badges
   (:use [common-swagger-api.schema :only [describe NonBlankString]])
   (:require [schema.core :as s]
+            [schema-tools.core :as st]
             [common-swagger-api.schema.apps :refer [AnalysisSubmission]])
   (:import [java.util UUID]))
 
@@ -12,7 +13,7 @@
    AnalysisSubmission})
 
 (s/defschema NewSubmission
-  (dissoc Submission :id))
+  (st/dissoc Submission :id))
 
 (s/defschema Badge
   {:id
@@ -28,7 +29,9 @@
    AnalysisSubmission})
 
 (s/defschema NewBadge
-  (dissoc Badge :id :user)) ;user should be included in the request query params
+  (st/dissoc Badge :id :user)) ;user should be included in the request query params
 
 (s/defschema UpdateBadge
-  (dissoc Badge :id)) ;user and name should be updatable, but not id
+  (-> Badge
+      (st/dissoc :id)
+      (st/optional-keys-schema)))

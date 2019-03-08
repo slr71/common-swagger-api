@@ -8,6 +8,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [cheshire "5.6.3"]
                  [metosin/compojure-api "1.1.8"]
+                 [metosin/schema-tools "0.11.0"]
                  [org.cyverse/clojure-commons "2.8.1"]
                  [org.cyverse/heuristomancer "2.8.6"]
                  [org.flatland/ordered "1.5.7"]]
