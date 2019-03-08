@@ -18,6 +18,9 @@
   {:id
    (describe UUID "The UUID for the badge")
 
+   :name
+   (describe String "The name for the badge")
+
    :user
    (describe NonBlankString "The username of the user that owns the object")
 
