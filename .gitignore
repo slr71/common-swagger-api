@@ -13,3 +13,6 @@ bin
 /.settings
 build.xml
 test2junit
+.DS_Store
+*.iml
+.idea
