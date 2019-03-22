@@ -24,6 +24,10 @@
 (def AppPublicParam (describe Boolean "Whether the App has been published and is viewable by all users"))
 (def SystemId (describe NonBlankString "The ID of the app execution system"))
 
+(defschema IncludeHiddenParams
+  {(optional-key :include-hidden)
+   (describe Boolean "True if hidden elements should be included in the results.")})
+
 (defschema AppBase
   {:id                              AppIdParam
    :name                            (describe String "The App's name")
