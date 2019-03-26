@@ -17,3 +17,4 @@ test2junit
 *.iml
 .idea
 .nrepl-port
+.eastwood
