@@ -17,12 +17,19 @@
 
 (def AppListingSummary "List Apps")
 
+(def AppsShredderSummary "Logically Deleting Apps")
+(def AppsShredderDocs
+  "One or more Apps can be marked as deleted in the DE without being completely removed from the database using this service.
+   <b>Note</b>: an attempt to delete an app that is already marked as deleted is treated as a no-op rather than an error condition.
+   If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
+
 (def AppDeletedParam (describe Boolean "Whether the App is marked as deleted"))
 (def AppDisabledParam (describe Boolean "Whether the App is marked as disabled"))
 (def AppDocUrlParam (describe String "The App's documentation URL"))
 (def AppIdParam (describe UUID "A UUID that is used to identify the App"))
 (def AppPublicParam (describe Boolean "Whether the App has been published and is viewable by all users"))
 (def SystemId (describe NonBlankString "The ID of the app execution system"))
+(def StringAppIdParam (describe NonBlankString "The App identifier"))
 
 (defschema IncludeHiddenParams
   {(optional-key :include-hidden)
@@ -136,6 +143,16 @@
 
           SortFieldOptionalKey
           (describe (apply enum AppSearchValidSortFields) SortFieldDocs)}))
+
+(defschema QualifiedAppId
+  {:system_id SystemId
+   :app_id    StringAppIdParam})
+
+(defschema AppDeletionRequest
+  (describe
+    {:app_ids                              (describe [QualifiedAppId] "A List of qualified app identifiers")
+     (optional-key :root_deletion_request) (describe Boolean "Set to `true` to  delete one or more public apps")}
+    "List of App IDs to delete."))
 
 (defschema FileMetadata
   {:attr  (describe String "The attribute name.")
