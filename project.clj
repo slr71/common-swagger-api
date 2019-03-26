@@ -1,4 +1,4 @@
-(defproject org.cyverse/common-swagger-api "2.10.3-SNAPSHOT"
+(defproject org.cyverse/common-swagger-api "2.10.3"
   :description "Common library for Swagger documented RESTful APIs"
   :url "https://github.com/cyverse-de/common-swagger-api"
   :license {:name "BSD"
@@ -9,7 +9,7 @@
                  [cheshire "5.8.1"]
                  [metosin/compojure-api "1.1.12"]
                  [metosin/schema-tools "0.11.0"]
-                 [org.cyverse/clojure-commons "3.0.3-SNAPSHOT"]
+                 [org.cyverse/clojure-commons "3.0.3"]
                  [org.cyverse/heuristomancer "2.8.6"]
                  [org.flatland/ordered "1.5.7"]]
   :eastwood {:linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
