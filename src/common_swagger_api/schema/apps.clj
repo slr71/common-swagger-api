@@ -51,6 +51,9 @@
   "Apps can be marked as favorites in the DE, which allows users to access them without having to search.
    This service is used to remove an App from a user's favorites list.")
 
+(def AppIntegrationDataSummary "Return the Integration Data Record for an App")
+(def AppIntegrationDataDocs "This service returns the integration data associated with an app.")
+
 (def AppJobViewSummary "Obtain an app description.")
 (def AppJobViewDocs
   "This service allows the Discovery Environment user interface to obtain an app description
