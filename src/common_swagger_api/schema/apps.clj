@@ -18,6 +18,9 @@
   (:require [clojure.set :as sets])
   (:import [java.util UUID Date]))
 
+(def AppCopySummary "Make a Copy of an App Available for Editing")
+(def AppCopyDocs "This service can be used to make a copy of an App in the user's workspace.")
+
 (def AppCreateSummary "Add a new App.")
 (def AppCreateDocs "This service adds a new App to the user's workspace.")
 
