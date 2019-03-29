@@ -35,6 +35,9 @@
 (def AppDocumentationSummary "Get App Documentation")
 (def AppDocumentationDocs "This service is used by the DE to obtain documentation for a single App.")
 
+(def AppDocumentationAddSummary "Add App Documentation")
+(def AppDocumentationAddDocs "This service is used by the DE to add documentation for a single App.")
+
 (def AppDocumentationUpdateSummary "Update App Documentation")
 (def AppDocumentationUpdateDocs "This service is used by the DE to update documentation for a single App.")
 
