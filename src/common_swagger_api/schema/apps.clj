@@ -21,6 +21,11 @@
 (def AppCreateSummary "Add a new App.")
 (def AppCreateDocs "This service adds a new App to the user's workspace.")
 
+(def AppJobViewSummary "Obtain an app description.")
+(def AppJobViewDocs
+  "This service allows the Discovery Environment user interface to obtain an app description
+   that can be used to construct a job submission form.")
+
 (def AppListingSummary "List Apps")
 
 (def AppPreviewSummary "Preview Command Line Arguments")
