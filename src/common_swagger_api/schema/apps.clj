@@ -50,6 +50,8 @@
    **Note**: an attempt to delete an app that is already marked as deleted is treated as a no-op rather than an error condition.
    If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
 
+(def AppUpdateSummary "Update an App")
+
 (def AppCategoryIdPathParam (describe UUID "The App Category's UUID"))
 (def AppDeletedParam (describe Boolean "Whether the App is marked as deleted"))
 (def AppDisabledParam (describe Boolean "Whether the App is marked as disabled"))
@@ -542,6 +544,7 @@
              OptionalToolsKey  (describe [AppToolRequest] ToolListDocs))))
 
 (def AppCreateRequest (describe AppRequest "The App to add."))
+(def AppUpdateRequest (describe AppRequest "The App to update."))
 
 (defschema AppPreviewRequest
   (-> App
