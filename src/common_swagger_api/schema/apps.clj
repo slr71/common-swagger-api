@@ -35,6 +35,9 @@
 (def AppDocumentationSummary "Get App Documentation")
 (def AppDocumentationDocs "This service is used by the DE to obtain documentation for a single App.")
 
+(def AppDocumentationUpdateSummary "Update App Documentation")
+(def AppDocumentationUpdateDocs "This service is used by the DE to update documentation for a single App.")
+
 (def AppJobViewSummary "Obtain an app description.")
 (def AppJobViewDocs
   "This service allows the Discovery Environment user interface to obtain an app description
@@ -394,7 +397,9 @@
    (describe String "The user that last modified the App's documentation")})
 
 (defschema AppDocumentationRequest
-  (dissoc AppDocumentation :references))
+  (-> AppDocumentation
+      (dissoc :references)
+      (describe "The App Documentation Request")))
 
 (defschema PipelineEligibility
   {:is_valid (describe Boolean "Whether the App can be used in a Pipeline")
