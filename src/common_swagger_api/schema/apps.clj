@@ -32,6 +32,8 @@
   "This service allows the Discovery Environment user interface to obtain an app description
    that can be used to construct a job submission form.")
 
+(def AppLabelUpdateSummary "Update App Labels")
+
 (def AppListingSummary "List Apps")
 
 (def AppPreviewSummary "Preview Command Line Arguments")
@@ -252,6 +254,8 @@
          {OptionalToolsKey           (describe [(merge Tool {OptionalDeprecatedKey ToolDeprecatedParam})] ToolListDocs)
           (optional-key :references) AppReferencesParam
           OptionalGroupsKey          (describe [AppGroup] GroupListDocs)}))
+
+(def AppLabelUpdateRequest (describe App "The App to update."))
 
 (defschema AppFileParameterDetails
   {:id          (describe String "The Parameter's ID")
