@@ -18,6 +18,9 @@
   (:require [clojure.set :as sets])
   (:import [java.util UUID Date]))
 
+(def AppCreateSummary "Add a new App.")
+(def AppCreateDocs "This service adds a new App to the user's workspace.")
+
 (def AppListingSummary "List Apps")
 
 (def AppsShredderSummary "Logically Deleting Apps")
@@ -514,6 +517,8 @@
       (->optional-param :id)
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              OptionalToolsKey  (describe [AppToolRequest] ToolListDocs))))
+
+(def AppCreateRequest (describe AppRequest "The App to add."))
 
 (defschema AppPreviewRequest
   (-> App
