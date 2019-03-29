@@ -41,6 +41,11 @@
 (def AppDocumentationUpdateSummary "Update App Documentation")
 (def AppDocumentationUpdateDocs "This service is used by the DE to update documentation for a single App.")
 
+(def AppFavoriteAddSummary "Marking an App as a Favorite")
+(def AppFavoriteAddDocs
+  "Apps can be marked as favorites in the DE, which allows users to access them without having to search.
+   This service is used to add an App to a user's favorites list.")
+
 (def AppFavoriteDeleteSummary "Removing an App as a Favorite")
 (def AppFavoriteDeleteDocs
   "Apps can be marked as favorites in the DE, which allows users to access them without having to search.
