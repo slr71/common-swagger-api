@@ -30,6 +30,8 @@
    **Note**: an attempt to delete an App that is already marked as deleted is treated as a no-op rather than an error condition.
    If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
 
+(def AppDetailsSummary "Get App Details")
+
 (def AppJobViewSummary "Obtain an app description.")
 (def AppJobViewDocs
   "This service allows the Discovery Environment user interface to obtain an app description
