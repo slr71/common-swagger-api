@@ -21,6 +21,12 @@
 (def AppCreateSummary "Add a new App.")
 (def AppCreateDocs "This service adds a new App to the user's workspace.")
 
+(def AppDeleteSummary "Logically Deleting an App")
+(def AppDeleteDocs
+  "An app can be marked as deleted in the DE without being completely removed from the database using this service.
+   **Note**: an attempt to delete an App that is already marked as deleted is treated as a no-op rather than an error condition.
+   If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
+
 (def AppJobViewSummary "Obtain an app description.")
 (def AppJobViewDocs
   "This service allows the Discovery Environment user interface to obtain an app description
@@ -39,7 +45,7 @@
 (def AppsShredderSummary "Logically Deleting Apps")
 (def AppsShredderDocs
   "One or more Apps can be marked as deleted in the DE without being completely removed from the database using this service.
-   <b>Note</b>: an attempt to delete an app that is already marked as deleted is treated as a no-op rather than an error condition.
+   **Note**: an attempt to delete an app that is already marked as deleted is treated as a no-op rather than an error condition.
    If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
 
 (def AppCategoryIdPathParam (describe UUID "The App Category's UUID"))
