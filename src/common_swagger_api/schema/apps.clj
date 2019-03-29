@@ -41,6 +41,11 @@
 (def AppDocumentationUpdateSummary "Update App Documentation")
 (def AppDocumentationUpdateDocs "This service is used by the DE to update documentation for a single App.")
 
+(def AppFavoriteDeleteSummary "Removing an App as a Favorite")
+(def AppFavoriteDeleteDocs
+  "Apps can be marked as favorites in the DE, which allows users to access them without having to search.
+   This service is used to remove an App from a user's favorites list.")
+
 (def AppJobViewSummary "Obtain an app description.")
 (def AppJobViewDocs
   "This service allows the Discovery Environment user interface to obtain an app description
