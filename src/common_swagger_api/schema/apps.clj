@@ -23,6 +23,14 @@
 
 (def AppListingSummary "List Apps")
 
+(def AppPreviewSummary "Preview Command Line Arguments")
+(def AppPreviewDocs
+  "The app integration utility in the DE uses this service to obtain an example list of command-line arguments
+   so that the user can tell what the command-line might look like without having to run a job using the app that is being integrated first.
+   The App request body also requires that each parameter contain a `value` field that contains the parameter value to include on the command line.
+   The response body is in the same format as the `/arg-preview` service in the JEX.
+   Please see the JEX documentation for more information.")
+
 (def AppsShredderSummary "Logically Deleting Apps")
 (def AppsShredderDocs
   "One or more Apps can be marked as deleted in the DE without being completely removed from the database using this service.
@@ -527,7 +535,8 @@
       (->optional-param :description)
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              (optional-key :is_public) AppPublicParam
-             OptionalToolsKey  (describe [AppToolRequest] ToolListDocs))))
+             OptionalToolsKey (describe [AppToolRequest] ToolListDocs))
+      (describe "The App to preview.")))
 
 (defschema AppCategoryMetadata
   {(optional-key :avus) (describe [Any] "A listing of App Category metadata")})
