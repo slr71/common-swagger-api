@@ -32,6 +32,9 @@
 
 (def AppDetailsSummary "Get App Details")
 
+(def AppDocumentationSummary "Get App Documentation")
+(def AppDocumentationDocs "This service is used by the DE to obtain documentation for a single App.")
+
 (def AppJobViewSummary "Obtain an app description.")
 (def AppJobViewDocs
   "This service allows the Discovery Environment user interface to obtain an app description
