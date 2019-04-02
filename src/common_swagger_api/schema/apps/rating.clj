@@ -15,5 +15,6 @@
      (optional-key :comment_id) CommentIdParam}))
 
 (defschema RatingRequest
-  {:rating                    UserRatingParam
-   (optional-key :comment_id) CommentIdParam})
+  (-> {:rating                    UserRatingParam
+       (optional-key :comment_id) CommentIdParam}
+      (describe "The user's new rating for this App.")))

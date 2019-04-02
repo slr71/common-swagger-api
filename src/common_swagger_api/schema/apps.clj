@@ -77,6 +77,13 @@
    The response body is in the same format as the `/arg-preview` service in the JEX.
    Please see the JEX documentation for more information.")
 
+(def AppRatingSummary "Rate an App")
+(def AppRatingDocs
+  "Users have the ability to rate an App for its usefulness, and this service provides the means to store the App rating.
+   This service accepts a rating level between one and five, inclusive,
+   and a comment identifier that refers to a comment in iPlant's Confluence wiki.
+   The rating is stored in the database and associated with the authenticated user.")
+
 (def AppRatingDeleteSummary "Delete an App Rating")
 (def AppRatingDeleteDocs
   "The DE uses this service to remove a rating that a user has previously made.
