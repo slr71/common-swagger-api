@@ -101,6 +101,11 @@
    and what types of files are produced by each App's task in the pipeline.
    This service provides that information.")
 
+(def AppToolListingSummary "List Tools used by an App")
+(def AppToolListingDocs
+  "This service lists information for all of the tools that are associated with an App.
+   This information used to be included in the results of the App listing service.")
+
 (def AppUpdateSummary "Update an App")
 
 (def PublishAppSummary "Submit an App for Public Use")
@@ -420,6 +425,9 @@
           :suggested_categories
           (describe [AppDetailCategory]
                     "The list of Categories the integrator wishes to associate with the App")}))
+
+(defschema AppToolListing
+  {:tools (describe [AppDetailsTool] "Listing of App Tools")})
 
 (defschema AppDocumentation
   {(optional-key :app_id)
