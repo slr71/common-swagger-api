@@ -85,6 +85,13 @@
 
 (def AppUpdateSummary "Update an App")
 
+(def PublishAppSummary "Submit an App for Public Use")
+(def PublishAppDocs
+  "This service can be used to submit a private App for public use.
+   The user supplies basic information about the App and a suggested location for it.
+   The service records the information and suggested location then places the App in the Beta category.
+   A Tito administrator can subsequently move the App to the suggested location at a later time if it proves to be useful.")
+
 (def AppCategoryIdPathParam (describe UUID "The App Category's UUID"))
 (def AppDeletedParam (describe Boolean "Whether the App is marked as deleted"))
 (def AppDisabledParam (describe Boolean "Whether the App is marked as disabled"))
@@ -601,7 +608,8 @@
       (->optional-param :description)
       (assoc (optional-key :documentation) AppDocParam
              (optional-key :references) AppReferencesParam)
-      (merge AppCategoryMetadata)))
+      (merge AppCategoryMetadata)
+      (describe "The user's Publish App Request.")))
 
 (defschema AppPublishableResponse
   {:publishable           (describe Boolean "True if the app is publishable.")
