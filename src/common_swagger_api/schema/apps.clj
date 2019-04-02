@@ -95,6 +95,12 @@
    **Note**: an attempt to delete an app that is already marked as deleted is treated as a no-op rather than an error condition.
    If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
 
+(def AppTaskListingSummary "List Tasks with File Parameters in an App")
+(def AppTaskListingDocs
+  "When a pipeline is being created, the UI needs to know what types of files are consumed by
+   and what types of files are produced by each App's task in the pipeline.
+   This service provides that information.")
+
 (def AppUpdateSummary "Update an App")
 
 (def PublishAppSummary "Submit an App for Public Use")
