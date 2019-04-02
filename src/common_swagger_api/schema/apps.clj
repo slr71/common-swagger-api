@@ -63,6 +63,12 @@
 
 (def AppListingSummary "List Apps")
 
+(def AppPublishableSummary "Determine if an App Can be Made Public")
+(def AppPublishableDocs
+  "A multi-step App can't be made public if any of the Tasks that are included in it are not public.
+   This endpoint returns a true flag if the App is a single-step App
+   or it's a multistep App in which all of the Tasks included in the pipeline are public.")
+
 (def AppPreviewSummary "Preview Command Line Arguments")
 (def AppPreviewDocs
   "The app integration utility in the DE uses this service to obtain an example list of command-line arguments
