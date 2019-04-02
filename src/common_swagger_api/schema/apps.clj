@@ -41,6 +41,11 @@
 (def AppDocumentationUpdateSummary "Update App Documentation")
 (def AppDocumentationUpdateDocs "This service is used by the DE to update documentation for a single App.")
 
+(def AppEditingViewSummary "Make an App Available for Editing")
+(def AppEditingViewDocs
+  "The app integration utility in the DE uses this service to obtain the App description JSON so that it can be edited.
+   The App must have been integrated by the requesting user.")
+
 (def AppFavoriteAddSummary "Marking an App as a Favorite")
 (def AppFavoriteAddDocs
   "Apps can be marked as favorites in the DE, which allows users to access them without having to search.
