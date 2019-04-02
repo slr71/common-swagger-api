@@ -77,6 +77,11 @@
    The response body is in the same format as the `/arg-preview` service in the JEX.
    Please see the JEX documentation for more information.")
 
+(def AppRatingDeleteSummary "Delete an App Rating")
+(def AppRatingDeleteDocs
+  "The DE uses this service to remove a rating that a user has previously made.
+   This service deletes the authenticated user's rating for the corresponding app-id.")
+
 (def AppsShredderSummary "Logically Deleting Apps")
 (def AppsShredderDocs
   "One or more Apps can be marked as deleted in the DE without being completely removed from the database using this service.
