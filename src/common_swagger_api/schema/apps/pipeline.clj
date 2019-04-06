@@ -4,6 +4,24 @@
         [schema.core :only [defschema optional-key Keyword]])
   (:import [java.util UUID]))
 
+(def PipelineCopySummary "Make a Copy of a Pipeline Available for Editing")
+(def PipelineCopyDocs
+  "This service can be used to make a copy of a Pipeline in the user's workspace.
+   This endpoint will copy the App details, steps, and mappings, but will not copy tasks used in the Pipeline steps.")
+
+(def PipelineCreateSummary "Create a Pipeline")
+(def PipelineCreateDocs "This service adds a new Pipeline.")
+
+(def PipelineEditingViewSummary "Make a Pipeline Available for Editing")
+(def PipelineEditingViewDocs
+  "The DE uses this service to obtain a JSON representation of a Pipeline for editing.
+   The Pipeline must have been integrated by the requesting user, and it must not already be public.")
+
+(def PipelineUpdateSummary "Update a Pipeline")
+(def PipelineUpdateDocs
+  "This service updates an existing Pipeline in the database,
+   as long as the Pipeline has not been submitted for public use.")
+
 (defschema PipelineMappingMap
   {(describe Keyword "The input ID") (describe String "The output ID")})
 
@@ -46,7 +64,11 @@
      (describe [PipelineMapping] "The Pipeline's input/output mappings")}))
 
 (defschema PipelineUpdateRequest
-  (->optional-param Pipeline :tasks))
+  (-> Pipeline
+      (->optional-param :tasks)
+      (describe "The Pipeline to update.")))
 
 (defschema PipelineCreateRequest
-  (->optional-param PipelineUpdateRequest :id))
+  (-> PipelineUpdateRequest
+      (->optional-param :id)
+      (describe "The Pipeline to create.")))
