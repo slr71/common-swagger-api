@@ -1,6 +1,11 @@
 (ns common-swagger-api.schema.apps.categories
   (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.apps :only [AppCategoryIdPathParam AppListingDetail SystemId]]
+        [common-swagger-api.schema.apps
+         :only [AppCategoryIdPathParam
+                AppListingDetail
+                AppListingPagingParams
+                SystemId]]
+        [common-swagger-api.schema.ontologies :only [OntologyHierarchyFilterParams]]
         [schema.core :only [defschema optional-key recursive]]))
 
 (def AppCategoryListingSummary "List App Categories")
@@ -51,3 +56,7 @@
 (defschema AppCategoryAppListing
   (merge (dissoc AppCategory :categories)
          {:apps (describe [AppListingDetail] "A listing of Apps under this Category")}))
+
+(defschema OntologyAppListingPagingParams
+  (merge AppListingPagingParams
+         OntologyHierarchyFilterParams))

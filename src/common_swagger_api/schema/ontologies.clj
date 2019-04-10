@@ -6,6 +6,9 @@
 (def OntologyVersionParam (describe String "The unique version of the Ontology"))
 (def OntologyClassIRIParam (describe String "A unique Class IRI"))
 
+(s/defschema OntologyHierarchyFilterParams
+  {:attr (describe String "The metadata attribute that stores class IRIs under the given root IRI")})
+
 (s/defschema OntologyDetails
   {:iri        (describe (s/maybe String) "The unique IRI for this Ontology")
    :version    OntologyVersionParam
