@@ -546,6 +546,12 @@
   {(optional-key :app-type)
    (describe String "The type of app to include in the listing.")})
 
+(defschema AppListingPagingParams
+  (merge PagingParams
+         AppFilterParams
+         {SortFieldOptionalKey
+          (describe (apply enum AppListingValidSortFields) SortFieldDocs)}))
+
 (defschema AppSearchParams
   (merge PagingParams
          AppFilterParams
