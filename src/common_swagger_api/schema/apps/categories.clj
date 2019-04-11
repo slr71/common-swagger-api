@@ -17,6 +17,10 @@
    The DE uses this service to obtain the list of apps when a user clicks on a category in the _Apps_ window.
    This endpoint accepts optional URL query parameters to limit and sort Apps, which will allow pagination of results.")
 
+(def AppCategoryHierarchyListingSummary "List App Category Hierarchy")
+(def AppHierarchiesListingSummary "List App Hierarchies")
+(def AppHierarchyUnclassifiedListingSummary "List Unclassified Apps")
+
 (def AppCategoryNameParam (describe String "The App Category's name"))
 
 (defschema CategoryListingParams
