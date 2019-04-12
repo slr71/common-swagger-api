@@ -9,8 +9,3 @@ Upon error, the response body contains an error code along with some additional 
 only the `name` (except in parameters and parameter arguments),
 `description`, `label`, and `display` (only in parameter arguments)
 fields will be processed and updated by this endpoint.
-
-#### Delegates to metadata service
-    POST /avus/filter-targets
-    GET /avus/{target-type}/{target-id}
-Where `{target-type}` is `app`.

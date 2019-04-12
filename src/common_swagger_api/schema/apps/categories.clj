@@ -11,6 +11,7 @@
 (def AppCategoryListingSummary "List App Categories")
 (def AppCategoryListingDocs
   "This service is used by the DE to obtain the list of app categories that are visible to the user.")
+
 (def AppCategoryAppListingSummary "List Apps in a Category")
 (def AppCategoryAppListingDocs
   "This service lists all of the apps within an app category or any of its descendents.
@@ -18,8 +19,20 @@
    This endpoint accepts optional URL query parameters to limit and sort Apps, which will allow pagination of results.")
 
 (def AppCategoryHierarchyListingSummary "List App Category Hierarchy")
+(def AppCategoryHierarchyListingDocs
+  "Gets the list of app categories that are visible to the user for the active ontology version,
+   rooted at the given `root-iri`.")
+
 (def AppHierarchiesListingSummary "List App Hierarchies")
+(def AppHierarchiesListingDocs
+  "Lists all hierarchies saved for the active ontology version.")
+
+(def AppHierarchyAppListingDocs "Lists all of the apps under an app category hierarchy that are visible to the user.")
+
 (def AppHierarchyUnclassifiedListingSummary "List Unclassified Apps")
+(def AppHierarchyUnclassifiedListingDocs
+  "Lists all of the apps that are visible to the user that are not under the given app category
+   or any of its subcategories.")
 
 (def AppCategoryNameParam (describe String "The App Category's name"))
 
