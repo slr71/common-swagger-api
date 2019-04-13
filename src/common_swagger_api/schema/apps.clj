@@ -7,6 +7,7 @@
                                           SortFieldDocs
                                           SortFieldOptionalKey]]
         [common-swagger-api.schema.apps.rating :only [Rating]]
+        [common-swagger-api.schema.ontologies :only [OntologyHierarchyList]]
         [common-swagger-api.schema.tools :only [Tool ToolDetails ToolListingImage ToolListingItem]]
         [schema.core :only [defschema
                             enum
@@ -31,6 +32,8 @@
    If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
 
 (def AppDetailsSummary "Get App Details")
+(def AppDetailsDocs
+  "This service is used by the DE to obtain high-level details about a single App.")
 
 (def AppDocumentationSummary "Get App Documentation")
 (def AppDocumentationDocs "This service is used by the DE to obtain documentation for a single App.")
@@ -67,6 +70,10 @@
 (def AppLabelUpdateSummary "Update App Labels")
 
 (def AppListingSummary "List Apps")
+(def AppListingDocs
+  "This service allows users to get a paged listing of all Apps accessible to the user.
+   If the `search` parameter is included, then the results are filtered by
+   the App name, description, integrator's name, tool name, or category name the app is under.")
 
 (def AppPublishableSummary "Determine if an App Can be Made Public")
 (def AppPublishableDocs
@@ -112,6 +119,10 @@
    This information used to be included in the results of the App listing service.")
 
 (def AppUpdateSummary "Update an App")
+(def AppUpdateDocs
+  "This service updates a single-step App in the database, as long as the App has not been submitted for public use,
+   and the app's name must not duplicate the name of any other app (visible to the requesting user)
+   under the same categories as this app.")
 
 (def PublishAppSummary "Submit an App for Public Use")
 (def PublishAppDocs
@@ -391,45 +402,26 @@
    (describe Date "The last date this app has run to `Completed` status")})
 
 (defschema AppDetails
-  (merge AppBase
-         {:id
-          (describe String "The app identifier.")
-
-          :tools
-          (describe [AppDetailsTool] ToolListDocs)
-
-          :deleted
-          AppDeletedParam
-
-          :disabled
-          AppDisabledParam
-
-          :integrator_email
-          (describe String "The App integrator's email address.")
-
-          :integrator_name
-          (describe String "The App integrator's full name.")
-
-          (optional-key :wiki_url)
-          AppDocUrlParam
-
-          :references
-          AppReferencesParam
-
-          (optional-key :job_stats)
-          (describe AppListingJobStats AppListingJobStatsDocs)
-
-          (optional-key :hierarchies)
-          (describe Any
-                    "The ontology hierarchies associated with the App")
-
-          :categories
-          (describe [AppDetailCategory]
-                    "The list of Categories associated with the App")
-
-          :suggested_categories
-          (describe [AppDetailCategory]
-                    "The list of Categories the integrator wishes to associate with the App")}))
+  (-> AppBase
+      (merge {:id                   (describe String "The app identifier.")
+              :tools                (describe [AppDetailsTool] ToolListDocs)
+              :deleted              AppDeletedParam
+              :disabled             AppDisabledParam
+              :integrator_email     (describe String "The App integrator's email address.")
+              :integrator_name      (describe String "The App integrator's full name.")
+              :wiki_url             AppDocUrlParam
+              :references           AppReferencesParam
+              :job_stats            (describe AppListingJobStats AppListingJobStatsDocs)
+              :categories           (describe
+                                      [AppDetailCategory]
+                                      "The list of Categories associated with the App")
+              :suggested_categories (describe
+                                      [AppDetailCategory]
+                                      "The list of Categories the integrator wishes to associate with the App")}
+             OntologyHierarchyList)
+      (->optional-param :wiki_url)
+      (->optional-param :job_stats)
+      (->optional-param :hierarchies)))
 
 (defschema AppToolListing
   {:tools (describe [AppDetailsTool] "Listing of App Tools")})
