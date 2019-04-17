@@ -23,6 +23,10 @@
   "Gets the list of app categories that are visible to the user for the active ontology version,
    rooted at the given `root-iri`.")
 
+(def AppCommunityAppListingSummary "List Apps in a Community")
+(def AppCommunityAppListingDocs
+  "Lists all of the apps under an App Community that are visible to the user.")
+
 (def AppHierarchiesListingSummary "List App Hierarchies")
 (def AppHierarchiesListingDocs
   "Lists all hierarchies saved for the active ontology version.")
@@ -35,6 +39,7 @@
    or any of its subcategories.")
 
 (def AppCategoryNameParam (describe String "The App Category's name"))
+(def AppCommunityGroupNameParam (describe String "The full group name of the App Community"))
 
 (defschema CategoryListingParams
   {(optional-key :public)
