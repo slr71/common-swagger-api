@@ -7,6 +7,7 @@
                                           SortFieldDocs
                                           SortFieldOptionalKey]]
         [common-swagger-api.schema.apps.rating :only [Rating]]
+        [common-swagger-api.schema.metadata :only [AvuListRequest]]
         [common-swagger-api.schema.ontologies :only [OntologyHierarchyList]]
         [common-swagger-api.schema.tools :only [Tool ToolDetails ToolListingImage ToolListingItem]]
         [schema.core :only [defschema
@@ -627,8 +628,13 @@
              OptionalToolsKey (describe [AppToolRequest] ToolListDocs))
       (describe "The App to preview.")))
 
-(defschema AppCategoryMetadata
-  {(optional-key :avus) (describe [Any] "A listing of App Category metadata")})
+(defschema AppCategoryMetadataAddRequest
+  (-> AvuListRequest
+      (describe "Community metadata to add to the App.")))
+
+(defschema AppCategoryMetadataDeleteRequest
+  (-> AvuListRequest
+      (describe "Community metadata to remove from the App.")))
 
 (defschema PublishAppRequest
   (-> AppBase
@@ -637,7 +643,8 @@
       (->optional-param :description)
       (assoc (optional-key :documentation) AppDocParam
              (optional-key :references) AppReferencesParam)
-      (merge AppCategoryMetadata)
+      (merge AppCategoryMetadataAddRequest)
+      (->optional-param :avus)
       (describe "The user's Publish App Request.")))
 
 (defschema AppPublishableResponse
