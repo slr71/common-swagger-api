@@ -32,7 +32,7 @@
              (describe [(s/recursive #'AvuRequest)] "AVUs attached to this AVU"))))
 
 (s/defschema AvuListRequest
-  (-> {:avus (describe [AvuRequest] "The AVUs to save for the target data item")}
+  (-> {:avus (describe [AvuRequest] "The AVUs to save for the target item")}
       (describe "The Metadata AVU update request")))
 
 (s/defschema SetAvuRequest
