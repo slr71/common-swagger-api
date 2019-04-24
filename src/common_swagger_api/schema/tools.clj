@@ -1,10 +1,16 @@
 (ns common-swagger-api.schema.tools
-  (:use [common-swagger-api.schema :only [->optional-param describe]]
-        [common-swagger-api.schema.containers :only [Image
-                                                     Settings
-                                                     ToolContainer]]
+  (:use [clojure-commons.error-codes]
+        [common-swagger-api.schema :only [->optional-param describe ErrorResponse]]
+        [common-swagger-api.schema.common :only [IncludeHiddenParams]]
+        [common-swagger-api.schema.containers
+         :only [DevicesParamOptional
+                Image
+                NewToolContainer
+                Settings
+                ToolContainer
+                VolumesFromParamOptional
+                VolumesParamOptional]]
         [schema.core :only [defschema enum optional-key]])
-  (:require [schema.core :as s])
   (:import (java.util UUID)))
 
 (def ToolIdParam (describe UUID "A UUID that is used to identify the Tool"))
@@ -17,6 +23,17 @@
 (def SubmittedByParam (describe String "The username of the user that submitted the Tool Request"))
 (def ToolImplementationDocs "Information about the user who integrated the Tool into the DE")
 (def Interactive (describe Boolean "Determines whether the tool is interactive."))
+
+(defschema ToolSearchParams
+  (merge IncludeHiddenParams
+         {(optional-key :search) (describe String "The pattern to match in an Tool's Name or Description.")
+          (optional-key :public) (describe Boolean
+                                           "Set to `true` to list only public Tools, `false` to list only private Tools,
+                                            or leave unset to list all Tools.")}))
+
+(defschema PrivateToolDeleteParams
+  {(optional-key :force-delete)
+   (describe Boolean "Flag to force deletion of a Tool already in use by Apps.")})
 
 (defschema ToolTestData
   {(optional-key :params) (describe [String] "The list of command-line parameters")
@@ -54,6 +71,31 @@
   (assoc (dissoc Settings :id)
     :image (dissoc Image :id)))
 
+(defschema ToolImportRequest
+  (-> Tool
+      (->optional-param :id)
+      (merge
+        {:implementation (describe ToolImplementation ToolImplementationDocs)
+         :container      NewToolContainer})))
+
+(defschema PrivateToolContainerImportRequest
+  (dissoc NewToolContainer
+          DevicesParamOptional
+          VolumesParamOptional
+          VolumesFromParamOptional))
+
+(defschema PrivateToolImportRequest
+  (-> ToolImportRequest
+      (->optional-param :type)
+      (->optional-param :implementation)
+      (merge {:container PrivateToolContainerImportRequest})))
+
+(defschema PrivateToolUpdateRequest
+  (-> PrivateToolImportRequest
+      (->optional-param :name)
+      (->optional-param :version)
+      (->optional-param :container)))
+
 (defschema ToolRequestSummary
   {:id                     ToolRequestIdParam
    :name                   ToolNameParam
@@ -73,3 +115,16 @@
          {:implementation              (describe ToolImplementor ToolImplementationDocs)
           :container                   ToolListingImage
           (optional-key :tool_request) ToolListingToolRequestSummary}))
+
+(defschema ToolListing
+  {:tools (describe [ToolListingItem] "Listing of App Tools")})
+
+(defschema ErrorPrivateToolRequestBadParam
+  (assoc ErrorResponse
+    :error_code (describe (enum ERR_EXISTS ERR_BAD_OR_MISSING_FIELD) "Exists or Bad Field error code")))
+
+(def PrivateToolImportResponse400
+  {:schema      ErrorPrivateToolRequestBadParam
+   :description "
+* `ERR_EXISTS`: A Tool with the given `name` already exists.
+* `ERR_BAD_OR_MISSING_FIELD`: The image with the given `name` and `tag` has been deprecated."})

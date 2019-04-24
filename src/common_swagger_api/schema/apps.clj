@@ -1,15 +1,20 @@
 (ns common-swagger-api.schema.apps
-  (:use [common-swagger-api.schema :only [->optional-param
-                                          describe
-                                          optional-key->keyword
-                                          NonBlankString
-                                          PagingParams
-                                          SortFieldDocs
-                                          SortFieldOptionalKey]]
+  (:use [common-swagger-api.schema
+         :only [->optional-param
+                describe
+                optional-key->keyword
+                NonBlankString
+                PagingParams
+                SortFieldDocs
+                SortFieldOptionalKey]]
         [common-swagger-api.schema.apps.rating :only [Rating]]
         [common-swagger-api.schema.metadata :only [AvuListRequest]]
         [common-swagger-api.schema.ontologies :only [OntologyHierarchyList]]
-        [common-swagger-api.schema.tools :only [Tool ToolDetails ToolListingImage ToolListingItem]]
+        [common-swagger-api.schema.tools
+         :only [Tool
+                ToolDetails
+                ToolListingImage
+                ToolListingItem]]
         [schema.core :only [defschema
                             enum
                             optional-key
@@ -163,10 +168,6 @@
 (def TreeSelectorGroupParameterListDocs "The TreeSelector Group's arguments")
 (def TreeSelectorGroupGroupListDocs "The TreeSelector Group's groups")
 (def AppListingJobStatsDocs "Some launch statistics associated with the App")
-
-(defschema IncludeHiddenParams
-  {(optional-key :include-hidden)
-   (describe Boolean "True if hidden elements should be included in the results.")})
 
 (defschema AppParameterListItem
   {:id                         (describe UUID "A UUID that is used to identify the List Item")
