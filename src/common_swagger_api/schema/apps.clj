@@ -1,9 +1,11 @@
 (ns common-swagger-api.schema.apps
   (:use [common-swagger-api.schema
          :only [->optional-param
+                CommonResponses
                 describe
-                optional-key->keyword
+                ErrorResponseNotFound
                 NonBlankString
+                optional-key->keyword
                 PagingParams
                 SortFieldDocs
                 SortFieldOptionalKey]]
@@ -711,3 +713,10 @@
 
    (optional-key :archive_logs)
    (describe Bool "True if the job logs should be uploaded to the data store.")})
+
+(def ToolAppListingResponses
+  (merge CommonResponses
+         {200 {:schema      AppListing
+               :description "The listing of Apps using the given Tool."}
+          404 {:schema      ErrorResponseNotFound
+               :description "The `tool-id` does not exist."}}))

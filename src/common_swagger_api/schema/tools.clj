@@ -1,6 +1,13 @@
 (ns common-swagger-api.schema.tools
   (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema :only [->optional-param describe ErrorResponse]]
+        [common-swagger-api.schema
+         :only [->optional-param
+                CommonResponses
+                describe
+                ErrorResponse
+                ErrorResponseForbidden
+                ErrorResponseNotFound
+                ErrorResponseNotWritable]]
         [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [common-swagger-api.schema.containers
          :only [DevicesParamOptional
@@ -12,6 +19,39 @@
                 VolumesParamOptional]]
         [schema.core :only [defschema enum optional-key]])
   (:import (java.util UUID)))
+
+(def ToolAddSummary "Add Private Tool")
+
+(def ToolAppListingSummary "Get Apps by Tool")
+(def ToolAppListingDocs
+  "This endpoint returns a listing of Apps using the given Tool.")
+
+(def ToolDeleteSummary "Delete a Private Tool")
+(def ToolDeleteDocs
+  "Deletes a private Tool, as long as it is not in use by any Apps.
+   The requesting user must have ownership permission for the Tool.
+   If the Tool is already in use in private Apps,
+   then an `ERR_NOT_WRITEABLE` will be returned along with a listing of the Apps using this Tool,
+   unless the `force-delete` flag is set to `true`.")
+
+(def ToolDetailsSummary "Get a Tool")
+(def ToolDetailsDocs
+  "This endpoint returns the details for one tool accessible to the user.")
+
+(def ToolIntegrationDataListingSummary "Return the Integration Data Record for a Tool")
+(def ToolIntegrationDataListingDocs
+  "This service returns the integration data associated with an app.")
+
+(def ToolListingSummary "List Tools")
+(def ToolListingDocs
+  "This endpoint allows users to get a listing of all Tools accessible to the user.")
+
+(def ToolPermissionsListingSummary "List Tool Permissions")
+(def ToolPermissionsListingDocs
+  "This endpoint allows the caller to list the permissions for one or more Tools.
+   The authenticated user must have read permission on every Tool in the request body for this endpoint to succeed.")
+
+(def ToolUpdateSummary "Update a Private Tool")
 
 (def ToolIdParam (describe UUID "A UUID that is used to identify the Tool"))
 (def ToolRequestIdParam (describe UUID "The Tool Requests's UUID"))
@@ -26,7 +66,7 @@
 
 (defschema ToolSearchParams
   (merge IncludeHiddenParams
-         {(optional-key :search) (describe String "The pattern to match in an Tool's Name or Description.")
+         {(optional-key :search) (describe String "The pattern to match in a Tool's Name or Description.")
           (optional-key :public) (describe Boolean
                                            "Set to `true` to list only public Tools, `false` to list only private Tools,
                                             or leave unset to list all Tools.")}))
@@ -88,13 +128,15 @@
   (-> ToolImportRequest
       (->optional-param :type)
       (->optional-param :implementation)
-      (merge {:container PrivateToolContainerImportRequest})))
+      (merge {:container PrivateToolContainerImportRequest})
+      (describe "The private Tool to import.")))
 
 (defschema PrivateToolUpdateRequest
   (-> PrivateToolImportRequest
       (->optional-param :name)
       (->optional-param :version)
-      (->optional-param :container)))
+      (->optional-param :container)
+      (describe "The private Tool to update.")))
 
 (defschema ToolRequestSummary
   {:id                     ToolRequestIdParam
@@ -128,3 +170,34 @@
    :description "
 * `ERR_EXISTS`: A Tool with the given `name` already exists.
 * `ERR_BAD_OR_MISSING_FIELD`: The image with the given `name` and `tag` has been deprecated."})
+
+(def PrivateToolImportResponses
+  (merge CommonResponses
+         {200 {:schema      ToolDetails
+               :description "The new Tool details."}
+          400 PrivateToolImportResponse400}))
+
+(def ToolDeleteResponses
+  (merge CommonResponses
+         {200 {:description "The Tool was successfully deleted."}
+          400 {:schema      ErrorResponseNotWritable
+               :description "The Tool could not be deleted."}
+          403 {:schema      ErrorResponseForbidden
+               :description "The requesting user does not have permission to delete this Tool."}
+          404 {:schema      ErrorResponseNotFound
+               :description "A Tool with the given `tool-id` does not exist."}}))
+
+(def ToolDetailsResponses
+  (merge CommonResponses
+         {200 {:schema      ToolDetails
+               :description "The Tool details."}
+          403 {:schema      ErrorResponseForbidden
+               :description "The requesting user does not have `read` permission for the Tool."}
+          404 {:schema      ErrorResponseNotFound
+               :description "The `tool-id` does not exist."}}))
+
+(def ToolUpdateResponses
+  (merge CommonResponses
+         {200 {:schema      ToolDetails
+               :description "The updated Tool details."}
+          400 PrivateToolImportResponse400}))

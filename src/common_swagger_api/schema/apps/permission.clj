@@ -1,5 +1,11 @@
 (ns common-swagger-api.schema.apps.permission
-  (:use [common-swagger-api.schema :only [describe ErrorResponse NonBlankString]]
+  (:use [common-swagger-api.schema
+         :only [CommonResponses
+                describe
+                ErrorResponse
+                ErrorResponseForbidden
+                ErrorResponseNotFound
+                NonBlankString]]
         [common-swagger-api.schema.apps :only [QualifiedAppId]]
         [schema.core :only [defschema enum optional-key]])
   (:import (java.util UUID)))
@@ -25,6 +31,23 @@
   "This endpoint allows the caller to revoke permission to access one or more apps from one or more users.
    The authenticate user must have ownership permission to every app in the request body for this endoint to fully succeed.
    Note: like app sharing, this is a potentially slow operation.")
+
+(def ToolSharingSummary "Add Tool Permissions")
+(def ToolSharingDocs
+  "This endpoint allows the caller to share multiple Tools with multiple users.
+   The authenticated user must have ownership permission to every Tool in the request body for this endpoint to fully succeed.
+   Note: this is a potentially slow operation and the response is returned synchronously.
+   The DE UI handles this by allowing the user to continue working while the request is being processed.
+   When calling this endpoint, please be sure that the response timeout is long enough.
+   Using a response timeout that is too short will result in an exception on the client side.
+   On the server side, the result of the sharing operation when a connection is lost is undefined.
+   It may be worthwhile to repeat failed or timed out calls to this endpoint.")
+
+(def ToolUnsharingSummary "Revoke Tool Permissions")
+(def ToolUnsharingDocs
+  "This endpoint allows the caller to revoke permission to access one or more Tools from one or more users.
+   The authenticated user must have ownership permission to every Tool in the request body for this endoint to fully succeed.
+   Note: like Tool sharing, this is a potentially slow operation.")
 
 (def AppPermissionEnum (enum "read" "write" "own" ""))
 (def ToolPermissionEnum AppPermissionEnum)
@@ -103,7 +126,9 @@
   {:unsharing (describe [SubjectAppUnsharingResponseElement] "The list of app unsharing responses")})
 
 (defschema ToolIdList
-  {:tools (describe [UUID] "A List of Tool IDs")})
+  (describe
+    {:tools (describe [UUID] "A List of Tool IDs")}
+    "The Tool permission listing request."))
 
 (defschema ToolPermissionListElement
   {:id          (describe UUID "The Tool ID")
@@ -132,7 +157,9 @@
     :tools (describe [ToolSharingResponseElement] "The list of Tool sharing responses for the subject")))
 
 (defschema ToolSharingRequest
-  {:sharing (describe [SubjectToolSharingRequestElement] "The list of Tool sharing requests")})
+  (describe
+    {:sharing (describe [SubjectToolSharingRequestElement] "The list of Tool sharing requests")}
+    "The Tool sharing request."))
 
 (defschema ToolSharingResponse
   {:sharing (describe [SubjectToolSharingResponseElement] "The list of Tool sharing responses")})
@@ -152,8 +179,20 @@
     :tools (describe [ToolUnsharingResponseElement] "The list of Tool unsharing responses for the subject")))
 
 (defschema ToolUnsharingRequest
-  {:unsharing (describe [SubjectToolUnsharingRequestElement] "The list of unsharing requests for individual subjects")})
+  (describe
+    {:unsharing
+     (describe [SubjectToolUnsharingRequestElement] "The list of unsharing requests for individual subjects")}
+    "The Tool unsharing request."))
 
 (defschema ToolUnsharingResponse
   {:unsharing
    (describe [SubjectToolUnsharingResponseElement] "The list of unsharing responses for individual subjects")})
+
+(def ToolPermissionsListingResponses
+  (merge CommonResponses
+         {200 {:schema      ToolPermissionListing
+               :description "The Tool permission listings."}
+          403 {:schema      ErrorResponseForbidden
+               :description "The requesting user does not have `read` permission for some Tool(s) in the request."}
+          404 {:schema      ErrorResponseNotFound
+               :description "Some `tool-id`(s) in the request do not exist."}}))
