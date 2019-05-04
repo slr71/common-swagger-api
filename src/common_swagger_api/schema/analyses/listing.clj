@@ -9,6 +9,37 @@
   (:require [clojure.java.io :as io])
   (:import (java.util UUID)))
 
+(def AnalysesDeleteSummary "Delete Multiple Analyses")
+(def AnalysesDeleteDocs
+  "This service allows the caller to mark one or more analyses as deleted in the apps database.")
+
+(def AnalysesListingSummary "List Analyses")
+(def AnalysesListingDocs
+  "This service allows users to list analyses that they've previously submitted for execution.")
+
+(def AnalysisDeleteSummary "Delete an Analysis")
+(def AnalysisDeleteDocs
+  "This service marks an analysis as deleted in the DE database.")
+
+(def AnalysisHistorySummary "Get the Status Update History of an Analysis")
+(def AnalysisHistoryDocs
+  "This endpoint returns a status update history for each step in an analysis.")
+
+(def AnalysisStepsSummary "Display the steps of an analysis.")
+(def AnalysisStepsDocs
+  "This service returns a list of steps in an analysis.")
+
+(def AnalysisSubmitSummary "Submit an Analysis")
+(def AnalysisSubmitDocs
+  "This service allows users to submit analyses for execution.
+   The `config` element in the analysis submission is a map
+   from parameter IDs as they appear in the response from the `/apps/:app-id` endpoint
+   to the desired values for those parameters.")
+
+(def AnalysisUpdateSummary "Update an Analysis")
+(def AnalysisUpdateDocs
+  "This service allows an analysis name or description to be updated.")
+
 ;; JSON query params are not currently supported by compojure-api,
 ;; so we have to define "filter" in this schema as a String for now.
 (def OptionalKeyFilter (optional-key :filter))

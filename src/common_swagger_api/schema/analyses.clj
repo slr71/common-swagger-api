@@ -9,6 +9,20 @@
                 Keyword]])
   (:import (java.util UUID)))
 
+(def AnalysisParametersSummary "Display the parameters used in an analysis.")
+(def AnalysisParametersDocs
+  "This service returns a list of parameter values used in a previously executed analysis.")
+
+(def AnalysisRelaunchSummary "Obtain information to relaunch analysis.")
+(def AnalysisRelaunchDocs
+  "This service allows the Discovery Environment user interface to obtain an app description
+   that can be used to relaunch a previously submitted job,
+   possibly with modified parameter values.")
+
+(def AnalysisStopSummary "Stop a running analysis.")
+(def AnalysisStopDocs
+  "This service allows DE users to stop running analyses.")
+
 (def AnalysisIdPathParam (describe UUID "The Analysis UUID"))
 
 (defschema ParameterValue
