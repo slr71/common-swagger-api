@@ -7,7 +7,8 @@
                 ErrorResponse
                 ErrorResponseForbidden
                 ErrorResponseNotFound
-                ErrorResponseNotWritable]]
+                ErrorResponseNotWritable
+                PagingParams]]
         [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [common-swagger-api.schema.containers
          :only [DevicesParamOptional
@@ -70,6 +71,7 @@
 
 (defschema ToolSearchParams
   (merge IncludeHiddenParams
+         PagingParams
          {(optional-key :search) (describe String "The pattern to match in a Tool's Name or Description.")
           (optional-key :public) (describe Boolean
                                            "Set to `true` to list only public Tools, `false` to list only private Tools,
