@@ -4,6 +4,7 @@
         [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [schema.core
          :only [defschema
+                Int
                 maybe
                 optional-key]])
   (:require [clojure.java.io :as io])
@@ -57,10 +58,10 @@
 (def ExternalId (describe NonBlankString "The analysis identifier from the job execution system."))
 
 (defschema BatchStatus
-  {:total     (describe Integer "The total number of jobs in the batch.")
-   :completed (describe Integer "The number of completed jobs in the batch.")
-   :running   (describe Integer "The number of running jobs in the batch.")
-   :submitted (describe Integer "The number of submitted jobs in the batch.")})
+  {:total     (describe Int "The total number of jobs in the batch.")
+   :completed (describe Int "The number of completed jobs in the batch.")
+   :running   (describe Int "The number of running jobs in the batch.")
+   :submitted (describe Int "The number of submitted jobs in the batch.")})
 
 (defschema BaseAnalysis
   {(optional-key :app_description)
@@ -137,12 +138,12 @@
   (select-keys Analysis (cons :id (map optional-key [:description :name]))))
 
 (def AppStepNumber
-  (describe Integer (str "The sequential step number from the app, which might be different "
-                         "from the analysis step number if app steps have been combined.")))
+  (describe Int (str "The sequential step number from the app, which might be different "
+                     "from the analysis step number if app steps have been combined.")))
 
 (defschema AnalysisStep
   {:step_number
-   (describe Integer "The sequential step number in the analysis.")
+   (describe Int "The sequential step number in the analysis.")
 
    (optional-key :external_id)
    (describe String "The step ID from the execution system.")

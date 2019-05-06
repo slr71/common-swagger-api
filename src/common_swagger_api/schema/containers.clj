@@ -18,8 +18,8 @@
       (describe "The values needed to add a new image to a tool.")))
 
 (s/defschema Settings
-  (-> {(s/optional-key :cpu_shares)        (describe Integer "The shares of the CPU that the tool container will receive")
-       (s/optional-key :pids_limit)        Integer
+  (-> {(s/optional-key :cpu_shares)        (describe s/Int "The shares of the CPU that the tool container will receive")
+       (s/optional-key :pids_limit)        s/Int
        (s/optional-key :memory_limit)      (describe Long "The amount of memory (in bytes) that the tool container is restricted to")
        (s/optional-key :min_memory_limit)  (describe Long "The minimum about of memory (in bytes) that is required to run the tool container")
        (s/optional-key :min_cpu_cores)     (describe Double "The minimum number of CPU cores needed to run the tool container")
@@ -30,7 +30,7 @@
        (s/optional-key :name)              (describe s/Str "The name given to the tool container")
        (s/optional-key :entrypoint)        (describe s/Str "The entrypoint for a tool container")
        (s/optional-key :skip_tmp_mount)    Boolean
-       (s/optional-key :uid)               Integer
+       (s/optional-key :uid)               s/Int
        :id                                 s/Uuid}
       (describe "The group of settings for a container.")))
 
@@ -78,8 +78,8 @@
 
 (s/defschema Port
   (-> {:id                            s/Uuid
-       (s/optional-key :host_port)    (s/maybe Integer)
-       :container_port                Integer
+       (s/optional-key :host_port)    (s/maybe s/Int)
+       :container_port                s/Int
        (s/optional-key :bind_to_host) (s/maybe Boolean)}
       (describe "Port information for a tool container.")))
 

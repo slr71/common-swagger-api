@@ -17,7 +17,11 @@
                 ToolContainer
                 VolumesFromParamOptional
                 VolumesParamOptional]]
-        [schema.core :only [defschema enum optional-key]])
+        [schema.core
+         :only [defschema
+                enum
+                Int
+                optional-key]])
   (:import (java.util UUID)))
 
 (def ToolAddSummary "Add Private Tool")
@@ -97,7 +101,7 @@
    :version                           VersionParam
    :type                              (describe String "The Tool Type name")
    (optional-key :restricted)         (describe Boolean "Determines whether a time limit is applied and whether network access is granted")
-   (optional-key :time_limit_seconds) (describe Integer "The number of seconds that a tool is allowed to execute. A value of 0 means the time limit is disabled")
+   (optional-key :time_limit_seconds) (describe Int "The number of seconds that a tool is allowed to execute. A value of 0 means the time limit is disabled")
    (optional-key :interactive)        Interactive})
 
 (defschema ToolDetails
