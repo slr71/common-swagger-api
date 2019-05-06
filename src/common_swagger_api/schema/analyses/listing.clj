@@ -1,5 +1,5 @@
 (ns common-swagger-api.schema.analyses.listing
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
+  (:use [common-swagger-api.schema :only [describe NonBlankString PagingParams]]
         [common-swagger-api.schema.apps :only [SystemId]]
         [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [schema.core
@@ -46,6 +46,7 @@
 
 (defschema AnalysisListingParams
   (merge IncludeHiddenParams
+         PagingParams
          {OptionalKeyFilter
           (describe String (slurp (io/resource "docs/analyses/listing/filter-param.md")))}))
 
