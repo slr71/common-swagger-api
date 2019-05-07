@@ -1,6 +1,15 @@
 (ns common-swagger-api.schema.containers
   (:use [common-swagger-api.schema :only [->optional-param describe]])
-  (:require [schema.core :as s]))
+  (:require [common-swagger-api.coerce :as coerce]
+            [schema.core :as s]))
+
+(defn coerce-settings-long-values
+  "Converts any values in the given settings map that should be a Long, according to the Settings schema."
+  [settings]
+  (-> settings
+      (coerce/string->long :memory_limit)
+      (coerce/string->long :min_memory_limit)
+      (coerce/string->long :min_disk_space)))
 
 (s/defschema Image
   (-> {:name                            s/Str

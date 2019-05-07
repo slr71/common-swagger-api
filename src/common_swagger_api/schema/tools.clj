@@ -11,7 +11,8 @@
                 PagingParams]]
         [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [common-swagger-api.schema.containers
-         :only [DevicesParamOptional
+         :only [coerce-settings-long-values
+                DevicesParamOptional
                 Image
                 NewToolContainer
                 Settings
@@ -24,6 +25,24 @@
                 Int
                 optional-key]])
   (:import (java.util UUID)))
+
+(defn- coerce-container-settings-long-values
+  [tool]
+  (if (contains? tool :container)
+    (update tool :container coerce-settings-long-values)
+    tool))
+
+(defn coerce-tool-import-requests
+  "Middleware that converts any container values in the given tool import/update request that should be a Long."
+  [handler]
+  (fn [request]
+    (handler (update request :body-params coerce-container-settings-long-values))))
+
+(defn coerce-tool-list-import-request
+  "Middleware that converts any container values in the given tool list import request that should be a Long."
+  [handler]
+  (fn [request]
+    (handler (update-in request [:body-params :tools] (partial map coerce-container-settings-long-values)))))
 
 (def ToolAddSummary "Add Private Tool")
 
