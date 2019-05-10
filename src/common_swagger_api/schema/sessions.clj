@@ -9,3 +9,7 @@
 (defschema LoginResponse
   {:login_time    (describe Long "Login time as milliseconds since the epoch.")
    :auth_redirect RedirectUrisResponse})
+
+(defschema LogoutParams
+  (merge IPAddrParam
+         {:login-time (describe Long "The login time returned by `POST /users/login` or `/bootstrap`.")}))
