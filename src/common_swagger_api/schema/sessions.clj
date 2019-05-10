@@ -3,6 +3,9 @@
         [common-swagger-api.schema.oauth :only [RedirectUrisResponse]]
         [schema.core :only [defschema]]))
 
+(def LogoutSummary "Record a User Logout")
+(def LogoutDocs "This service records the fact that the user logged out.")
+
 (defschema IPAddrParam
   {:ip-address (describe String "The IP address of the requesting user, for matching login to logout requests.")})
 
