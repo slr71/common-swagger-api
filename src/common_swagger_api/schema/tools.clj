@@ -62,6 +62,22 @@
 (def ToolDetailsDocs
   "This endpoint returns the details for one tool accessible to the user.")
 
+(def ToolInstallRequestSummary "Request Tool Installation")
+(def ToolInstallRequestDocs
+  "This service submits a request for a tool to be installed so that it can be used from within the Discovery Environment.
+   The installation request and all status updates related to the tool request will be tracked in the Discovery Environment database.")
+
+(def ToolInstallRequestListingSummary "List Tool Requests")
+(def ToolInstallRequestListingDocs
+  "This endpoint lists high level details about tool requests that have been submitted.
+   A user may track their own tool requests with this endpoint.")
+
+(def ToolInstallRequestStatusCodeListingSummary "List Tool Request Status Codes")
+(def ToolInstallRequestStatusCodeListingDocs
+  "Tool request status codes are largely arbitrary, but once they've been used once,
+   they're stored in the database so that they can be reused easily.
+   This endpoint allows the caller to list the known status codes.")
+
 (def ToolIntegrationDataListingSummary "Return the Integration Data Record for a Tool")
 (def ToolIntegrationDataListingDocs
   "This service returns the integration data associated with an app.")
@@ -249,7 +265,10 @@
    Interactive})
 
 (defschema ToolRequest
-  (dissoc ToolRequestDetails :id :submitted_by :history))
+  (-> ToolRequestDetails
+      (dissoc :id :submitted_by :history)
+      (describe
+        "A tool installation request. One of `source_url` or `source_upload_file` fields are required, but not both.")))
 
 (defschema ToolRequestSummary
   {:id                     ToolRequestIdParam
