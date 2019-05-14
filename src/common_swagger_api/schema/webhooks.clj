@@ -18,11 +18,13 @@
    (optional-key :template) (describe NonBlankString "Template for this Webhook type")})
 
 (def WebhookIdParam (describe UUID "A UUID that is used to identify the Webhook"))
+
 (defschema Webhook
   {(optional-key :id) WebhookIdParam
    :type              (describe WebhookType "Type of webhook subscription")
    :url               (describe NonBlankString "Url to post the notification")
    :topics            (describe [NonBlankString] "A List of topic names")})
+
 (defschema WebhookList
   {:webhooks (describe [Webhook] "A List of webhooks")})
 
