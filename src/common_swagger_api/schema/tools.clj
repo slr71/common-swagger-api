@@ -62,6 +62,22 @@
 (def ToolDetailsDocs
   "This endpoint returns the details for one tool accessible to the user.")
 
+(def ToolInstallRequestSummary "Request Tool Installation")
+(def ToolInstallRequestDocs
+  "This service submits a request for a tool to be installed so that it can be used from within the Discovery Environment.
+   The installation request and all status updates related to the tool request will be tracked in the Discovery Environment database.")
+
+(def ToolInstallRequestListingSummary "List Tool Requests")
+(def ToolInstallRequestListingDocs
+  "This endpoint lists high level details about tool requests that have been submitted.
+   A user may track their own tool requests with this endpoint.")
+
+(def ToolInstallRequestStatusCodeListingSummary "List Tool Request Status Codes")
+(def ToolInstallRequestStatusCodeListingDocs
+  "Tool request status codes are largely arbitrary, but once they've been used once,
+   they're stored in the database so that they can be reused easily.
+   This endpoint allows the caller to list the known status codes.")
+
 (def ToolIntegrationDataListingSummary "Return the Integration Data Record for a Tool")
 (def ToolIntegrationDataListingDocs
   "This service returns the integration data associated with an app.")
@@ -86,6 +102,7 @@
 (def AttributionParam (describe String "The Tool's author or publisher"))
 (def SubmittedByParam (describe String "The username of the user that submitted the Tool Request"))
 (def ToolImplementationDocs "Information about the user who integrated the Tool into the DE")
+(def ToolRequestStatusCodeId (describe UUID "The Status Code's UUID"))
 (def Interactive (describe Boolean "Determines whether the tool is interactive."))
 
 (defschema ToolSearchParams
@@ -163,6 +180,96 @@
       (->optional-param :container)
       (describe "The private Tool to update.")))
 
+(defschema ToolRequestStatus
+  {(optional-key :status)
+   (describe String
+             "The status code of the Tool Request update. The status code is case-sensitive, and if it isn't
+              defined in the database already then it will be added to the list of known status codes")
+
+   :status_date
+   (describe Long "The timestamp of the Tool Request status update")
+
+   :updated_by
+   (describe String "The username of the user that updated the Tool Request status")
+
+   (optional-key :comments)
+   (describe String "The administrator comments of the Tool Request status update")})
+
+(defschema ToolRequestDetails
+  {:id
+   ToolRequestIdParam
+
+   :submitted_by
+   SubmittedByParam
+
+   (optional-key :phone)
+   (describe String "The phone number of the user submitting the request")
+
+   (optional-key :tool_id)
+   ToolRequestToolIdParam
+
+   :name
+   ToolNameParam
+
+   :description
+   ToolDescriptionParam
+
+   (optional-key :source_url)
+   (describe String "A link that can be used to obtain the tool")
+
+   (optional-key :source_upload_file)
+   (describe String "The path to a file that has been uploaded into iRODS")
+
+   :documentation_url
+   (describe String "A link to the tool documentation")
+
+   :version
+   VersionParam
+
+   (optional-key :attribution)
+   AttributionParam
+
+   (optional-key :multithreaded)
+   (describe Boolean
+             "A flag indicating whether or not the tool is multithreaded. This can be `true` to indicate
+              that the user requesting the tool knows that it is multithreaded, `false` to indicate that the
+              user knows that the tool is not multithreaded, or omitted if the user does not know whether or
+              not the tool is multithreaded")
+
+   :test_data_path
+   (describe String "The path to a test data file that has been uploaded to iRODS")
+
+   :cmd_line
+   (describe String "Instructions for using the tool")
+
+   (optional-key :additional_info)
+   (describe String
+             "Any additional information that may be helpful during tool installation or validation")
+
+   (optional-key :additional_data_file)
+   (describe String
+             "Any additional data file that may be helpful during tool installation or validation")
+
+   (optional-key :architecture)
+   (describe (enum "32-bit Generic" "64-bit Generic" "Others" "Don't know")
+             "One of the architecture names known to the DE. Currently, the valid values are
+              `32-bit Generic` for a 32-bit executable that will run in the DE,
+              `64-bit Generic` for a 64-bit executable that will run in the DE,
+              `Others` for tools run in a virtual machine or interpreter, and
+              `Don't know` if the user requesting the tool doesn't know what the architecture is")
+
+   :history
+   (describe [ToolRequestStatus] "A history of status updates for this Tool Request")
+
+   (optional-key :interactive)
+   Interactive})
+
+(defschema ToolRequest
+  (-> ToolRequestDetails
+      (dissoc :id :submitted_by :history)
+      (describe
+        "A tool installation request. One of `source_url` or `source_upload_file` fields are required, but not both.")))
+
 (defschema ToolRequestSummary
   {:id                     ToolRequestIdParam
    :name                   ToolNameParam
@@ -173,6 +280,31 @@
    :status                 (describe String "The current status of the Tool Request")
    :date_updated           (describe Long "The timestamp of the last Tool Request status update")
    :updated_by             (describe String "The username of the user that last updated the Tool Request status")})
+
+(defschema ToolRequestListing
+  {:tool_requests (describe [ToolRequestSummary]
+                            "A listing of high level details about tool requests that have been submitted")})
+
+(defschema ToolRequestListingParams
+  (merge PagingParams
+         {(optional-key :status)
+          (describe String
+                    "The name of a status code to include in the results. The name of the status code is case
+                     sensitive. If the status code isn't already defined, it will be added to the database")}))
+
+(defschema ToolRequestStatusCodeListingParams
+  {(optional-key :filter)
+   (describe String
+             "If this parameter is set then only the status codes that contain the string passed in this
+              query parameter will be listed. This is a case-insensitive search")})
+
+(defschema ToolRequestStatusCode
+  {:id          ToolRequestStatusCodeId
+   :name        (describe String "The Status Code")
+   :description (describe String "A brief description of the Status Code")})
+
+(defschema ToolRequestStatusCodeListing
+  {:status_codes (describe [ToolRequestStatusCode] "A listing of known Status Codes")})
 
 (defschema ToolListingToolRequestSummary
   (select-keys ToolRequestSummary [:id :status]))
