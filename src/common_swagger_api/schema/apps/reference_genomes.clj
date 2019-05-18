@@ -3,6 +3,14 @@
         [schema.core :only [defschema optional-key]])
   (:import (java.util Date UUID)))
 
+(def ReferenceGenomeDetailsSummary "Get a Reference Genome.")
+(def ReferenceGenomeDetailsDocs
+  "This endpoint may be used to obtain a Reference Genome by its UUID.")
+
+(def ReferenceGenomeListingSummary "List Reference Genomes.")
+(def ReferenceGenomeListingDocs
+  "This endpoint may be used to obtain lists of all available Reference Genomes.")
+
 (def ReferenceGenomeIdParam (describe UUID "A UUID that is used to identify the Reference Genome"))
 
 (defschema ReferenceGenomeListingParams
