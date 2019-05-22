@@ -3,6 +3,8 @@
         [schema.core :only [defschema optional-key]])
   (:import [java.util UUID]))
 
+(def IntegrationDataIdPathParam (describe UUID "A UUID that is used to identify the integration data record"))
+
 (defschema IntegrationDataUpdate
   {:email
    (describe NonBlankString "The user's email address.")
