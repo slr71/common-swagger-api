@@ -11,6 +11,32 @@
             [common-swagger-api.schema.apps :as apps])
   (:import [java.util Date]))
 
+(def AdminAppPatchSummary "Update App Details and Labels")
+
+(def AppDeleteDocs
+  "An app can be marked as deleted in the DE without being completely removed from the database using this service.
+   This endpoint is the same as the non-admin endpoint,
+   except an error is not returned if the user does not own the App.")
+
+(def AppDetailsDocs "This service allows administrative users to view detailed information about private apps.")
+(def AppDocumentationAddDocs "This service is used by DE administrators to add documentation for a single App.")
+(def AppDocumentationUpdateDocs "This service is used by DE administrators to update documentation for a single App.")
+
+(def AppIntegrationDataUpdateSummary "Update the Integration Data Record for an App")
+(def AppIntegrationDataUpdateDocs
+  "This service allows administrators to change the integration data record associated with an app.")
+
+(def AppListingDocs
+  "This service allows admins to list all public apps, including apps listed under the `Trash` category:
+   deleted public apps and private apps that are 'orphaned' (not categorized in any user's workspace).
+   If the `search` parameter is included, then the results are filtered by the App name, description,
+   integrator's name, tool name, or category name the app is under.")
+
+(def AppShredderSummary "Permanently Deleting Apps")
+(def AppShredderDocs
+  "This service physically removes an App from the database,
+   which allows administrators to completely remove Apps that are causing problems.")
+
 (defschema AdminAppListingJobStats
   (merge apps/AppListingJobStats
          {:job_count
@@ -65,4 +91,5 @@
              (optional-key :references) apps/AppReferencesParam
              (optional-key :deleted) apps/AppDeletedParam
              (optional-key :disabled) apps/AppDisabledParam
-             apps/OptionalGroupsKey (describe [apps/AppGroup] apps/GroupListDocs))))
+             apps/OptionalGroupsKey (describe [apps/AppGroup] apps/GroupListDocs))
+      (describe "The App to update.")))
