@@ -67,15 +67,17 @@
   (sets/union apps/AppSearchValidSortFields
               AdminAppListingJobStatsKeys))
 
-(def AppSubsets (enum :public :private :all))
+(def AppSubsetDocs "The subset of apps to search.")
+(def AppSubsetOptionalKey (optional-key :app-subset))
+(def AppSubsets [:public :private :all])
 
 (defschema AdminAppSearchParams
   (merge apps/AppSearchParams
          {SortFieldOptionalKey
           (describe (apply enum AdminAppSearchValidSortFields) SortFieldDocs)
 
-          (optional-key :app-subset)
-          (describe AppSubsets "The subset of apps to search." :default :public)}))
+          AppSubsetOptionalKey
+          (describe (apply enum AppSubsets) AppSubsetDocs :default :public)}))
 
 (defschema AdminAppDetails
   (merge apps/AppDetails
