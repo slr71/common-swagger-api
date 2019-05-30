@@ -547,6 +547,12 @@
          {SortFieldOptionalKey
           (describe (apply enum AppListingValidSortFields) SortFieldDocs)}))
 
+(def AppJobStatsStartDateOptionalParam (optional-key :start_date))
+(def AppJobStatsStartDateParamDocs "Filters out the app stats before this start date")
+
+(def AppJobStatsEndDateOptionalParam (optional-key :end_date))
+(def AppJobStatsEndDateParamDocs "Filters out the apps stats after this end date")
+
 (defschema AppSearchParams
   (merge PagingParams
          AppFilterParams
@@ -554,11 +560,11 @@
           (describe String
                     "The pattern to match in an App's Name, Description, Integrator Name, or Tool Name.")
 
-          (optional-key :start_date)
-          (describe Date "Filters out the app stats before this start date")
+          AppJobStatsStartDateOptionalParam
+          (describe Date AppJobStatsStartDateParamDocs)
 
-          (optional-key :end_date)
-          (describe Date "Filters out the apps stats after this end date")
+          AppJobStatsEndDateOptionalParam
+          (describe Date AppJobStatsEndDateParamDocs)
 
           SortFieldOptionalKey
           (describe (apply enum AppSearchValidSortFields) SortFieldDocs)}))
