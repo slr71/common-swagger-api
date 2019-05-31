@@ -79,17 +79,26 @@
           AppSubsetOptionalKey
           (describe (apply enum AppSubsets) AppSubsetDocs :default :public)}))
 
+(defschema AppExtraInfo
+  {:htcondor
+   {:extra_requirements
+    (describe String "A set of additional requirements to add to the HTCondor submit file")}})
+
 (defschema AdminAppDetails
   (merge apps/AppDetails
          {(optional-key :job_stats)
-          (describe AdminAppListingJobStats apps/AppListingJobStatsDocs)}))
+          (describe AdminAppListingJobStats apps/AppListingJobStatsDocs)
+
+          (optional-key :extra)
+          AppExtraInfo}))
 
 (defschema AdminAppPatchRequest
   (-> apps/AppBase
       (->optional-param :id)
       (->optional-param :name)
       (->optional-param :description)
-      (assoc (optional-key :wiki_url) apps/AppDocUrlParam
+      (assoc (optional-key :extra) AppExtraInfo
+             (optional-key :wiki_url) apps/AppDocUrlParam
              (optional-key :references) apps/AppReferencesParam
              (optional-key :deleted) apps/AppDeletedParam
              (optional-key :disabled) apps/AppDisabledParam
