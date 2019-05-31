@@ -79,15 +79,18 @@
           AppSubsetOptionalKey
           (describe (apply enum AppSubsets) AppSubsetDocs :default :public)}))
 
-(defschema AdminAppDetails
-  (merge apps/AppDetails
-         {(optional-key :job_stats)
-          (describe AdminAppListingJobStats apps/AppListingJobStatsDocs)}))
-
 (defschema AppExtraInfo
   {:htcondor
    {:extra_requirements
     (describe String "A set of additional requirements to add to the HTCondor submit file")}})
+
+(defschema AdminAppDetails
+  (merge apps/AppDetails
+         {(optional-key :job_stats)
+          (describe AdminAppListingJobStats apps/AppListingJobStatsDocs)
+
+          (optional-key :extra)
+          AppExtraInfo}))
 
 (defschema AdminAppPatchRequest
   (-> apps/AppBase
