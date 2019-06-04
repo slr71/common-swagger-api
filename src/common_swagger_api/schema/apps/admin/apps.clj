@@ -3,6 +3,8 @@
          :only [->optional-param
                 optional-key->keyword
                 describe
+                CommonResponses
+                ErrorResponseNotFound
                 PagingParams
                 SortFieldDocs
                 SortFieldOptionalKey]]
@@ -104,3 +106,10 @@
              (optional-key :disabled) apps/AppDisabledParam
              apps/OptionalGroupsKey (describe [apps/AppGroup] apps/GroupListDocs))
       (describe "The App to update.")))
+
+(defschema ToolAdminAppListingResponses
+  (merge CommonResponses
+         {200 {:schema      AdminAppListing
+               :description "The listing of Apps using the given Tool."}
+          404 {:schema      ErrorResponseNotFound
+               :description "The `tool-id` does not exist."}}))
