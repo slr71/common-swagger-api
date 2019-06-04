@@ -15,7 +15,7 @@
 (defschema WebhookType
   {(optional-key :id)       (describe UUID "A UUID for the type")
    :type                    (describe NonBlankString "Webhook type")
-   (optional-key :template) (describe NonBlankString "Template for this Webhook type")})
+   (optional-key :template) (describe "Template for this Webhook type")})
 
 (def WebhookIdParam (describe UUID "A UUID that is used to identify the Webhook"))
 
