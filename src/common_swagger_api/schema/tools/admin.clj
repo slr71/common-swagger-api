@@ -51,6 +51,9 @@
       (->optional-param :container)
       (describe "The Tool to update.")))
 
+(defschema ToolRequestStatusUpdate
+  (dissoc schema/ToolRequestStatus :updated_by :status_date))
+
 (defschema ToolDeleteResponses
   (merge CommonResponses
          {200 {:description "The Tool was successfully deleted."}
