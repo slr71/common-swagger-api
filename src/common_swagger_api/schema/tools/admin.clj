@@ -18,6 +18,29 @@
 
 (def ToolsImportSummary "Add new Tools.")
 
+(def ToolInstallRequestDeleteSummary "Delete a Tool Request")
+(def ToolInstallRequestDeleteDocs
+  "This service allows administrators to delete a tool request.
+   This endpoint is primarily intended for use in the QA cleanup suite.")
+
+(def ToolInstallRequestDetailsSummary "Obtain Tool Request Details")
+(def ToolInstallRequestDetailsDocs
+  "This service obtains detailed information about a tool request.
+   This is the service that the DE support team uses to obtain the request details.")
+
+(def ToolInstallRequestListingDocs
+  "This endpoint lists high level details about tool requests that have been submitted.
+   Administrators may use this endpoint to track tool requests for all users.")
+
+(def ToolInstallRequestStatusCodeDeleteSummary "Delete a Tool Request Status Code")
+(def ToolInstallRequestStatusCodeDeleteDocs
+  "This service allows administrators to delete a tool request status code
+   provided that the status code isn't in use in a tool request.")
+
+(def ToolInstallRequestStatusUpdateSummary "Update the Status of a Tool Request")
+(def ToolInstallRequestStatusUpdateDocs
+  "This endpoint is used by Discovery Environment administrators to update the status of a tool request.")
+
 (def ToolIntegrationUpdateSummary "Update the Integration Data Record for a Tool")
 (def ToolIntegrationUpdateDocs
   "This service allows administrators to change the integration data record associated with a tool.")
@@ -52,7 +75,9 @@
       (describe "The Tool to update.")))
 
 (defschema ToolRequestStatusUpdate
-  (dissoc schema/ToolRequestStatus :updated_by :status_date))
+  (-> schema/ToolRequestStatus
+      (dissoc :updated_by :status_date)
+      (describe "A Tool Request status update.")))
 
 (defschema ToolDeleteResponses
   (merge CommonResponses
