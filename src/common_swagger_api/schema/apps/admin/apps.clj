@@ -91,6 +91,9 @@
          {(optional-key :job_stats)
           (describe AdminAppListingJobStats apps/AppListingJobStatsDocs)
 
+          (optional-key :documentation)
+          (describe apps/AppDocumentation "App documentation as returned by the specific app documentation endpoints.")
+
           (optional-key :extra)
           AppExtraInfo}))
 
