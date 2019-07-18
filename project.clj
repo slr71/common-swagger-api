@@ -12,6 +12,7 @@
                  [org.cyverse/clojure-commons "3.0.3"]
                  [org.cyverse/heuristomancer "2.8.6"]
                  [org.flatland/ordered "1.5.7"]]
-  :eastwood {:linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
+  :eastwood {:exclude-namespaces [common-swagger-api.schema.data.exists]
+             :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[test2junit "1.2.2"]
             [jonase/eastwood "0.3.5"]])

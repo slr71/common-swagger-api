@@ -9,3 +9,6 @@
 (def DataIdPathParam (describe UUID "The UUID assigned to the file or folder"))
 
 (def PermissionEnum (s/enum :read :write :own))
+
+(s/defschema Paths
+  {:paths (describe [(s/one NonBlankString "path") NonBlankString] "A list of iRODS paths")})
