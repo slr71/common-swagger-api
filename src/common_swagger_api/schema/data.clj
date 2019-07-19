@@ -5,6 +5,7 @@
   (:import [java.util UUID]))
 
 (def CommonErrorCodeResponses [ERR_UNCHECKED_EXCEPTION ERR_SCHEMA_VALIDATION])
+(def CommonErrorCodeDocs "Potential Error Codes returned by this endpoint.")
 
 (def DataIdPathParam (describe UUID "The UUID assigned to the file or folder"))
 
