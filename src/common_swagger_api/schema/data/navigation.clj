@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.data.navigation
   (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema :only [describe CommonResponses ErrorResponse ErrorResponseUnchecked]]
+        [common-swagger-api.schema :only [describe CommonResponses ErrorResponseUnchecked]]
         [common-swagger-api.schema.data :as data-schema]
         [common-swagger-api.schema.stats :as stats-schema])
   (:require [schema.core :as s]))
@@ -55,11 +55,11 @@
          {200 {:schema      NavigationRootResponse
                :description "The Root Listing."}
           500 {:schema      NavigationRootErrorResponses
-               :description "Potential Error Codes returned by this endpoint."}}))
+               :description data-schema/CommonErrorCodeDocs}}))
 
 (s/defschema NavigationResponses
   (merge CommonResponses
          {200 {:schema      NavigationResponse
                :description "The Folder Listing."}
           500 {:schema      NavigationErrorResponses
-               :description "Potential Error Codes returned by this endpoint."}}))
+               :description data-schema/CommonErrorCodeDocs}}))
