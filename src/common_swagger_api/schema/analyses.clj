@@ -137,3 +137,9 @@
 
    (optional-key :missing-paths)
                (describe [String] "Any paths parsed from an HT Analysis Path List that no longer exist.")})
+
+(defschema AnalysisPod
+  {:name (describe String "The name of a pod in Kubernetes associated with an analysis.")})
+
+(defschema AnalysisPodList
+  {:pods (describe [AnalysisPod] "A list of pods in Kubernetes associated with an analysis.")})
