@@ -149,3 +149,28 @@
 
 (defschema AnalysisPodList
   {:pods (describe [AnalysisPod] "A list of pods in Kubernetes associated with an analysis.")})
+
+(def AnalysisPodLogSummary
+  "The logs from a pod associated with the analysis")
+
+(def AnalysisPodLogDescription
+  "This endpoint returns the logs from the provided pod associated with the provided analysis.")
+
+(defschema AnalysisPodLogParameters
+  {(optional-key :follow)
+   (describe Boolean "True if the logs should be tailed continuously")
+
+   (optional-key :previous)
+   (describe Boolean "True if the logs of a previously terminated container should be returned")
+
+   (optional-key :since)
+   (describe Long "Number of seconds in the past to start showing logs")
+
+   (optional-key :tail-lines)
+   (describe Long "Number of lines from the end of the log to show")
+
+   (optional-key :timestamps)
+   (describe Boolean "True if timestamps should be prepended to the log lines")
+
+   (optional-key :container)
+   (describe String "Name of the container to display logs from. Defaults to 'analysis'")})
