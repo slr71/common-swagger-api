@@ -141,5 +141,11 @@
 (defschema AnalysisPod
   {:name (describe String "The name of a pod in Kubernetes associated with an analysis.")})
 
+(def AnalysisPodListSummary
+  "List the Kubernetes pods associated with the analysis.")
+
+(def AnalysisPodListDescription
+  "This endpoint returns a listing of pod objects associated with the analysis. Usually will return a single pod.")
+
 (defschema AnalysisPodList
   {:pods (describe [AnalysisPod] "A list of pods in Kubernetes associated with an analysis.")})
