@@ -139,7 +139,8 @@
                (describe [String] "Any paths parsed from an HT Analysis Path List that no longer exist.")})
 
 (defschema AnalysisPod
-  {:name (describe String "The name of a pod in Kubernetes associated with an analysis.")})
+  {:name        (describe String "The name of a pod in Kubernetes associated with an analysis.")
+   :external_id (describe UUID "The external ID associated with the pod.")})
 
 (def AnalysisPodListSummary
   "List the Kubernetes pods associated with the analysis.")
