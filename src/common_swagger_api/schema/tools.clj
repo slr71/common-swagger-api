@@ -316,7 +316,8 @@
           (optional-key :tool_request) ToolListingToolRequestSummary}))
 
 (defschema ToolListing
-  {:tools (describe [ToolListingItem] "Listing of App Tools")})
+  {:tools (describe [ToolListingItem] "Listing of App Tools")
+   :total (describe Int "The total number of App Tools in the listing")})
 
 (defschema ErrorPrivateToolRequestBadParam
   (assoc ErrorResponse
