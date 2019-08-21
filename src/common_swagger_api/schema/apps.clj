@@ -10,6 +10,7 @@
                 SortFieldDocs
                 SortFieldOptionalKey]]
         [common-swagger-api.schema.apps.rating :only [Rating]]
+        [common-swagger-api.schema.containers :only [Settings]]
         [common-swagger-api.schema.metadata :only [AvuListRequest]]
         [common-swagger-api.schema.ontologies :only [OntologyHierarchyList]]
         [common-swagger-api.schema.tools
@@ -23,7 +24,8 @@
                 optional-key
                 recursive
                 Any]])
-  (:require [clojure.set :as sets])
+  (:require [clojure.set :as sets]
+            [schema-tools.core :as st])
   (:import [java.util UUID Date]))
 
 (def AppCopySummary "Make a Copy of an App Available for Editing")
@@ -372,11 +374,21 @@
                which would cause duplicate keys in the job submission JSON. The step ID is prepended to
                the Parameter ID in order to ensure that all parameter value keys are unique.")))
 
+(defschema AppGroupResourceRequirements
+  (-> Settings
+      (st/select-keys [:memory_limit
+                       :min_memory_limit
+                       :min_cpu_cores
+                       :max_cpu_cores
+                       :min_disk_space])
+      (describe "The Tool resource requirements for this step")))
+
 (defschema AppGroupJobView
-  (assoc AppGroup
-    :id                   (describe String "The app group ID.")
-    :step_number          (describe Long "The step number associated with this parameter group")
-    OptionalParametersKey (describe [AppParameterJobView] ParameterListDocs)))
+  (merge AppGroup
+         {:id                          (describe String "The app group ID.")
+          :step_number                 (describe Long "The step number associated with this parameter group")
+          (optional-key :requirements) AppGroupResourceRequirements
+          OptionalParametersKey        (describe [AppParameterJobView] ParameterListDocs)}))
 
 (defschema AppJobView
   (assoc AppBase
