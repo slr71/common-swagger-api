@@ -164,6 +164,9 @@
    (optional-key :since)
    (describe Long "Number of seconds in the past to start showing logs")
 
+   (optional-key :since-time)
+   (describe String "The time at which to start showing log lines. Expressed as seconds since the epoch.")
+
    (optional-key :tail-lines)
    (describe Long "Number of lines from the end of the log to show")
 
