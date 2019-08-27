@@ -158,10 +158,7 @@
   "This endpoint returns the logs from the provided pod associated with the provided analysis.")
 
 (defschema AnalysisPodLogParameters
-  {(optional-key :follow)
-   (describe Boolean "True if the logs should be tailed continuously")
-
-   (optional-key :previous)
+  {(optional-key :previous)
    (describe Boolean "True if the logs of a previously terminated container should be returned")
 
    (optional-key :since)
@@ -175,3 +172,10 @@
 
    (optional-key :container)
    (describe String "Name of the container to display logs from. Defaults to 'analysis'")})
+
+(defschema AnalysisPodLogEntry
+  {:since_time
+   (describe String "Contains the seconds since the epoch for the time when the log entry was retrieved")
+
+   :lines
+   (describe [String] "The lines that make up the log entry")})
