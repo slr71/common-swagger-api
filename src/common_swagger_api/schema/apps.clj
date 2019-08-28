@@ -23,7 +23,8 @@
                 enum
                 optional-key
                 recursive
-                Any]])
+                Any
+                Int]])
   (:require [clojure.set :as sets]
             [schema-tools.core :as st])
   (:import [java.util UUID Date]))
@@ -374,31 +375,32 @@
                which would cause duplicate keys in the job submission JSON. The step ID is prepended to
                the Parameter ID in order to ensure that all parameter value keys are unique.")))
 
-(defschema AppGroupResourceRequirements
+(defschema AppStepResourceRequirements
   (-> Settings
       (st/select-keys [:memory_limit
                        :min_memory_limit
                        :min_cpu_cores
                        :max_cpu_cores
                        :min_disk_space])
+      (merge {:step_number (describe Int "The sequential step number of the Tool in the analysis")})
       (describe "The Tool resource requirements for this step")))
 
 (defschema AppGroupJobView
   (merge AppGroup
-         {:id                          (describe String "The app group ID.")
-          :step_number                 (describe Long "The step number associated with this parameter group")
-          (optional-key :requirements) AppGroupResourceRequirements
-          OptionalParametersKey        (describe [AppParameterJobView] ParameterListDocs)}))
+         {:id                   (describe String "The app group ID.")
+          :step_number          (describe Int "The step number associated with this parameter group")
+          OptionalParametersKey (describe [AppParameterJobView] ParameterListDocs)}))
 
 (defschema AppJobView
-  (assoc AppBase
-    :app_type         (describe String "DE or External.")
-    :id               (describe String "The app ID.")
-    :label            (describe String "An alias for the App's name")
-    :deleted          AppDeletedParam
-    :disabled         AppDisabledParam
-    OptionalDebugKey  (describe Boolean "True if input files should be retained for the job by default.")
-    OptionalGroupsKey (describe [AppGroupJobView] GroupListDocs)))
+  (merge AppBase
+         {:app_type                    (describe String "DE or External.")
+          :id                          (describe String "The app ID.")
+          :label                       (describe String "An alias for the App's name")
+          :deleted                     AppDeletedParam
+          :disabled                    AppDisabledParam
+          OptionalDebugKey             (describe Boolean "True if input files should be retained for the job by default.")
+          (optional-key :requirements) (describe [AppStepResourceRequirements] "The list of resource requirements for each step")
+          OptionalGroupsKey            (describe [AppGroupJobView] GroupListDocs)}))
 
 (defschema AppDetailCategory
   {:id AppCategoryIdPathParam
