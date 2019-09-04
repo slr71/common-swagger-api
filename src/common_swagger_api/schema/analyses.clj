@@ -182,3 +182,7 @@
 
    :lines
    (describe [String] "The lines that make up the log entry")})
+
+(defschema AnalysisTimeLimit
+  {:time_limit
+   (describe String "Contains the seconds since the epoch for the analysis's time limit or the string 'null' if the time limit isn't set.")})
