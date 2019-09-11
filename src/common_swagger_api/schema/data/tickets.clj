@@ -1,8 +1,25 @@
 (ns common-swagger-api.schema.data.tickets
-  (:use [common-swagger-api.schema :only [describe
+  (:use [clojure-commons.error-codes]
+        [common-swagger-api.schema :only [describe
+                                          doc-only
+                                          CommonResponses
+                                          ErrorResponseUnchecked
                                           NonBlankString
                                           StandardUserQueryParams]])
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [common-swagger-api.schema.data :as data-schema]))
+
+(def AddTicketSummary "Create Tickets")
+(def AddTicketDocs
+  "This endpoint allows creating tickets for a set of provided paths.")
+
+(def DeleteTicketSummary "Delete Tickets")
+(def DeleteTicketDocs
+  "This endpoint deletes the provided set of tickets.")
+
+(def ListTicketSummary "List Tickets")
+(def ListTicketDocs
+  "This endpoint lists tickets for a set of provided paths.")
 
 (s/defschema AddTicketQueryParams
   {(s/optional-key :mode)
@@ -61,3 +78,47 @@
 (s/defschema DeleteTicketsResponse
   (assoc Tickets
    :user (describe NonBlankString "The user performing the request.")))
+
+(def TicketCommonErrorCodes
+  (conj data-schema/CommonErrorCodeResponses
+        ERR_TOO_MANY_RESULTS
+        ERR_DOES_NOT_EXIST
+        ERR_NOT_A_USER))
+
+(s/defschema AddTicketErrorResponses
+  (merge ErrorResponseUnchecked
+         {:error_code (apply s/enum (conj TicketCommonErrorCodes
+                                          ERR_NOT_WRITEABLE))}))
+
+(s/defschema AddTicketResponses
+  (merge CommonResponses
+         {200 {:schema      AddTicketResponse
+               :description "Create Tickets Response."}
+          500 {:schema      AddTicketErrorResponses
+               :description data-schema/CommonErrorCodeDocs}}))
+
+(s/defschema ListTicketErrorResponses
+  (merge ErrorResponseUnchecked
+         {:error_code (apply s/enum (conj TicketCommonErrorCodes
+                                          ERR_NOT_READABLE))}))
+
+(s/defschema ListTicketResponses
+  (merge CommonResponses
+         {200 {:schema      (doc-only ListTicketsResponse ListTicketsDocumentation)
+               :description "List Tickets Response."}
+          500 {:schema      ListTicketErrorResponses
+               :description data-schema/CommonErrorCodeDocs}}))
+
+(s/defschema DeleteTicketErrorResponses
+  (merge ErrorResponseUnchecked
+         {:error_code (apply s/enum (conj data-schema/CommonErrorCodeResponses
+                                          ERR_NOT_WRITEABLE
+                                          ERR_TICKET_DOES_NOT_EXIST
+                                          ERR_NOT_A_USER))}))
+
+(s/defschema DeleteTicketResponses
+  (merge CommonResponses
+         {200 {:schema      DeleteTicketsResponse
+               :description "Delete Tickets Response."}
+          500 {:schema      DeleteTicketErrorResponses
+               :description data-schema/CommonErrorCodeDocs}}))
