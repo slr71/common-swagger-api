@@ -11,7 +11,7 @@
         [schema.core :only [defschema enum optional-key]])
   (:require [clojure.set :as sets]
             [common-swagger-api.schema.apps :as apps])
-  (:import [java.util Date]))
+  (:import [java.util Date UUID]))
 
 (def AdminAppPatchSummary "Update App Details and Labels")
 
@@ -38,6 +38,10 @@
 (def AppShredderDocs
   "This service physically removes an App from the database,
    which allows administrators to completely remove Apps that are causing problems.")
+
+(def AppPublicationRequestsSummary "List App Publication Requests")
+(def AppPublicationRequestsDocs
+  "This service lists requests for app publication that require administrator intervention.")
 
 (defschema AdminAppListingJobStats
   (merge apps/AppListingJobStats
@@ -116,3 +120,11 @@
                :description "The listing of Apps using the given Tool."}
           404 {:schema      ErrorResponseNotFound
                :description "The `tool-id` does not exist."}}))
+
+(defschema AppPublicationRequest
+  {:id       (describe UUID "The app publication request identifier")
+   :app      (describe AdminAppDetails "Details about the app that the user wants to publish")
+   :username (describe String "The username of the user who wants to publish the app")})
+
+(defschema AppPublicationRequestListing
+  {:publication_requests (describe [AppPublicationRequest] "The list of app publication requests")})
