@@ -81,8 +81,8 @@
   {(optional-key :app_id)
    (describe UUID "The ID of the app to list publication requests for")
 
-   (optional-key :submitter)
-   (describe String "The username of the submitter to list publication requests for")})
+   (optional-key :requestor)
+   (describe String "The username of the person to requested the app publication")})
 
 (defschema AdminAppSearchParams
   (merge apps/AppSearchParams
@@ -131,7 +131,7 @@
 (defschema AppPublicationRequest
   {:id        (describe UUID "The app publication request identifier")
    :app       (describe AdminAppDetails "Details about the app that the user wants to publish")
-   :submitter (describe String "The username of the user who wants to publish the app")})
+   :requestor (describe String "The username of the person who requested the app publication")})
 
 (defschema AppPublicationRequestListing
   {:publication_requests (describe [AppPublicationRequest] "The list of app publication requests")})
