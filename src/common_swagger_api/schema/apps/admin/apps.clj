@@ -130,7 +130,7 @@
 
 (defschema AppPublicationRequest
   {:id        (describe UUID "The app publication request identifier")
-   :app       (describe AppDetails "Details about the app that the user wants to publish")
+   :app       (describe apps/AppDetails "Details about the app that the user wants to publish")
    :requestor (describe String "The username of the person who requested the app publication")})
 
 (defschema AppPublicationRequestListing
