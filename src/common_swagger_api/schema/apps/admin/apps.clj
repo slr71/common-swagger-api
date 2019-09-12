@@ -82,7 +82,7 @@
    (describe UUID "The ID of the app to list publication requests for")
 
    (optional-key :requestor)
-   (describe String "The username of the person to requested the app publication")})
+   (describe String "The username of the person who requested the app publication")})
 
 (defschema AdminAppSearchParams
   (merge apps/AppSearchParams
