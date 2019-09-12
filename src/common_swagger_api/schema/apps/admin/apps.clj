@@ -77,6 +77,13 @@
 (def AppSubsetOptionalKey (optional-key :app-subset))
 (def AppSubsets [:public :private :all])
 
+(defschema AppPublicationRequestSearchParams
+  {(optional-key :app_id)
+   (describe UUID "The ID of the app to list publication requests for")
+
+   (optional-key :submitter)
+   (describe String "The username of the submitter to list publication requests for")})
+
 (defschema AdminAppSearchParams
   (merge apps/AppSearchParams
          {SortFieldOptionalKey
@@ -122,9 +129,9 @@
                :description "The `tool-id` does not exist."}}))
 
 (defschema AppPublicationRequest
-  {:id       (describe UUID "The app publication request identifier")
-   :app      (describe AdminAppDetails "Details about the app that the user wants to publish")
-   :username (describe String "The username of the user who wants to publish the app")})
+  {:id        (describe UUID "The app publication request identifier")
+   :app       (describe AdminAppDetails "Details about the app that the user wants to publish")
+   :submitter (describe String "The username of the user who wants to publish the app")})
 
 (defschema AppPublicationRequestListing
   {:publication_requests (describe [AppPublicationRequest] "The list of app publication requests")})
