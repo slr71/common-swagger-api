@@ -21,10 +21,14 @@
 (def ListTicketDocs
   "This endpoint lists tickets for a set of provided paths.")
 
+(def ModeParamOptionalKey (s/optional-key :mode))
+(def ModeParamValues [:read :write])
+(def ModeParamDocs
+  "Whether the created tickets allow `write` or `read` only access. Default is `read` only.")
+
 (s/defschema AddTicketQueryParams
-  {(s/optional-key :mode)
-   (describe (s/enum :read :write)
-             "Whether the created tickets allow `write` or `read` only access. Default is `read` only.")
+  {ModeParamOptionalKey
+   (describe (apply s/enum ModeParamValues) ModeParamDocs)
 
    (s/optional-key :uses-limit)
    (describe Long "Sets the `uses-limit` of the created tickets, when provided")
