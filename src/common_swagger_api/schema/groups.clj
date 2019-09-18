@@ -4,6 +4,10 @@
             [schema.core :as s]))
 
 (def ValidGroupPrivileges (s/enum "view" "read" "update" "admin" "optin" "optout" "groupAttrRead" "groupAttrUpdate"))
+(def GroupDetailsParamKey (s/optional-key :details))
+(defn GroupDetailsParamDesc
+  [group-descriptor]
+  (describe Boolean (str "Optionally include " group-descriptor " details such as modified date and creator information.")))
 
 (defn base-group [group-descriptor]
   {:name
@@ -62,6 +66,9 @@
      :created_by
      (describe String (str "The ID of the subject who created the " group-descriptor))
 
+     (s/optional-key :created_by_detail)
+     (describe subjects/Subject (str "The details of the subject who created the " group-descriptor))
+
      :has_composite
      (describe Boolean (str "True if this " group-descriptor " has a composite member"))
 
@@ -90,6 +97,9 @@
 
 (defn group-list [group-descriptor plural-group-descriptor]
   {:groups (describe [(group group-descriptor)] (str "The list of " plural-group-descriptor " in the result set"))})
+
+(defn group-list-with-detail [group-descriptor plural-group-descriptor]
+  {:groups (describe [(group-with-detail group-descriptor)] (str "The list of " plural-group-descriptor " in the result set"))})
 
 (defn group-members [group-descriptor]
   {:members (describe [subjects/Subject] (str "The list of " group-descriptor " members"))})
