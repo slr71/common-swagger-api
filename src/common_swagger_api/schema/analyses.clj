@@ -1,12 +1,15 @@
 (ns common-swagger-api.schema.analyses
   (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.apps :only [SystemId]]
+        [common-swagger-api.schema.apps
+         :only [AppStepResourceRequirements
+                SystemId]]
         [schema.core
          :only [defschema
                 enum
                 optional-key
                 Any
                 Keyword]])
+  (:require [schema-tools.core :as st])
   (:import (java.util UUID)))
 
 (def AnalysisParametersSummary "Display the parameters used in an analysis.")
@@ -80,6 +83,12 @@
 (defschema AnalysisSubmissionConfig
   {(describe Keyword "The step-ID_param-ID") (describe Any "The param-value")})
 
+(defschema AnalysisStepResourceRequirements
+  (st/select-keys AppStepResourceRequirements [:min_memory_limit
+                                               :min_cpu_cores
+                                               :min_disk_space
+                                               :step_number]))
+
 (defschema AnalysisSubmission
   {:system_id
    SystemId
@@ -95,6 +104,9 @@
 
    :config
    (describe AnalysisSubmissionConfig "A map from (str step-id \"_\" param-id) to param-value.")
+
+   (optional-key :requirements)
+   (describe [AnalysisStepResourceRequirements] "The list of optional resource requirements requested for any step")
 
    (optional-key :create_output_subdir)
    (describe Boolean "Indicates whether a subdirectory should be created beneath the specified output directory.")
