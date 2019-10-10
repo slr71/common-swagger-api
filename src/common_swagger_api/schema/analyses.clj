@@ -3,6 +3,8 @@
         [common-swagger-api.schema.apps
          :only [AppStepResourceRequirements
                 SystemId]]
+        [common-swagger-api.schema.containers
+         :only [coerce-settings-long-values]]
         [schema.core
          :only [defschema
                 enum
@@ -11,6 +13,18 @@
                 Keyword]])
   (:require [schema-tools.core :as st])
   (:import (java.util UUID)))
+
+(defn- coerce-analysis-requirements-long-values
+  [analysis]
+  (if (contains? analysis :requirements)
+    (update analysis :requirements (partial map coerce-settings-long-values))
+    analysis))
+
+(defn coerce-analysis-submission-requirements
+  "Middleware that converts any requirements values in the given analysis submission that should be a Long."
+  [handler]
+  (fn [request]
+    (handler (update request :body-params coerce-analysis-requirements-long-values))))
 
 (def AnalysisParametersSummary "Display the parameters used in an analysis.")
 (def AnalysisParametersDocs
@@ -148,7 +162,7 @@
    :start-date (describe String "The analysis start date as milliseconds since the epoch.")
 
    (optional-key :missing-paths)
-               (describe [String] "Any paths parsed from an HT Analysis Path List that no longer exist.")})
+   (describe [String] "Any paths parsed from an HT Analysis Path List that no longer exist.")})
 
 (defschema AnalysisPod
   {:name        (describe String "The name of a pod in Kubernetes associated with an analysis.")
