@@ -9,21 +9,20 @@
 (def DataItemPathParam (describe NonBlankString "The IRODS paths to this data item"))
 
 (s/defschema StatQueryParams
-  (assoc StandardUserQueryParams
-    (s/optional-key :validation-behavior)
-    (describe PermissionEnum "What level of permissions on the queried files should be validated?")))
+  {(s/optional-key :validation-behavior)
+   (describe PermissionEnum "What level of permissions on the queried files should be validated?")})
 
 (s/defschema FilteredStatQueryParams
-  (assoc StatQueryParams
-    (s/optional-key :filter-include)
-    (describe String (str "Comma-separated list of keys to generate and return in each stat object. "
-                          "Defaults to all keys. If both this and filter-exclude are provided, "
-                          "includes are processed first, then excludes."))
+  (merge StatQueryParams
+         {(s/optional-key :filter-include)
+          (describe String (str "Comma-separated list of keys to generate and return in each stat object. "
+                                "Defaults to all keys. If both this and filter-exclude are provided, "
+                                "includes are processed first, then excludes."))
 
-    (s/optional-key :filter-exclude)
-    (describe String (str "Comma-separated list of keys to exclude from each stat object. "
-                          "Defaults to no keys. If both this and filter-include are provided, "
-                          "includes are processed first, then excludes."))))
+          (s/optional-key :filter-exclude)
+          (describe String (str "Comma-separated list of keys to exclude from each stat object. "
+                                "Defaults to no keys. If both this and filter-include are provided, "
+                                "includes are processed first, then excludes."))}))
 
 (s/defschema DataStatInfo
   {:id
@@ -102,3 +101,18 @@
 (s/defschema FilteredStatusInfo
   {(s/optional-key :paths) (describe FilteredPathsMap "Paths info")
    (s/optional-key :ids) (describe FilteredDataIdsMap "IDs info")})
+
+;; Used only for display as documentation in Swagger UI
+(s/defschema StatResponsePathsMap
+  {:/path/from/request/to/a/folder (describe DirStatInfo "A folder's info")
+   :/path/from/request/to/a/file   (describe FileStatInfo "A file's info")})
+
+;; Used only for display as documentation in Swagger UI
+(s/defschema StatResponseIdsMap
+  {:some-folder-uuid (describe DirStatInfo "A folder's info")
+   :some-file-uuid   (describe FileStatInfo "A file's info")})
+
+;; Used only for display as documentation in Swagger UI
+(s/defschema StatResponse
+  {(s/optional-key :paths) (describe StatResponsePathsMap "A map of paths from the request to their status info")
+   (s/optional-key :ids) (describe StatResponseIdsMap "A map of ids from the request to their status info")})
