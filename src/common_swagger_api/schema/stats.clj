@@ -1,8 +1,13 @@
 (ns common-swagger-api.schema.stats
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.data :only [PermissionEnum]])
-  (:require [schema.core :as s])
+  (:use [clojure-commons.error-codes]
+        [common-swagger-api.schema])
+  (:require [common-swagger-api.schema.data :as data-schema]
+            [schema.core :as s])
   (:import [java.util UUID]))
+
+(def StatSummary "File and Folder Status Information")
+(def StatDocs
+  "This endpoint allows the caller to get information about many files and folders at once.")
 
 (def DataTypeEnum (s/enum :file :dir))
 (def DataItemIdParam (describe UUID "The UUID of this data item"))
@@ -10,7 +15,7 @@
 
 (s/defschema StatQueryParams
   {(s/optional-key :validation-behavior)
-   (describe PermissionEnum "What level of permissions on the queried files should be validated?")})
+   (describe data-schema/PermissionEnum "What level of permissions on the queried files should be validated?")})
 
 (s/defschema FilteredStatQueryParams
   (merge StatQueryParams
@@ -44,7 +49,7 @@
    (describe Long "The date this data item was last modified")
 
    :permission
-   (describe PermissionEnum "The requesting user's permissions on this data item")
+   (describe data-schema/PermissionEnum "The requesting user's permissions on this data item")
 
    (s/optional-key :share-count)
    (describe Long (str "The number of other users this data item is shared with (only displayed to users with 'own' "
@@ -116,3 +121,20 @@
 (s/defschema StatResponse
   {(s/optional-key :paths) (describe StatResponsePathsMap "A map of paths from the request to their status info")
    (s/optional-key :ids) (describe StatResponseIdsMap "A map of ids from the request to their status info")})
+
+(s/defschema StatErrorResponses
+  (merge ErrorResponseUnchecked
+         {:error_code (apply s/enum (conj data-schema/CommonErrorCodeResponses
+                                          ERR_DOES_NOT_EXIST
+                                          ERR_NOT_READABLE
+                                          ERR_NOT_WRITEABLE
+                                          ERR_NOT_OWNER
+                                          ERR_NOT_A_USER
+                                          ERR_TOO_MANY_RESULTS))}))
+
+(s/defschema StatResponses
+  (merge CommonResponses
+         {200 {:schema      (doc-only StatusInfo StatResponse)
+               :description "File and Folder Status Response."}
+          500 {:schema      StatErrorResponses
+               :description data-schema/CommonErrorCodeDocs}}))
