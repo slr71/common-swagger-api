@@ -363,14 +363,14 @@
 
 (defschema AppTaskListing
   (assoc AppBase
-    :id    (describe String "The App's ID.")
-    :tasks (describe [AppTask] "The App's tasks")))
+         :id    (describe String "The App's ID.")
+         :tasks (describe [AppTask] "The App's tasks")))
 
 (defschema AppParameterJobView
   (assoc AppParameter
-    :id
-    (describe String
-              "A string consisting of the App's step ID and the Parameter ID separated by an underscore.
+         :id
+         (describe String
+                   "A string consisting of the App's step ID and the Parameter ID separated by an underscore.
                Both identifiers are necessary because the same task may be associated with a single App,
                which would cause duplicate keys in the job submission JSON. The step ID is prepended to
                the Parameter ID in order to ensure that all parameter value keys are unique.")))
@@ -382,7 +382,10 @@
                        :min_cpu_cores
                        :max_cpu_cores
                        :min_disk_space])
-      (merge {:step_number (describe Int "The sequential step number of the Tool in the analysis")})
+      (merge {(optional-key :default_memory)     (describe Long "The default amount of memory (in bytes) requested to run the tool container")
+              (optional-key :default_cpu_cores)  (describe Double "The default number of CPU cores requested to run the tool container")
+              (optional-key :default_disk_space) (describe Long "The default amount of disk space requested to run the tool container")
+              :step_number                       (describe Int "The sequential step number of the Tool in the analysis")})
       (describe "The Tool resource requirements for this step")))
 
 (defschema AppGroupJobView
@@ -430,11 +433,11 @@
               :references           AppReferencesParam
               :job_stats            (describe AppListingJobStats AppListingJobStatsDocs)
               :categories           (describe
-                                      [AppDetailCategory]
-                                      "The list of Categories associated with the App")
+                                     [AppDetailCategory]
+                                     "The list of Categories associated with the App")
               :suggested_categories (describe
-                                      [AppDetailCategory]
-                                      "The list of Categories the integrator wishes to associate with the App")}
+                                     [AppDetailCategory]
+                                     "The list of Categories the integrator wishes to associate with the App")}
              OntologyHierarchyList)
       (->optional-param :wiki_url)
       (->optional-param :job_stats)
@@ -589,9 +592,9 @@
 
 (defschema AppDeletionRequest
   (describe
-    {:app_ids                              (describe [QualifiedAppId] "A List of qualified app identifiers")
-     (optional-key :root_deletion_request) (describe Boolean "Set to `true` to  delete one or more public apps")}
-    "List of App IDs to delete."))
+   {:app_ids                              (describe [QualifiedAppId] "A List of qualified app identifiers")
+    (optional-key :root_deletion_request) (describe Boolean "Set to `true` to  delete one or more public apps")}
+   "List of App IDs to delete."))
 
 (defschema AppParameterListItemRequest
   (->optional-param AppParameterListItem :id))
