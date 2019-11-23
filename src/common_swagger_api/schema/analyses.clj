@@ -36,6 +36,8 @@
    that can be used to relaunch a previously submitted job,
    possibly with modified parameter values.")
 
+(def AnalysesRelauncherSummary "Auto Relaunch Analyses")
+
 (def AnalysisStopSummary "Stop a running analysis.")
 (def AnalysisStopDocs
   "This service allows DE users to stop running analyses.")
@@ -78,6 +80,9 @@
   {:app_id     (describe String "The ID of the app used to perform the analysis.")
    :system_id  SystemId
    :parameters (describe [AnalysisParameter] "The list of parameters.")})
+
+(defschema AnalysesRelauncherRequest
+  {:analyses (describe [UUID] "The identifiers of the analyses to be relaunched.")})
 
 (defschema AnalysisShredderRequest
   {:analyses (describe [UUID] "The identifiers of the analyses to be deleted.")})
