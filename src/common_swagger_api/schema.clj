@@ -4,6 +4,7 @@
         [potemkin :only [import-vars]])
   (:require compojure.api.sweet
             [ring.swagger.json-schema :as json-schema]
+            [schema-tools.core :as st]
             [schema.core :as s]
             [schema.spec.core :as spec :include-macros true]
             [schema.spec.variant :as variant]))
@@ -38,9 +39,7 @@
 (defn ->required-param
   "Removes an optional param from the given schema and re-adds it as a required param."
   [schema param]
-  (-> schema
-    (assoc (->required-key param) (schema param))
-    (dissoc param)))
+  (st/required-keys schema [param]))
 
 (defn ->optional-param
   "Removes a required param from the given schema and re-adds it as an optional param."
