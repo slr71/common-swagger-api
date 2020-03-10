@@ -35,6 +35,23 @@
 
 (def optional-key->keyword s/explicit-schema-key)
 
+(defn copy-json-schema-meta
+  "Copies JSON schema metadata from one schema element to another. This is useful in cases where a transformation
+   is being applied to a metadata schema element, and the metadata has to be copied from the original element to
+   the transformed one."
+  [src dest]
+  (if-let [json-schema-meta (:json-schema (meta src))]
+    (vary-meta dest assoc :json-schema json-schema-meta)
+    dest))
+
+(defn transform-enum
+  "Converts the items in an enumeration using a provided transformation function."
+  [enum f]
+  (->> (:vs enum)
+       (map f)
+       (apply s/enum)
+       (copy-json-schema-meta enum)))
+
 (defn ->optional-param
   "Removes a required param from the given schema and re-adds it as an optional param."
   [schema param]
