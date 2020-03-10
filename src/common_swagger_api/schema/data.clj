@@ -1,6 +1,11 @@
 (ns common-swagger-api.schema.data
   (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema :only [describe NonBlankString]])
+        [common-swagger-api.schema :only [describe
+                                          NonBlankString
+                                          PagingParams
+                                          SortFieldDocs
+                                          SortFieldOptionalKey]]
+        [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
   (:require [schema.core :as s]
             [schema-tools.core :as st])
   (:import [java.util UUID]))
@@ -25,3 +30,26 @@
   (-> (merge DataIds OptionalPaths)
       st/optional-keys
       (describe "The path or data ids of the data objects to gather status information on.")))
+
+(def ValidFolderListingSortFields
+  #{:datecreated
+    :datemodified
+    :name
+    :path
+    :size})
+
+(s/defschema FolderListingPagingParams
+  (merge
+   PagingParams
+   {SortFieldOptionalKey
+    (describe (apply s/enum ValidFolderListingSortFields) SortFieldDocs)}))
+
+(s/defschema FolderListingParams
+  (merge
+   FolderListingPagingParams
+   {(s/optional-key :entity-type)
+    (describe (s/enum :any :file :folder) "The type of folder items to include in the response.")
+
+    (s/optional-key :info-type)
+    (describe (s/either [ValidInfoTypesEnum] ValidInfoTypesEnum)
+              "A list of info-types with which to filter a folder's result items.")}))

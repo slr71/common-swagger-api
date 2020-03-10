@@ -13,7 +13,8 @@
                  [org.cyverse/heuristomancer "2.8.6"]
                  [org.flatland/ordered "1.5.7"]]
   :eastwood {:exclude-namespaces [common-swagger-api.schema.data.exists
-                                  common-swagger-api.schema.data.tickets]
+                                  common-swagger-api.schema.data.tickets
+                                  common-swagger-api.schema.stats]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[test2junit "1.2.2"]
             [jonase/eastwood "0.3.5"]])
