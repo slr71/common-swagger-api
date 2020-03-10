@@ -17,9 +17,6 @@
 
 (def PermissionEnum (s/enum :read :write :own))
 
-(def ZonePathParam (describe String "The IRODS zone"))
-(def PathPathParam (describe String "The IRODS path under the zone"))
-
 (s/defschema Paths
   {:paths (describe [(s/one NonBlankString "path") NonBlankString] "A list of iRODS paths")})
 
