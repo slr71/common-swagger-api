@@ -217,3 +217,47 @@
 (defschema AnalysisTimeLimit
   {:time_limit
    (describe String "Contains the seconds since the epoch for the analysis's time limit or the string 'null' if the time limit isn't set.")})
+
+(def ConcurrentJobLimitUsername
+  (describe String "The username associated with the limit"))
+
+(def ConcurrentJobLimitListingSummary
+  "List Concurrent Job Limits")
+
+(def ConcurrentJobLimitListingDescription
+  "Lists the concurrent job limits for all users who have one defined. The record describing the default limit contains
+   no username. Users without explicit limits defined will use the default limit.")
+
+(def ConcurrentJobLimitRetrievalSummary
+  "Get a User's Concurrent Job Limit")
+
+(def ConcurrentJobLimitRetrievalDescription
+  "Gets the concurrent job limit for a user. The limit will either be the limit that was explicitly set for the user
+   or the default limit. If the default limit is returned then there will be no username in the response body.")
+
+(def ConcurrentJobLimitUpdateSummary
+  "Update a User's Concurrent Job Limit")
+
+(def ConcurrentJobLimitUpdateDescription
+  "Updates the concurrent job limit for a user. The user's limit will be set explicitly even if it's equal to the
+   default limit.")
+
+(def ConcurrentJobLimitRemovalSummary
+  "Remove a User's Concurrent Job Limit")
+
+(def ConcurrentJobLimitRemovalDescription
+  "Removes the explicitly configured concurrent job limit for a user. This effectively returns the user's job limit
+   to whatever the default job limit is.")
+
+(defschema ConcurrentJobLimit
+  {(optional-key :username)
+   (describe String "The username of the limited user, omitted for the default setting")
+
+   :concurrent_jobs
+   (describe Long "The maximum number of concurrently running jobs")})
+
+(defschema ConcurrentJobLimits
+  {:limits (describe [ConcurrentJobLimit] "The list of concurrent job limits")})
+
+(defschema ConcurrentJobLimitUpdate
+  (st/dissoc ConcurrentJobLimit :username))
