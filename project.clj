@@ -3,8 +3,8 @@
   :url "https://github.com/cyverse-de/common-swagger-api"
   :license {:name "BSD"
             :url "http://iplantcollaborative.org/sites/default/files/iPLANT-LICENSE.txt"}
-  :deploy-repositories [["releases" "https://clojars.org/repo"]
-                        ["snapshots" "https://clojars.org/repo"]]
+  :deploy-repositories [["releases" :clojars]
+                        ["snapshots" :clojars]]
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [cheshire "5.8.1"]
                  [metosin/compojure-api "1.1.12"]
