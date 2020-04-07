@@ -85,6 +85,11 @@
    If the `search` parameter is included, then the results are filtered by
    the App name, description, integrator's name, tool name, or category name the app is under.")
 
+(def SingleAppListingSummary "List An App")
+(def SingleAppListingDocs
+  "This service returns listing information for a single app. The Sonora UI uses this to provide a way to link
+   to a single app without displaying the app launch dialog.")
+
 (def AppPublishableSummary "Determine if an App Can be Made Public")
 (def AppPublishableDocs
   "A multi-step App can't be made public if any of the Tasks that are included in it are not public.
