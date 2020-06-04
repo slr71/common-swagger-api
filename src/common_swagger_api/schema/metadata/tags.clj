@@ -4,9 +4,9 @@
                                           describe
                                           ErrorResponse
                                           NonBlankString
-                                          StandardUserQueryParams
-                                          StandardDataItemQueryParams]]
-        [metadata.routes.schemas.common])
+                                          StandardUserQueryParams]]
+        [common-swagger-api.schema.metadata :only [DataTypeEnum
+                                                   StandardDataItemQueryParams]])
   (:require [schema.core :as s])
   (:import [java.util UUID]))
 
@@ -14,11 +14,36 @@
 (def TagValueString (s/both NonBlankString (s/pred #(<= (count %) 255) 'valid-tag-value-size?)))
 (def TagSuggestLimit (s/both Long (s/pred (partial < 0) 'valid-tag-suggest-limit?)))
 
+(def GetTagsSummary "List All Attached Tags for a User")
+(def GetTagsDescription "This endpoint lists all tags that have been attached to a file or folder by a user.")
+(def DeleteTagsSummary "Permanently Delete All Attached Tags for a User")
+(def DeleteTagsDescription "This endpoint permanently deletes all tag attachments that have been added to a file or folder by a user.")
+(def GetAttachedTagSummary "List Attached Tags")
+(def GetAttachedTagDescription "This endpoint lists the tags of the user that are attached to the indicated file or folder.")
+(def PatchTagsSummary "Attach/Detach Tags to a File/Folder")
+(def PatchTagsDescription "
+Depending on the `type` parameter, this endpoint either attaches a set of the authenticated user's
+tags to the indicated file or folder, or it detaches the set.")
+(def GetTagSuggestionsSummary "Suggest a Tag")
+(def GetTagSuggestionsDescription "
+Given a textual fragment of a tag's value, this endpoint will list up to a given number of the
+authenticated user's tags that contain the fragment.")
+(def GetUserTagsSummary "List Tags Defined by a User")
+(def GetUserTagsDescription "This endpoint lists all of the tags defined by a user.")
+(def DeleteUserTagsSummary "Delete Tags Defined by a User")
+(def DeleteUserTagsDescription "This endpoint deletes all tags defined by the current user. Corresponding attached tags will also be deleted.")
+(def PostTagSummary "Create a Tag")
+(def PostTagDescription "This endpoint creates a tag for use by the authenticated user.")
+(def DeleteTagSummary "Delete a Tag")
+(def DeleteTagDescription "This endpoint allows a user tag to be deleted, detaching it from all metadata.")
+(def PatchTagSummary "Update Tag Labels/Descriptions")
+(def PatchTagDescription "This endpoint allows a tag's label and description to be modified by the owning user.")
+
+(s/defschema TagTypeEnum {:type (describe (s/enum "attach" "detach") "Whether to attach or detach the provided set of tags to the file/folder")})
+
 (s/defschema UpdateAttachedTagsQueryParams
   (merge StandardDataItemQueryParams
-         {:type
-          (describe (s/enum "attach" "detach")
-                    "Whether to attach or detach the provided set of tags to the file/folder")}))
+         TagTypeEnum))
 
 (s/defschema TagSuggestQueryParams
   (merge StandardUserQueryParams
@@ -28,6 +53,8 @@
           (s/optional-key :limit)
           (describe TagSuggestLimit
                     "The maximum number of suggestions to return. No limit means return all")}))
+
+(s/defschema TagId {:id TagIdPathParam})
 
 (s/defschema Tag
   {:id
@@ -40,10 +67,10 @@
    (describe String "The description of the purpose of the tag")})
 
 (s/defschema TagRequest
-  (dissoc Tag :id))
+  (describe (dissoc Tag :id) "The user tag to create."))
 
 (s/defschema TagUpdateRequest
-  (->optional-param TagRequest :value))
+  (describe (->optional-param TagRequest :value) "The tag fields to update."))
 
 (s/defschema TagList
   {:tags (describe [Tag] "A list of Tags")})
