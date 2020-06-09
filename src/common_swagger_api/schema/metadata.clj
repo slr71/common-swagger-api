@@ -1,7 +1,5 @@
 (ns common-swagger-api.schema.metadata
-  (:use [common-swagger-api.schema :only [->optional-param
-                                          describe
-                                          StandardUserQueryParams]])
+  (:use [common-swagger-api.schema :only [->optional-param describe]])
   (:require [schema.core :as s])
   (:import (java.util UUID)))
 
@@ -44,8 +42,3 @@
 
 (def DataTypes ["file" "folder"])
 (def DataTypeEnum (apply s/enum DataTypes))
-(def DataTypeParam (describe DataTypeEnum "The type of the requested data item."))
-
-(s/defschema StandardDataItemQueryParams
-  (assoc StandardUserQueryParams
-    :data-type DataTypeParam))

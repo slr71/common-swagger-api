@@ -41,20 +41,13 @@ authenticated user's tags that contain the fragment.")
 
 (s/defschema TagTypeEnum {:type (describe (s/enum "attach" "detach") "Whether to attach or detach the provided set of tags to the file/folder")})
 
-(s/defschema UpdateAttachedTagsQueryParams
-  (merge StandardDataItemQueryParams
-         TagTypeEnum))
-
 (s/defschema TagSuggestQueryParams
-  (merge StandardUserQueryParams
-         {:contains
-          (describe String "The value fragment")
+  {:contains
+   (describe String "The value fragment")
 
-          (s/optional-key :limit)
-          (describe TagSuggestLimit
-                    "The maximum number of suggestions to return. No limit means return all")}))
-
-(s/defschema TagId {:id TagIdPathParam})
+   (s/optional-key :limit)
+   (describe TagSuggestLimit
+             "The maximum number of suggestions to return. No limit means return all")})
 
 (s/defschema Tag
   {:id
@@ -96,6 +89,3 @@ authenticated user's tags that contain the fragment.")
 (s/defschema AttachedTagsListing
   {:tags (describe [AttachedTagDetails] "A list of tags and their attached targets")})
 
-(s/defschema ErrorResponseBadTagRequest
-  (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_ILLEGAL_ARGUMENT ERR_NOT_UNIQUE) "Bad Tag Request error codes")))
