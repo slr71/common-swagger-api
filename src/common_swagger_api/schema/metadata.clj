@@ -39,3 +39,6 @@
   (-> AvuListRequest
       (->optional-param :avus)
       (describe "The Metadata AVU save request")))
+
+(def DataTypes ["file" "folder"])
+(def DataTypeEnum (apply s/enum DataTypes))
