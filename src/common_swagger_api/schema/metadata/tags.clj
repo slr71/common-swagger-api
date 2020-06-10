@@ -3,10 +3,12 @@
         [common-swagger-api.schema :only [->optional-param
                                           describe
                                           ErrorResponse
+                                          ErrorResponseIllegalArgument
+                                          ErrorResponseNotFound
+                                          ErrorResponseUnchecked
                                           NonBlankString
                                           StandardUserQueryParams]]
-        [common-swagger-api.schema.metadata :only [DataTypeEnum
-                                                   StandardDataItemQueryParams]])
+        [common-swagger-api.schema.metadata :only [DataTypeEnum]])
   (:require [schema.core :as s])
   (:import [java.util UUID]))
 
@@ -89,3 +91,56 @@ authenticated user's tags that contain the fragment.")
 (s/defschema AttachedTagsListing
   {:tags (describe [AttachedTagDetails] "A list of tags and their attached targets")})
 
+(s/defschema ErrorResponseBadTagRequest
+  (assoc ErrorResponse
+    :error_code (describe (s/enum ERR_ILLEGAL_ARGUMENT ERR_NOT_UNIQUE) "Bad Tag Request error codes")))
+
+(def TagDefaultErrorResponses
+  {500      {:schema      ErrorResponseUnchecked
+             :description "Unchecked errors"}
+   :default {:schema      ErrorResponse
+             :description "All other errors"}})
+
+(def GetTagsResponses
+  (merge {200 {:schema      AttachedTagsListing
+               :description "Attached tags are listed in the response"}}
+         TagDefaultErrorResponses))
+
+(def DeleteTagsResponses
+  (merge {200 {:schema      nil
+               :description "The attached tags were successfully deleted"}}
+         TagDefaultErrorResponses))
+
+(def DeleteUserTagsResponses DeleteTagsResponses)
+
+(def GetAttachedTagResponses
+  (merge {200 {:schema      TagList
+               :description "The tags are listed in the response"}}
+         TagDefaultErrorResponses))
+
+(def GetUserTagsResponses GetAttachedTagResponses)
+
+(def PatchTags400Response {:schema      ErrorResponseBadTagRequest
+                           :description "The `type` wasn't provided or had a value other than `attach` or `detach`;
+                             or the request body wasn't syntactically correct"})
+(def PatchTags404Response {:schema      ErrorResponseNotFound
+                           :description "One of the provided tag Ids doesn't map to a tag for the authenticated user"})
+
+(def GetTagSuggestionsResponses
+  (merge {200 {:schema      TagList
+               :description "zero or more suggestions were returned"}
+          400 {:schema      ErrorResponseIllegalArgument
+               :description "the `contains` parameter was missing or
+                                the `limit` parameter was set to a something other than a non-negative number."}}
+         TagDefaultErrorResponses))
+
+(def PostTag400Response {:schema      ErrorResponseBadTagRequest
+                         :description "The `value` was not unique, too long,
+                             or the request body wasn't syntactically correct"})
+
+(def DeleteTagResponses
+  (merge {200 {:schema      nil
+               :description "The tag was successfully deleted"}
+          404 {:schema      ErrorResponseNotFound
+               :description "`tag-id` wasn't a UUID of a tag owned by the authenticated user"}}
+         TagDefaultErrorResponses))
