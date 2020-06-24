@@ -1,5 +1,6 @@
 (ns common-swagger-api.schema.analyses.listing
   (:use [common-swagger-api.schema :only [describe NonBlankString PagingParams]]
+        [common-swagger-api.schema.analyses]
         [common-swagger-api.schema.apps :only [SystemId]]
         [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [schema.core
@@ -127,9 +128,10 @@
     (describe Boolean "Indicates whether or not the analysis can be shared.")))
 
 (defschema AnalysisList
-  {:analyses  (describe [Analysis] "The list of analyses.")
-   :timestamp (describe Timestamp "The time the analysis list was retrieved.")
-   :total     ResultsTotalParam})
+  (merge {:analyses  (describe [Analysis] "The list of analyses.")
+          :timestamp (describe Timestamp "The time the analysis list was retrieved.")
+          :total     ResultsTotalParam}
+         AnalysisStats))
 
 (defschema AnalysisUpdate
   (select-keys Analysis (map optional-key [:description :name])))
