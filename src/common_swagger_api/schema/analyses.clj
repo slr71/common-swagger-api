@@ -3,6 +3,7 @@
         [common-swagger-api.schema.apps
          :only [AppStepResourceRequirements
                 SystemId]]
+        [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [common-swagger-api.schema.containers
          :only [coerce-settings-long-values]]
         [schema.core
@@ -11,7 +12,8 @@
                 optional-key
                 Any
                 Keyword]])
-  (:require [schema-tools.core :as st])
+  (:require [clojure.java.io :as io]
+            [schema-tools.core :as st])
   (:import (java.util UUID)))
 
 (defn- coerce-analysis-requirements-long-values
@@ -261,3 +263,18 @@
 
 (defschema ConcurrentJobLimitUpdate
   (st/dissoc ConcurrentJobLimit :username))
+
+(def AnalysisStatSummary "List analysis counts by status")
+(def AnalysisStatDescription "This service allows users to retrieve the total count of jobs grouped by job status.")
+
+(defschema AnalysisCount
+  {:count (describe Long "The total number of jobs with the attached job status.")
+   :status (describe String "The status for the attached job count.")})
+
+(defschema AnalysisStats
+  {:status-count (describe [AnalysisCount] "List the total number of jobs grouped by job status for a user.")})
+
+(defschema AnalysisStatParams
+  (merge IncludeHiddenParams
+         {(optional-key :filter)
+          (describe String (slurp (io/resource "docs/analyses/listing/filter-param.md")))}))
