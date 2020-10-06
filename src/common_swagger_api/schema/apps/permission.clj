@@ -72,7 +72,7 @@
    Note: like Tool sharing, this is a potentially slow operation.")
 
 (def AppPermissionEnum (enum "read" "write" "own" ""))
-(def AnalysisPermissionEnum (enum "read" "own" ""))
+(def AnalysisPermissionEnum AppPermissionEnum)
 (def ToolPermissionEnum AppPermissionEnum)
 
 (defschema PermissionListerQueryParams
