@@ -122,7 +122,7 @@
 (defschema Analysis
   (assoc BaseAnalysis
     :app_disabled
-    (describe Boolean "Indicates whether the app is currently disabled.")
+    (describe Boolean "Indicates whether the app is currently disabled. DEPRECATED - always returns `false`.")
 
     :can_share
     (describe Boolean "Indicates whether or not the analysis can be shared.")))
