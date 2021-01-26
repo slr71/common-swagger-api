@@ -251,18 +251,26 @@
   "Removes the explicitly configured concurrent job limit for a user. This effectively returns the user's job limit
    to whatever the default job limit is.")
 
-(defschema ConcurrentJobLimit
+(defschema ConcurrentJobLimitListItem
   {(optional-key :username)
    (describe String "The username of the limited user, omitted for the default setting")
 
    :concurrent_jobs
-   (describe Long "The maximum number of concurrently running jobs")})
+   (describe Long "The maximum number of concurrently running jobs")
+
+   :is_default
+   (describe Boolean "True for the default setting.")})
+
+(defschema ConcurrentJobLimit
+  (-> ConcurrentJobLimitListItem
+      (st/dissoc :is_default)
+      (st/assoc :is_default (describe Boolean "True if the default setting is being used for the user."))))
 
 (defschema ConcurrentJobLimits
-  {:limits (describe [ConcurrentJobLimit] "The list of concurrent job limits")})
+  {:limits (describe [ConcurrentJobLimitListItem] "The list of concurrent job limits")})
 
 (defschema ConcurrentJobLimitUpdate
-  (st/dissoc ConcurrentJobLimit :username))
+  (st/dissoc ConcurrentJobLimit :username :is_default))
 
 (def AnalysisStatSummary "List analysis counts by status")
 (def AnalysisStatDescription "This service allows users to retrieve the total count of jobs grouped by job status.")
