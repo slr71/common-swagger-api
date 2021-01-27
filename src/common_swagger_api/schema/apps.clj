@@ -341,6 +341,16 @@
    (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
    (optional-key :system_id)        SystemId})
 
+(defschema AppLimitCheckResult
+  {:canRun      (describe Boolean "True if the user is currently permitted to launch an analysis using the app")
+   :reasonCodes (describe [String] (str "A list of codes indicating why a user can't currently use the app. This "
+                                        "list will be empty if the user is permitted to use the app"))})
+
+(defschema AppLimitChecks
+  {(optional-key :limitChecks)
+   (describe AppLimitCheckResult
+             "Indicates whether or not the user is currently permitted to launch an analysis using the app")})
+
 (defschema App
   (merge AppBase
          {OptionalToolsKey           (describe [(merge Tool {OptionalDeprecatedKey ToolDeprecatedParam})] ToolListDocs)
@@ -401,14 +411,30 @@
 
 (defschema AppJobView
   (merge AppBase
-         {:app_type                    (describe String "DE or External.")
-          :id                          (describe String "The app ID.")
-          :label                       (describe String "An alias for the App's name")
-          :deleted                     AppDeletedParam
-          :disabled                    AppDisabledParam
-          OptionalDebugKey             (describe Boolean "True if input files should be retained for the job by default.")
-          (optional-key :requirements) (describe [AppStepResourceRequirements] "The list of resource requirements for each step")
-          OptionalGroupsKey            (describe [AppGroupJobView] GroupListDocs)}))
+         AppLimitChecks
+         {:app_type
+          (describe String "DE or External.")
+
+          :id
+          (describe String "The app ID.")
+
+          :label
+          (describe String "An alias for the App's name")
+
+          :deleted
+          AppDeletedParam
+
+          :disabled
+          AppDisabledParam
+
+          OptionalDebugKey
+          (describe Boolean "True if input files should be retained for the job by default.")
+
+          (optional-key :requirements)
+          (describe [AppStepResourceRequirements] "The list of resource requirements for each step")
+
+          OptionalGroupsKey
+          (describe [AppGroupJobView] GroupListDocs)}))
 
 (defschema AppDetailCategory
   {:id AppCategoryIdPathParam
@@ -484,6 +510,7 @@
 
 (defschema AppListingDetail
   (merge AppBase
+         AppLimitChecks
          {:id
           (describe String "The app ID.")
 
