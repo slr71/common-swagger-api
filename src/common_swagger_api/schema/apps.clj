@@ -342,13 +342,20 @@
    (optional-key :system_id)        SystemId})
 
 (defschema AppLimitCheckResult
-  {:canRun      (describe Boolean "True if the user is currently permitted to launch an analysis using the app")
-   :reasonCodes (describe [String] (str "A list of codes indicating why a user can't currently use the app. This "
-                                        "list will be empty if the user is permitted to use the app"))})
+  {:limitCheckID   (describe String "An identifier indicating which limit check failed")
+   :reasonCodes    (describe [String] "A list of codes indicating the reason for the limit check failure")
+   :additionalInfo (describe Any "An arbitrary object providing information relevant to the limit check")})
+
+(defschema AppLimitCheckResultSummary
+  {:canRun  (describe Boolean "True if the user is currently permitted to launch an analysis using the app")
+   :results (describe [AppLimitCheckResult]
+                      (str "A list of individual limit check results providing information about why "
+                           "the check failed. This list will be empty if the user is permitted to use "
+                           "the app"))})
 
 (defschema AppLimitChecks
   {(optional-key :limitChecks)
-   (describe AppLimitCheckResult
+   (describe AppLimitCheckResultSummary
              "Indicates whether or not the user is currently permitted to launch an analysis using the app")})
 
 (defschema App
