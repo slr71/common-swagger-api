@@ -558,6 +558,11 @@
           (optional-key :beta)
           (describe Boolean "Whether the App has been marked as `beta` release status")
 
+          (optional-key :isBlessed)
+          (describe Boolean
+                    "Whether the App has been marked as having been reviewed and certified by Discovery Environment
+                     administrators")
+
           :pipeline_eligibility
           (describe PipelineEligibility "Whether the App can be used in a Pipeline")
 
