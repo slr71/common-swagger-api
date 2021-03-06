@@ -15,6 +15,15 @@
 
 (def AdminAppPatchSummary "Update App Details and Labels")
 
+
+(def BlessAppSummary "Mark App Certified")
+(def BlessAppDescription
+  "Mark an app as having been reviewed and certified by Discovery Environment administrators.")
+
+(def RemoveAppBlessingSummary "Mark App Not Certified")
+(def RemoveAppBlessingDescription
+  "Mark an app as not having been reviewed and certified by Discovery Environment administrators.")
+
 (def AppDeleteDocs
   "An app can be marked as deleted in the DE without being completely removed from the database using this service.
    This endpoint is the same as the non-admin endpoint,
