@@ -184,7 +184,11 @@
       (describe "The analysis sharing request.")))
 
 (defschema AnalysisSharingResponse
-  {:sharing (describe [SubjectAnalysisSharingResponseElement] "The list of sharing responses for individual subjects")})
+  {:sharing
+   (describe [SubjectAnalysisSharingResponseElement] "The list of sharing responses for individual subjects")
+
+   (optional-key :asyncTaskID)
+   (describe UUID "The ID of the asynchronous task being used to track the sharing request")})
 
 (defschema AnalysisUnsharingResponseElement
   {:analysis_id          (describe UUID "The analysis ID")
@@ -207,7 +211,10 @@
 
 (defschema AnalysisUnsharingResponse
   {:unsharing
-   (describe [SubjectAnalysisUnsharingResponseElement] "The list of unsharing responses for individual subjects")})
+   (describe [SubjectAnalysisUnsharingResponseElement] "The list of unsharing responses for individual subjects")
+
+   (optional-key :asyncTaskID)
+   (describe UUID "The ID of the asynchronous task being used to track the unsharing request")})
 
 (defschema ToolIdList
   (describe
