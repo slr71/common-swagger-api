@@ -166,12 +166,9 @@
 
 (defschema AnalysisSharingResponseElement
   (assoc AnalysisSharingRequestElement
-    :analysis_name                (describe NonBlankString "The analysis name")
-    :success                      (describe Boolean "A Boolean flag indicating whether the sharing request succeeded")
-    (optional-key :input_errors)  (describe [NonBlankString] "A list of any analysis input sharing errors")
-    (optional-key :outputs_error) (describe NonBlankString "A brief reason for any result folder sharing errors")
-    (optional-key :app_error)     (describe NonBlankString "A brief reason for any app sharing errors")
-    (optional-key :error)         (describe ErrorResponse "Information about any error that may have occurred")))
+    :analysis_name        (describe NonBlankString "The analysis name")
+    :ok                   (describe Boolean "A Boolean flag indicating whether or not the request passed validation")
+    (optional-key :error) (describe ErrorResponse "Information about any validation error that may have occurred")))
 
 (defschema SubjectAnalysisSharingRequestElement
   {:subject  (describe Subject "The user or group identification.")
@@ -190,12 +187,10 @@
   {:sharing (describe [SubjectAnalysisSharingResponseElement] "The list of sharing responses for individual subjects")})
 
 (defschema AnalysisUnsharingResponseElement
-  {:analysis_id                  (describe UUID "The analysis ID")
-   :analysis_name                (describe NonBlankString "The analysis name")
-   :success                      (describe Boolean "A Boolean flag indicating whether the unsharing request succeeded")
-   (optional-key :input_errors)  (describe [NonBlankString] "A list of any analysis input unsharing errors")
-   (optional-key :outputs_error) (describe NonBlankString "A brief reason for the result folder unsharing error")
-   (optional-key :error)         (describe ErrorResponse "Information about any error that may have occurred")})
+  {:analysis_id          (describe UUID "The analysis ID")
+   :analysis_name        (describe NonBlankString "The analysis name")
+   :ok                   (describe Boolean "A Boolean flag indicating whether or not the request passed validation")
+   (optional-key :error) (describe ErrorResponse "Information about any validation error that may have occurred")})
 
 (defschema SubjectAnalysisUnsharingRequestElement
   {:subject  (describe Subject "The user or group identification.")
