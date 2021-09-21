@@ -18,6 +18,11 @@
    The DE uses this service to obtain the list of apps when a user clicks on a category in the _Apps_ window.
    This endpoint accepts optional URL query parameters to limit and sort Apps, which will allow pagination of results.")
 
+(def FeaturedAppListingSummary "List Featured Apps")
+(def FeaturedAppListingDocs
+  "This service lists all of the apps within the Featured Apps category.
+   This endpoint accepts optional URL query parameters to limit and sort Apps, which will allow pagination of results.")
+
 (def AppCategoryHierarchyListingSummary "List App Category Hierarchy")
 (def AppCategoryHierarchyListingDocs
   "Gets the list of app categories that are visible to the user for the active ontology version,
