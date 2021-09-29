@@ -8,6 +8,39 @@
             [schema.core :as s])
   (:import [java.util UUID]))
 
+(def PermanentIDRequestAdminListSummary "List Permanent ID Requests")
+(def PermanentIDRequestAdminListDescription
+  "Allows administrators to list Permanent ID Requests from all users.")
+
+(def PermanentIDRequestAdminDetailsSummary "Get Permanent ID Request Details")
+(def PermanentIDRequestAdminDetailsDescription
+  "Allows administrators to retrieve details for a Permanent ID Request from any user.")
+
+(def PermanentIDRequestAdminStatusUpdateSummary "Update the Status of a Permanent ID Request")
+(def PermanentIDRequestAdminStatusUpdateDescription
+  "Allows administrators to update the status of a Permanent ID Request from any user.")
+
+(def PermanentIDRequestSummary "Create a Permanent ID Request")
+(def PermanentIDRequestDescription
+  "Creates a Permanent ID Request for the requesting user.")
+
+(def PermanentIDRequestDetailsSummary "Get Permanent ID Request Details")
+(def PermanentIDRequestDetailsDescription
+  "Allows a user to retrieve details for one of their Permanent ID Request submissions.")
+
+(def PermanentIDRequestListSummary "List Permanent ID Requests")
+(def PermanentIDRequestListDescription
+  "Lists all Permanent ID Requests submitted by the requesting user.")
+
+(def PermanentIDRequestStatusCodeListSummary "List Permanent ID Request Status Codes")
+(def PermanentIDRequestStatusCodeListDescription
+  "Lists all Permanent ID Request Status Codes that have been assigned to a request status update.
+   This allows a status to easily be reused by admins in future status updates.")
+
+(def PermanentIDRequestTypesSummary "List Permanent ID Request Types")
+(def PermanentIDRequestTypesDescription
+  "Lists the allowed Permanent ID Request Types the user can select when submitting a new request.")
+
 (def PermanentIDRequestIdParam (describe UUID "The Permanent ID Request's UUID"))
 
 (s/defschema PermanentID
