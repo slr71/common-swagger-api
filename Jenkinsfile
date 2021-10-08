@@ -14,7 +14,7 @@ node('docker') {
 
         dockerRepo = "test-${env.BUILD_TAG}"
 
-        sh "docker build --rm -t ${dockerRepo} ."
+        sh "docker build --pull --rm -t ${dockerRepo} ."
 
         dockerTestRunner = "test-${env.BUILD_TAG}"
         dockerTestCleanup = "test-cleanup-${env.BUILD_TAG}"
