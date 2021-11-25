@@ -462,6 +462,8 @@
 (defschema AppDetails
   (-> AppBase
       (merge {:id                   (describe String "The app identifier.")
+              :version              (describe String "The App's version")
+              :version_id           (describe String "The App's version ID")
               :tools                (describe [AppDetailsTool] ToolListDocs)
               :deleted              AppDeletedParam
               :disabled             AppDisabledParam
@@ -545,6 +547,9 @@
 
           (optional-key :version)
           (describe String "The App's latest version")
+
+          (optional-key :version_id)
+          (describe String "The latest App version ID")
 
           :integrator_email
           (describe String "The App integrator's email address")
