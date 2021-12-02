@@ -2,7 +2,7 @@
   (:use [common-swagger-api.schema :only [describe NonBlankString PagingParams]]
         [common-swagger-api.schema.analyses]
         [common-swagger-api.schema.apps :only [SystemId]]
-        [common-swagger-api.schema.common :only [IncludeHiddenParams]]
+        [common-swagger-api.schema.common :only [IncludeDeletedParams IncludeHiddenParams]]
         [schema.core
          :only [defschema
                 Int
@@ -48,6 +48,7 @@
 
 (defschema AnalysisListingParams
   (merge IncludeHiddenParams
+         IncludeDeletedParams
          PagingParams
          {OptionalKeyFilter
           (describe String (slurp (io/resource "docs/analyses/listing/filter-param.md")))}))

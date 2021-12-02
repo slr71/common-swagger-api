@@ -3,7 +3,7 @@
         [common-swagger-api.schema.apps
          :only [AppStepResourceRequirements
                 SystemId]]
-        [common-swagger-api.schema.common :only [IncludeHiddenParams]]
+        [common-swagger-api.schema.common :only [IncludeDeletedParams IncludeHiddenParams]]
         [common-swagger-api.schema.containers
          :only [coerce-settings-long-values]]
         [schema.core
@@ -284,5 +284,6 @@
 
 (defschema AnalysisStatParams
   (merge IncludeHiddenParams
+         IncludeDeletedParams
          {(optional-key :filter)
           (describe String (slurp (io/resource "docs/analyses/listing/filter-param.md")))}))
