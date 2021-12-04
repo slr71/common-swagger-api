@@ -152,6 +152,8 @@
 (def AppDocParam (describe String "The App's documentation"))
 (def AppDocUrlParam (describe String "The App's documentation URL"))
 (def AppIdParam (describe UUID "A UUID that is used to identify the App"))
+(def AppLatestVersionParam (describe String "The App's latest version"))
+(def AppLatestVersionIdParam (describe String "The latest App version ID"))
 (def AppPublicParam (describe Boolean "Whether the App has been published and is viewable by all users"))
 (def AppReferencesParam (describe [String] "The App's references"))
 (def StringAppIdParam (describe NonBlankString "The App identifier"))
@@ -490,6 +492,9 @@
   {(optional-key :app_id)
    StringAppIdParam
 
+   (optional-key :version_id)
+   AppLatestVersionIdParam
+
    :documentation
    AppDocParam
 
@@ -546,10 +551,10 @@
           AppDisabledParam
 
           (optional-key :version)
-          (describe String "The App's latest version")
+          AppLatestVersionParam
 
           (optional-key :version_id)
-          (describe String "The latest App version ID")
+          AppLatestVersionIdParam
 
           :integrator_email
           (describe String "The App integrator's email address")
