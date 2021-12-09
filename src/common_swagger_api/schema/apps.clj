@@ -152,6 +152,8 @@
 (def AppDocParam (describe String "The App's documentation"))
 (def AppDocUrlParam (describe String "The App's documentation URL"))
 (def AppIdParam (describe UUID "A UUID that is used to identify the App"))
+(def AppVersionParam (describe String "The App's version"))
+(def AppVersionIdParam (describe UUID "The App's version ID"))
 (def AppLatestVersionParam (describe String "The App's latest version"))
 (def AppLatestVersionIdParam (describe String "The latest App version ID"))
 (def AppPublicParam (describe Boolean "Whether the App has been published and is viewable by all users"))
@@ -362,7 +364,9 @@
 
 (defschema App
   (merge AppBase
-         {OptionalToolsKey           (describe [(merge Tool {OptionalDeprecatedKey ToolDeprecatedParam})] ToolListDocs)
+         {:version                   AppVersionParam
+          :version_id                AppVersionIdParam
+          OptionalToolsKey           (describe [(merge Tool {OptionalDeprecatedKey ToolDeprecatedParam})] ToolListDocs)
           (optional-key :references) AppReferencesParam
           OptionalGroupsKey          (describe [AppGroup] GroupListDocs)}))
 
@@ -464,8 +468,8 @@
 (defschema AppDetails
   (-> AppBase
       (merge {:id                   (describe String "The app identifier.")
-              :version              (describe String "The App's version")
-              :version_id           (describe String "The App's version ID")
+              :version              AppVersionParam
+              :version_id           AppVersionIdParam
               :tools                (describe [AppDetailsTool] ToolListDocs)
               :deleted              AppDeletedParam
               :disabled             AppDisabledParam
