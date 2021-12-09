@@ -370,7 +370,10 @@
           (optional-key :references) AppReferencesParam
           OptionalGroupsKey          (describe [AppGroup] GroupListDocs)}))
 
-(def AppLabelUpdateRequest (describe App "The App to update."))
+(defschema AppLabelUpdateRequest
+  (st/optional-keys
+    (describe App "The App to update.")
+    [:version :version_id]))
 
 (defschema AppFileParameterDetails
   {:id          (describe String "The Parameter's ID")
