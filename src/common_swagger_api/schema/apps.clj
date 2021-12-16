@@ -700,7 +700,7 @@
 
 (defschema AppRequest
   (-> App
-      (->optional-param :id)
+      (st/optional-keys [:id :version :version_id])
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              OptionalToolsKey  (describe [AppToolRequest] ToolListDocs))))
 
