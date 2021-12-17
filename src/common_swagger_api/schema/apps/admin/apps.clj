@@ -125,7 +125,9 @@
       (->optional-param :id)
       (->optional-param :name)
       (->optional-param :description)
-      (assoc (optional-key :extra) AppExtraInfo
+      (assoc (optional-key :version) apps/AppVersionParam
+             (optional-key :version_id) apps/AppVersionIdParam
+             (optional-key :extra) AppExtraInfo
              (optional-key :wiki_url) apps/AppDocUrlParam
              (optional-key :references) apps/AppReferencesParam
              (optional-key :deleted) apps/AppDeletedParam
