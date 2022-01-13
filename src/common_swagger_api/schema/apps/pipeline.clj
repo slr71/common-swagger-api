@@ -1,7 +1,10 @@
 (ns common-swagger-api.schema.apps.pipeline
-  (:use [common-swagger-api.schema :only [->optional-param describe]]
-        [common-swagger-api.schema.apps :only [AppTaskListing]]
-        [schema.core :only [defschema optional-key Keyword]])
+  (:require [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.apps :refer [AppTaskListing
+                                                    AppVersionParam
+                                                    AppVersionIdParam]]
+            [schema.core :refer [defschema optional-key Keyword]]
+            [schema-tools.core :as st])
   (:import [java.util UUID]))
 
 (def PipelineCopySummary "Make a Copy of a Pipeline Available for Editing")
@@ -57,6 +60,12 @@
     {:id
      (describe UUID "The pipeline's ID")
 
+     :version
+     AppVersionParam
+
+     :version_id
+     AppVersionIdParam
+
      :steps
      (describe [PipelineStep] "The Pipeline's steps")
 
@@ -65,10 +74,10 @@
 
 (defschema PipelineUpdateRequest
   (-> Pipeline
-      (->optional-param :tasks)
+      (st/optional-keys [:tasks :version :version_id])
       (describe "The Pipeline to update.")))
 
 (defschema PipelineCreateRequest
   (-> PipelineUpdateRequest
-      (->optional-param :id)
+      (st/optional-keys [:id])
       (describe "The Pipeline to create.")))
