@@ -107,7 +107,7 @@
 (defschema AnalysisStepResourceRequirements
   (st/select-keys AppStepResourceRequirements [:min_memory_limit
                                                :min_cpu_cores
-                                               :max_cpu_cures
+                                               :max_cpu_cores
                                                :min_disk_space
                                                :step_number]))
 
