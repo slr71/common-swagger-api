@@ -1,8 +1,6 @@
 (ns common-swagger-api.schema.apps.pipeline
   (:require [common-swagger-api.schema :refer [describe]]
-            [common-swagger-api.schema.apps :refer [AppTaskListing
-                                                    AppVersionParam
-                                                    AppVersionIdParam]]
+            [common-swagger-api.schema.apps :refer [AppTaskListing]]
             [schema.core :refer [defschema optional-key Keyword]]
             [schema-tools.core :as st])
   (:import [java.util UUID]))
@@ -60,12 +58,6 @@
     {:id
      (describe UUID "The pipeline's ID")
 
-     :version
-     AppVersionParam
-
-     :version_id
-     AppVersionIdParam
-
      :steps
      (describe [PipelineStep] "The Pipeline's steps")
 
@@ -74,7 +66,7 @@
 
 (defschema PipelineUpdateRequest
   (-> Pipeline
-      (st/optional-keys [:tasks :version :version_id])
+      (st/optional-keys [:tasks])
       (describe "The Pipeline to update.")))
 
 (defschema PipelineCreateRequest

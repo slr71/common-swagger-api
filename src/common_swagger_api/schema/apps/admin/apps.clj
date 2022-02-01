@@ -10,7 +10,8 @@
                 SortFieldOptionalKey]]
         [schema.core :only [defschema enum optional-key]])
   (:require [clojure.set :as sets]
-            [common-swagger-api.schema.apps :as apps])
+            [common-swagger-api.schema.apps :as apps]
+            [schema-tools.core :as st])
   (:import [java.util Date UUID]))
 
 (def AdminAppPatchSummary "Update App Details and Labels")
@@ -122,12 +123,10 @@
 
 (defschema AdminAppPatchRequest
   (-> apps/AppBase
-      (->optional-param :id)
-      (->optional-param :name)
-      (->optional-param :description)
-      (assoc (optional-key :version) apps/AppVersionParam
-             (optional-key :version_id) apps/AppVersionIdParam
-             (optional-key :extra) AppExtraInfo
+      (st/optional-keys [:id
+                         :name
+                         :description])
+      (assoc (optional-key :extra) AppExtraInfo
              (optional-key :wiki_url) apps/AppDocUrlParam
              (optional-key :references) apps/AppReferencesParam
              (optional-key :deleted) apps/AppDeletedParam
