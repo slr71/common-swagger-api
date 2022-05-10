@@ -5,16 +5,6 @@
             [schema-tools.core :as st])
   (:import [java.util UUID]))
 
-(s/defschema Submission
-  {:id
-   (describe UUID "The UUID for this submission")
-
-   :submission
-   AnalysisSubmission})
-
-(s/defschema NewSubmission
-  (st/dissoc Submission :id))
-
 (s/defschema QuickLaunch
   {:id
    (describe UUID "The UUID for the quick launch")
@@ -31,6 +21,9 @@
    :app_id
    (describe UUID "The UUID for the app the quick launch is associated with")
 
+   :app_version_id
+   (describe UUID "The UUID for the app version the quick launch is associated with")
+
    (s/optional-key :is_public)
    (describe Boolean "Whether the quick launch is publicly available. Defaults to false")
 
@@ -38,7 +31,9 @@
    AnalysisSubmission})
 
 (s/defschema NewQuickLaunch
-  (st/dissoc QuickLaunch :id :user)) ;user should be included in the request query params
+  (-> QuickLaunch
+      (st/dissoc :id :user) ;user should be included in the request query params
+      (st/optional-keys [:app_version_id])))
 
 (s/defschema UpdateQuickLaunch
   (-> QuickLaunch
@@ -57,12 +52,6 @@
 
 (s/defschema NewQuickLaunchFavorite
   (st/dissoc QuickLaunchFavorite :id :user)) ;user is in query params, id is auto-assigned.
-
-; Mostly just useful for admin operations. Users will either create or remove favorites.
-(s/defschema UpdateQuickLaunchFavorite
-  (-> QuickLaunchFavorite
-      (st/dissoc :id)
-      (st/optional-keys-schema)))
 
 (s/defschema QuickLaunchUserDefault
   {:id

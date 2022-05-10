@@ -152,6 +152,10 @@
 (def AppDocParam (describe String "The App's documentation"))
 (def AppDocUrlParam (describe String "The App's documentation URL"))
 (def AppIdParam (describe UUID "A UUID that is used to identify the App"))
+(def AppVersionParam (describe String "The App's version"))
+(def AppVersionIdParam (describe UUID "The App's version ID"))
+(def AppLatestVersionParam (describe String "The App's latest version"))
+(def AppLatestVersionIdParam (describe String "The latest App version ID"))
 (def AppPublicParam (describe Boolean "Whether the App has been published and is viewable by all users"))
 (def AppReferencesParam (describe [String] "The App's references"))
 (def StringAppIdParam (describe NonBlankString "The App identifier"))
@@ -337,6 +341,8 @@
   {:id                              AppIdParam
    :name                            (describe String "The App's name")
    :description                     (describe String "The App's description")
+   (optional-key :version)          AppVersionParam
+   (optional-key :version_id)       AppVersionIdParam
    (optional-key :integration_date) (describe Date "The App's Date of public submission")
    (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
    (optional-key :system_id)        SystemId})
@@ -477,9 +483,9 @@
                                      [AppDetailCategory]
                                      "The list of Categories the integrator wishes to associate with the App")}
              OntologyHierarchyList)
-      (->optional-param :wiki_url)
-      (->optional-param :job_stats)
-      (->optional-param :hierarchies)))
+      (st/optional-keys [:wiki_url
+                         :job_stats
+                         :hierarchies])))
 
 (defschema AppToolListing
   {:tools (describe [AppDetailsTool] "Listing of App Tools")})
@@ -487,6 +493,9 @@
 (defschema AppDocumentation
   {(optional-key :app_id)
    StringAppIdParam
+
+   (optional-key :version_id)
+   AppLatestVersionIdParam
 
    :documentation
    AppDocParam
@@ -542,6 +551,12 @@
 
           :disabled
           AppDisabledParam
+
+          (optional-key :version)
+          AppLatestVersionParam
+
+          (optional-key :version_id)
+          AppLatestVersionIdParam
 
           :integrator_email
           (describe String "The App integrator's email address")
@@ -680,7 +695,7 @@
 
 (defschema AppRequest
   (-> App
-      (->optional-param :id)
+      (st/optional-keys [:id])
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              OptionalToolsKey  (describe [AppToolRequest] ToolListDocs))))
 
@@ -689,9 +704,9 @@
 
 (defschema AppPreviewRequest
   (-> App
-      (->optional-param :id)
-      (->optional-param :name)
-      (->optional-param :description)
+      (st/optional-keys [:id
+                         :name
+                         :description])
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              (optional-key :is_public) AppPublicParam
              OptionalToolsKey (describe [AppToolRequest] ToolListDocs))

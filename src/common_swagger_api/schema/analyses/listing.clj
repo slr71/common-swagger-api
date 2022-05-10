@@ -72,6 +72,9 @@
    :app_id
    (describe String "The ID of the app used to perform the analysis.")
 
+   (optional-key :app_version_id)
+   (describe String "The version ID of the app used to perform the analysis.")
+
    :system_id
    SystemId
 

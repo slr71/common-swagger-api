@@ -79,9 +79,17 @@
    (describe Boolean "Indicates whether the parameter is visible in the app UI.")})
 
 (defschema AnalysisParameters
-  {:app_id     (describe String "The ID of the app used to perform the analysis.")
-   :system_id  SystemId
-   :parameters (describe [AnalysisParameter] "The list of parameters.")})
+  {:app_id
+   (describe String "The ID of the app used to perform the analysis.")
+
+   (optional-key :app_version_id)
+   (describe String "The version ID of the app used to perform the analysis.")
+
+   :system_id
+   SystemId
+
+   :parameters
+   (describe [AnalysisParameter] "The list of parameters.")})
 
 (defschema AnalysesRelauncherRequest
   {:analyses (describe [UUID] "The identifiers of the analyses to be relaunched.")})
