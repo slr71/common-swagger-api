@@ -44,6 +44,12 @@
    **Note**: an attempt to delete an App that is already marked as deleted is treated as a no-op rather than an error condition.
    If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
 
+(def AppVersionDeleteSummary "Logically Deleting an App Version")
+(def AppVersionDeleteDocs
+  "An app version can be marked as deleted in the DE without being completely removed from the database using this service.
+   **Note**: an attempt to delete an app version that is already marked as deleted is treated as a no-op rather than an error condition.
+   If the app version ID doesn't exist for the given app ID, however, then that is treated as an error condition.")
+
 (def AppDetailsSummary "Get App Details")
 (def AppDetailsDocs
   "This service is used by the DE to obtain high-level details about a single App.")
