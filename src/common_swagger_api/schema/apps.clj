@@ -346,15 +346,22 @@
    OptionalParametersKey
    (describe [AppParameter] ParameterListDocs)})
 
+(defschema AppVersionDetails
+  {:version    AppVersionParam
+   :version_id AppVersionIdParam})
+
+(defschema AppVersionListing
+  {(optional-key :versions) (describe [AppVersionDetails] "The list of available versions for this app")})
+
 (defschema AppBase
-  {:id                              AppIdParam
-   :name                            (describe String "The App's name")
-   :description                     (describe String "The App's description")
-   (optional-key :version)          AppVersionParam
-   (optional-key :version_id)       AppVersionIdParam
-   (optional-key :integration_date) (describe Date "The App's Date of public submission")
-   (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
-   (optional-key :system_id)        SystemId})
+  (merge
+    {:id                              AppIdParam
+     :name                            (describe String "The App's name")
+     :description                     (describe String "The App's description")
+     (optional-key :integration_date) (describe Date "The App's Date of public submission")
+     (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
+     (optional-key :system_id)        SystemId}
+    (st/optional-keys AppVersionDetails)))
 
 (defschema AppLimitCheckResult
   {:limitCheckID   (describe String "An identifier indicating which limit check failed")
@@ -435,6 +442,7 @@
 (defschema AppJobView
   (merge AppBase
          AppLimitChecks
+         AppVersionListing
          {:app_type
           (describe String "DE or External.")
 
