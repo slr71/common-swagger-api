@@ -410,10 +410,11 @@
                        :min_cpu_cores
                        :max_cpu_cores
                        :min_disk_space])
-      (merge {(optional-key :default_memory)     (describe Long "The default amount of memory (in bytes) requested to run the tool container")
-              (optional-key :default_cpu_cores)  (describe Double "The default number of CPU cores requested to run the tool container")
-              (optional-key :default_disk_space) (describe Long "The default amount of disk space requested to run the tool container")
-              :step_number                       (describe Int "The sequential step number of the Tool in the analysis")})
+      (merge {(optional-key :default_max_cpu_cores) (describe Double "The default limit of CPU cores requested to run the tool container")
+              (optional-key :default_cpu_cores)     (describe Double "The default minimum of CPU cores requested to run the tool container")
+              (optional-key :default_memory)        (describe Long "The default amount of memory (in bytes) requested to run the tool container")
+              (optional-key :default_disk_space)    (describe Long "The default amount of disk space requested to run the tool container")
+              :step_number                          (describe Int "The sequential step number of the Tool in the analysis")})
       (describe "The Tool resource requirements for this step")))
 
 (defschema AppGroupJobView
