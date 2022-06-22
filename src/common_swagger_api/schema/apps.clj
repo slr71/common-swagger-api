@@ -483,28 +483,6 @@
    (optional-key :job_last_completed)
    (describe Date "The last date this app has run to `Completed` status")})
 
-(defschema AppDetails
-  (-> AppBase
-      (merge {:id                   (describe String "The app identifier.")
-              :tools                (describe [AppDetailsTool] ToolListDocs)
-              :deleted              AppDeletedParam
-              :disabled             AppDisabledParam
-              :integrator_email     (describe String "The App integrator's email address.")
-              :integrator_name      (describe String "The App integrator's full name.")
-              :wiki_url             AppDocUrlParam
-              :references           AppReferencesParam
-              :job_stats            (describe AppListingJobStats AppListingJobStatsDocs)
-              :categories           (describe
-                                     [AppDetailCategory]
-                                     "The list of Categories associated with the App")
-              :suggested_categories (describe
-                                     [AppDetailCategory]
-                                     "The list of Categories the integrator wishes to associate with the App")}
-             OntologyHierarchyList)
-      (st/optional-keys [:wiki_url
-                         :job_stats
-                         :hierarchies])))
-
 (defschema AppToolListing
   {:tools (describe [AppDetailsTool] "Listing of App Tools")})
 
@@ -610,6 +588,21 @@
 
           :permission
           (describe String "The user's access level for the app.")}))
+
+(defschema AppDetails
+  (-> AppListingDetail
+      (merge {:tools                (describe [AppDetailsTool] ToolListDocs)
+              :references           AppReferencesParam
+              :job_stats            (describe AppListingJobStats AppListingJobStatsDocs)
+              :categories           (describe
+                                      [AppDetailCategory]
+                                      "The list of Categories associated with the App")
+              :suggested_categories (describe
+                                      [AppDetailCategory]
+                                      "The list of Categories the integrator wishes to associate with the App")}
+             AppVersionListing
+             OntologyHierarchyList)
+      (st/optional-keys [:job_stats :hierarchies])))
 
 (defschema AppListing
   {:total (describe Long "The total number of Apps in the listing")
