@@ -32,7 +32,7 @@
 
 (def AppDetailsDocs "This service allows administrative users to view detailed information about private apps.")
 (def AppDocumentationAddDocs "This service is used by DE administrators to add documentation for a single App.")
-(def AppDocumentationUpdateDocs "This service is used by DE administrators to update documentation for a single App.")
+(def AppDocumentationUpdateDocs "This service is used by DE administrators to update documentation for an app's latest version.")
 
 (def AppIntegrationDataUpdateSummary "Update the Integration Data Record for an App's latest Version")
 (def AppIntegrationDataUpdateDocs
@@ -52,6 +52,10 @@
 (def AppPublicationRequestsSummary "List App Publication Requests")
 (def AppPublicationRequestsDocs
   "This service lists requests for app publication that require administrator intervention.")
+
+(def AppVersionDocumentationUpdateSummary "Update App Version Documentation")
+(def AppVersionDocumentationUpdateDocs
+  "This service is used by DE administrators to update documentation for an app version.")
 
 (def AppVersionIntegrationDataUpdateSummary "Update App Version Integration Data")
 (def AppVersionIntegrationDataUpdateDocs
