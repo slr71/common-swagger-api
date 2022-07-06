@@ -31,7 +31,7 @@
    except an error is not returned if the user does not own the App.")
 
 (def AppDetailsDocs "This service allows administrative users to view detailed information about private apps.")
-(def AppDocumentationAddDocs "This service is used by DE administrators to add documentation for a single App.")
+(def AppDocumentationAddDocs "This service is used by DE administrators to add documentation for an app's latest version.")
 (def AppDocumentationUpdateDocs "This service is used by DE administrators to update documentation for an app's latest version.")
 
 (def AppIntegrationDataUpdateSummary "Update the Integration Data Record for an App's latest Version")
@@ -52,6 +52,10 @@
 (def AppPublicationRequestsSummary "List App Publication Requests")
 (def AppPublicationRequestsDocs
   "This service lists requests for app publication that require administrator intervention.")
+
+(def AppVersionDocumentationAddSummary "Add App Version Documentation")
+(def AppVersionDocumentationAddDocs
+  "This service is used by DE administrators to add documentation for an app version.")
 
 (def AppVersionDocumentationUpdateSummary "Update App Version Documentation")
 (def AppVersionDocumentationUpdateDocs
