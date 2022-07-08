@@ -7,5 +7,5 @@ Upon error, the response body contains an error code along with some additional 
 
 **Note**: Although this endpoint accepts all App fields,
 only the `name` (except in parameters and parameter arguments),
-`description`, `label`, and `display` (only in parameter arguments)
+`version`, `description`, `label`, and `display` (only in parameter arguments)
 fields will be processed and updated by this endpoint.
