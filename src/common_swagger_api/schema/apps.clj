@@ -382,11 +382,15 @@
 
 (defschema App
   (merge AppBase
+         AppVersionListing
          {OptionalToolsKey           (describe [(merge Tool {OptionalDeprecatedKey ToolDeprecatedParam})] ToolListDocs)
           (optional-key :references) AppReferencesParam
           OptionalGroupsKey          (describe [AppGroup] GroupListDocs)}))
 
-(def AppLabelUpdateRequest (describe App "The App to update."))
+(def AppLabelUpdateRequest
+  (-> App
+      (st/dissoc :versions)
+      (describe "The App to update.")))
 
 (defschema AppFileParameterDetails
   {:id          (describe String "The Parameter's ID")
@@ -707,6 +711,7 @@
 (defschema AppRequest
   (-> App
       (st/optional-keys [:id])
+      (st/dissoc :versions)
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              OptionalToolsKey  (describe [AppToolRequest] ToolListDocs))))
 
@@ -723,7 +728,8 @@
   (-> App
       (st/optional-keys [:id
                          :name
-                         :description])
+                         :description
+                         :versions])
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              (optional-key :is_public) AppPublicParam
              OptionalToolsKey (describe [AppToolRequest] ToolListDocs))
