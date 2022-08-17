@@ -13,6 +13,9 @@
 (def PipelineCreateSummary "Create a Pipeline")
 (def PipelineCreateDocs "This service adds a new Pipeline.")
 
+(def PipelineVersionCreateSummary "Add a new Pipeline Version")
+(def PipelineVersionCreateDocs "This service adds a new Version to an existing Pipeline.")
+
 (def PipelineEditingViewSummary "Make a Pipeline Available for Editing")
 (def PipelineEditingViewDocs
   "The DE uses this service to obtain a JSON representation of a Pipeline for editing.
@@ -80,3 +83,9 @@
   (-> PipelineUpdateRequest
       (st/optional-keys [:id])
       (describe "The Pipeline to create.")))
+
+(defschema PipelineVersionRequest
+  (-> PipelineCreateRequest
+      (st/dissoc :version_id)
+      (st/required-keys [:version])
+      (describe "The Pipeline Version to add.")))
