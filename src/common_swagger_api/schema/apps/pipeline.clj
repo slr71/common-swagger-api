@@ -31,6 +31,11 @@
   "This service updates an existing Pipeline in the database,
    as long as the Pipeline has not been submitted for public use.")
 
+(def PipelineVersionUpdateSummary "Update a Pipeline Version")
+(def PipelineVersionUpdateDocs
+  "This service updates an existing Pipeline Version in the database,
+   as long as the Pipeline has not been submitted for public use.")
+
 (defschema PipelineMappingMap
   {(describe Keyword "The input ID") (describe String "The output ID")})
 
