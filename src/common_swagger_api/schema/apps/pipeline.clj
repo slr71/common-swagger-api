@@ -10,6 +10,11 @@
   "This service can be used to make a copy of a Pipeline in the user's workspace.
    This endpoint will copy the App details, steps, and mappings, but will not copy tasks used in the Pipeline steps.")
 
+(def PipelineVersionCopySummary "Copy a Pipeline Version for Editing")
+(def PipelineVersionCopyDocs
+  "This service can be used to make a copy of a Pipeline's Version in the user's workspace.
+   This endpoint will copy the App details, steps, and mappings, but will not copy tasks used in the Pipeline steps.")
+
 (def PipelineCreateSummary "Create a Pipeline")
 (def PipelineCreateDocs "This service adds a new Pipeline.")
 
