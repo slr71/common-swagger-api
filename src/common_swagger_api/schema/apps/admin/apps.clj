@@ -15,6 +15,7 @@
   (:import [java.util Date UUID]))
 
 (def AdminAppPatchSummary "Update App Details and Labels")
+(def AdminAppVersionPatchSummary "Update App Version Details and Labels")
 
 
 (def BlessAppSummary "Mark App Certified")
