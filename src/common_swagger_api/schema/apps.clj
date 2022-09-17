@@ -35,11 +35,20 @@
 (def AppCreateSummary "Add a new App.")
 (def AppCreateDocs "This service adds a new App to the user's workspace.")
 
+(def AppVersionCreateSummary "Add a new App Version.")
+(def AppVersionCreateDocs "This service adds a new App Version to an existing App.")
+
 (def AppDeleteSummary "Logically Deleting an App")
 (def AppDeleteDocs
   "An app can be marked as deleted in the DE without being completely removed from the database using this service.
    **Note**: an attempt to delete an App that is already marked as deleted is treated as a no-op rather than an error condition.
    If the App doesn't exist in the database at all, however, then that is treated as an error condition.")
+
+(def AppVersionDeleteSummary "Logically Deleting an App Version")
+(def AppVersionDeleteDocs
+  "An app version can be marked as deleted in the DE without being completely removed from the database using this service.
+   **Note**: an attempt to delete an app version that is already marked as deleted is treated as a no-op rather than an error condition.
+   If the app version ID doesn't exist for the given app ID, however, then that is treated as an error condition.")
 
 (def AppDetailsSummary "Get App Details")
 (def AppDetailsDocs
@@ -337,15 +346,22 @@
    OptionalParametersKey
    (describe [AppParameter] ParameterListDocs)})
 
+(defschema AppVersionDetails
+  {:version    AppVersionParam
+   :version_id AppVersionIdParam})
+
+(defschema AppVersionListing
+  {(optional-key :versions) (describe [AppVersionDetails] "The list of available versions for this app")})
+
 (defschema AppBase
-  {:id                              AppIdParam
-   :name                            (describe String "The App's name")
-   :description                     (describe String "The App's description")
-   (optional-key :version)          AppVersionParam
-   (optional-key :version_id)       AppVersionIdParam
-   (optional-key :integration_date) (describe Date "The App's Date of public submission")
-   (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
-   (optional-key :system_id)        SystemId})
+  (merge
+    {:id                              AppIdParam
+     :name                            (describe String "The App's name")
+     :description                     (describe String "The App's description")
+     (optional-key :integration_date) (describe Date "The App's Date of public submission")
+     (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
+     (optional-key :system_id)        SystemId}
+    (st/optional-keys AppVersionDetails)))
 
 (defschema AppLimitCheckResult
   {:limitCheckID   (describe String "An identifier indicating which limit check failed")
@@ -366,11 +382,15 @@
 
 (defschema App
   (merge AppBase
+         AppVersionListing
          {OptionalToolsKey           (describe [(merge Tool {OptionalDeprecatedKey ToolDeprecatedParam})] ToolListDocs)
           (optional-key :references) AppReferencesParam
           OptionalGroupsKey          (describe [AppGroup] GroupListDocs)}))
 
-(def AppLabelUpdateRequest (describe App "The App to update."))
+(def AppLabelUpdateRequest
+  (-> App
+      (st/dissoc :versions)
+      (describe "The App to update.")))
 
 (defschema AppFileParameterDetails
   {:id          (describe String "The Parameter's ID")
@@ -426,6 +446,7 @@
 (defschema AppJobView
   (merge AppBase
          AppLimitChecks
+         AppVersionListing
          {:app_type
           (describe String "DE or External.")
 
@@ -465,28 +486,6 @@
 
    (optional-key :job_last_completed)
    (describe Date "The last date this app has run to `Completed` status")})
-
-(defschema AppDetails
-  (-> AppBase
-      (merge {:id                   (describe String "The app identifier.")
-              :tools                (describe [AppDetailsTool] ToolListDocs)
-              :deleted              AppDeletedParam
-              :disabled             AppDisabledParam
-              :integrator_email     (describe String "The App integrator's email address.")
-              :integrator_name      (describe String "The App integrator's full name.")
-              :wiki_url             AppDocUrlParam
-              :references           AppReferencesParam
-              :job_stats            (describe AppListingJobStats AppListingJobStatsDocs)
-              :categories           (describe
-                                     [AppDetailCategory]
-                                     "The list of Categories associated with the App")
-              :suggested_categories (describe
-                                     [AppDetailCategory]
-                                     "The list of Categories the integrator wishes to associate with the App")}
-             OntologyHierarchyList)
-      (st/optional-keys [:wiki_url
-                         :job_stats
-                         :hierarchies])))
 
 (defschema AppToolListing
   {:tools (describe [AppDetailsTool] "Listing of App Tools")})
@@ -594,6 +593,21 @@
           :permission
           (describe String "The user's access level for the app.")}))
 
+(defschema AppDetails
+  (-> AppListingDetail
+      (merge {:tools                (describe [AppDetailsTool] ToolListDocs)
+              :references           AppReferencesParam
+              :job_stats            (describe AppListingJobStats AppListingJobStatsDocs)
+              :categories           (describe
+                                      [AppDetailCategory]
+                                      "The list of Categories associated with the App")
+              :suggested_categories (describe
+                                      [AppDetailCategory]
+                                      "The list of Categories the integrator wishes to associate with the App")}
+             AppVersionListing
+             OntologyHierarchyList)
+      (st/optional-keys [:job_stats :hierarchies])))
+
 (defschema AppListing
   {:total (describe Long "The total number of Apps in the listing")
    :apps  (describe [AppListingDetail] "A listing of App details")})
@@ -697,8 +711,15 @@
 (defschema AppRequest
   (-> App
       (st/optional-keys [:id])
+      (st/dissoc :versions)
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              OptionalToolsKey  (describe [AppToolRequest] ToolListDocs))))
+
+(defschema AppVersionRequest
+  (-> AppRequest
+      (st/dissoc :version_id)
+      (st/required-keys [:version])
+      (describe "The App Version to add.")))
 
 (def AppCreateRequest (describe AppRequest "The App to add."))
 (def AppUpdateRequest (describe AppRequest "The App to update."))
@@ -707,7 +728,8 @@
   (-> App
       (st/optional-keys [:id
                          :name
-                         :description])
+                         :description
+                         :versions])
       (assoc OptionalGroupsKey (describe [AppGroupRequest] GroupListDocs)
              (optional-key :is_public) AppPublicParam
              OptionalToolsKey (describe [AppToolRequest] ToolListDocs))

@@ -126,6 +126,12 @@
    :app_id
    (describe String "The ID of the app used to perform the analysis.")
 
+   (optional-key :app_version_id)
+   (describe
+     UUID
+     "The ID of the app version used to perform the analysis.
+      If not provided, then it is assumed the submission is for the latest version of the app")
+
    (optional-key :job_id)
    (describe UUID "The UUID of the job being submitted.")
 

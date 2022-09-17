@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.apps.pipeline
   (:require [common-swagger-api.schema :refer [describe]]
-            [common-swagger-api.schema.apps :refer [AppTaskListing]]
+            [common-swagger-api.schema.apps :refer [AppTaskListing AppVersionListing]]
             [schema.core :refer [defschema optional-key Keyword]]
             [schema-tools.core :as st])
   (:import [java.util UUID]))
@@ -10,17 +10,35 @@
   "This service can be used to make a copy of a Pipeline in the user's workspace.
    This endpoint will copy the App details, steps, and mappings, but will not copy tasks used in the Pipeline steps.")
 
+(def PipelineVersionCopySummary "Copy a Pipeline Version for Editing")
+(def PipelineVersionCopyDocs
+  "This service can be used to make a copy of a Pipeline's Version in the user's workspace.
+   This endpoint will copy the App details, steps, and mappings, but will not copy tasks used in the Pipeline steps.")
+
 (def PipelineCreateSummary "Create a Pipeline")
 (def PipelineCreateDocs "This service adds a new Pipeline.")
+
+(def PipelineVersionCreateSummary "Add a new Pipeline Version")
+(def PipelineVersionCreateDocs "This service adds a new Version to an existing Pipeline.")
 
 (def PipelineEditingViewSummary "Make a Pipeline Available for Editing")
 (def PipelineEditingViewDocs
   "The DE uses this service to obtain a JSON representation of a Pipeline for editing.
-   The Pipeline must have been integrated by the requesting user, and it must not already be public.")
+   The requesting user must have write permissions for the Pipeline, and it must not already be public.")
+
+(def PipelineVersionEditingViewSummary "Make a Pipeline Version Available for Editing")
+(def PipelineVersionEditingViewDocs
+  "The DE uses this service to obtain a JSON representation of a Pipeline Version for editing.
+   The requesting user must have write permissions for the Pipeline, and it must not already be public.")
 
 (def PipelineUpdateSummary "Update a Pipeline")
 (def PipelineUpdateDocs
   "This service updates an existing Pipeline in the database,
+   as long as the Pipeline has not been submitted for public use.")
+
+(def PipelineVersionUpdateSummary "Update a Pipeline Version")
+(def PipelineVersionUpdateDocs
+  "This service updates an existing Pipeline Version in the database,
    as long as the Pipeline has not been submitted for public use.")
 
 (defschema PipelineMappingMap
@@ -55,17 +73,19 @@
 
 (defschema Pipeline
   (merge AppTaskListing
-    {:id
-     (describe UUID "The pipeline's ID")
+         AppVersionListing
+         {:id
+          (describe UUID "The pipeline's ID")
 
-     :steps
-     (describe [PipelineStep] "The Pipeline's steps")
+          :steps
+          (describe [PipelineStep] "The Pipeline's steps")
 
-     :mappings
-     (describe [PipelineMapping] "The Pipeline's input/output mappings")}))
+          :mappings
+          (describe [PipelineMapping] "The Pipeline's input/output mappings")}))
 
 (defschema PipelineUpdateRequest
   (-> Pipeline
+      (st/dissoc :versions)
       (st/optional-keys [:tasks])
       (describe "The Pipeline to update.")))
 
@@ -73,3 +93,9 @@
   (-> PipelineUpdateRequest
       (st/optional-keys [:id])
       (describe "The Pipeline to create.")))
+
+(defschema PipelineVersionRequest
+  (-> PipelineCreateRequest
+      (st/dissoc :version_id)
+      (st/required-keys [:version])
+      (describe "The Pipeline Version to add.")))
