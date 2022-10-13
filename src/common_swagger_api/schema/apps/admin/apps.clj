@@ -15,6 +15,7 @@
   (:import [java.util Date UUID]))
 
 (def AdminAppPatchSummary "Update App Details and Labels")
+(def AdminAppVersionPatchSummary "Update App Version Details and Labels")
 
 
 (def BlessAppSummary "Mark App Certified")
@@ -52,6 +53,10 @@
 (def AppPublicationRequestsSummary "List App Publication Requests")
 (def AppPublicationRequestsDocs
   "This service lists requests for app publication that require administrator intervention.")
+
+(def AppVersionDetailsSummary "Get App Version Details")
+(def AppVersionDetailsDocs
+  "This service is used by admins to obtain high-level details about an app version.")
 
 (def AppVersionDocumentationAddSummary "Add App Version Documentation")
 (def AppVersionDocumentationAddDocs
