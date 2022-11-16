@@ -533,6 +533,9 @@
           :app_type
           (describe String "The type ID of the App")
 
+          (optional-key :overall_job_type)
+          (describe String "The type of the App's tool(s)")
+
           :can_favor
           (describe Boolean "Whether the current user can favorite this App")
 
