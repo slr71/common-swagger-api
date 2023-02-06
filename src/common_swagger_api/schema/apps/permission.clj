@@ -7,6 +7,7 @@
                 ErrorResponseNotFound
                 NonBlankString]]
         [common-swagger-api.schema.apps :only [QualifiedAppId]]
+        [common-swagger-api.schema.subjects :only [BaseSubject]]
         [schema.core :only [defschema enum optional-key]])
   (:import (java.util UUID)))
 
@@ -79,17 +80,13 @@
   {(optional-key :full-listing)
    (describe Boolean "If true, include permissions for the authenticated user as well")})
 
-(defschema Subject
-  {:source_id (describe NonBlankString "The identifier of the subject source (for exmaple, 'ldap')")
-   :id        (describe NonBlankString "The subject identifier")})
-
 (defschema AppPermissionListingRequest
   (describe
     {:apps (describe [QualifiedAppId] "A List of qualified app identifiers")}
     "The app permission listing request."))
 
 (defschema SubjectPermissionListElement
-  {:subject    (describe Subject "The user or group identification")
+  {:subject    (describe BaseSubject "The user or group identification")
    :permission (describe AppPermissionEnum "The permission level assigned to the subject")})
 
 (defschema AppPermissionListElement
@@ -111,7 +108,7 @@
     (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
 
 (defschema SubjectAppSharingRequestElement
-  {:subject (describe Subject "The user or group identification")
+  {:subject (describe BaseSubject "The user or group identification")
    :apps    (describe [AppSharingRequestElement] "The list of app sharing requests for the subject")})
 
 (defschema SubjectAppSharingResponseElement
@@ -133,7 +130,7 @@
     (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
 
 (defschema SubjectAppUnsharingRequestElement
-  {:subject (describe Subject "The user or group identification")
+  {:subject (describe BaseSubject "The user or group identification")
    :apps    (describe [QualifiedAppId] "The list of app unsharing requests for the subject")})
 
 (defschema SubjectAppUnsharingResponseElement
@@ -171,7 +168,7 @@
     (optional-key :error) (describe ErrorResponse "Information about any validation error that may have occurred")))
 
 (defschema SubjectAnalysisSharingRequestElement
-  {:subject  (describe Subject "The user or group identification.")
+  {:subject  (describe BaseSubject "The user or group identification.")
    :analyses (describe [AnalysisSharingRequestElement] "The list of sharing requests for individual analyses")})
 
 (defschema SubjectAnalysisSharingResponseElement
@@ -197,7 +194,7 @@
    (optional-key :error) (describe ErrorResponse "Information about any validation error that may have occurred")})
 
 (defschema SubjectAnalysisUnsharingRequestElement
-  {:subject  (describe Subject "The user or group identification.")
+  {:subject  (describe BaseSubject "The user or group identification.")
    :analyses (describe [UUID] "The identifiers of the analyses to unshare")})
 
 (defschema SubjectAnalysisUnsharingResponseElement
@@ -240,7 +237,7 @@
     (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
 
 (defschema SubjectToolSharingRequestElement
-  {:subject (describe Subject "The user or group identification.")
+  {:subject (describe BaseSubject "The user or group identification.")
    :tools   (describe [ToolSharingRequestElement] "The list of Tool sharing requests for the subject")})
 
 (defschema SubjectToolSharingResponseElement
@@ -262,7 +259,7 @@
    (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")})
 
 (defschema SubjectToolUnsharingRequestElement
-  {:subject (describe Subject "The user or group identification.")
+  {:subject (describe BaseSubject "The user or group identification.")
    :tools   (describe [UUID] "The identifiers of the Tools to unshare")})
 
 (defschema SubjectToolUnsharingResponseElement
