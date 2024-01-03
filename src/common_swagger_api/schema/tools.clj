@@ -112,6 +112,9 @@
           (optional-key :public) (describe Boolean
                                            "Set to `true` to list only public Tools, `false` to list only private Tools,
                                             or leave unset to list all Tools.")}))
+(defschema ToolDetailsParams
+  {(optional-key :include-defaults)
+   (describe Boolean "Flag to include defaults set by configuration or not")})
 
 (defschema PrivateToolDeleteParams
   {(optional-key :force-delete)
