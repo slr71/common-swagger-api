@@ -159,6 +159,12 @@
    :notify
    (describe Boolean "Indicates whether the user wants to receive job status update notifications.")
 
+   (optional-key :notify_periodic)
+   (describe Boolean "Indicates whether the user wants to receive periodic email notifications that the job is still running, for interactive jobs.")
+
+   (optional-key :periodic_period)
+   (describe Integer "The number of seconds between periodic notifications, if the user has opted to receive them.")
+
    :output_dir
    (describe String "The path to the analysis output directory in the data store.")
 
