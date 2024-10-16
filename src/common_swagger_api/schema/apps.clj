@@ -38,6 +38,9 @@
 (def AppVersionCreateSummary "Add a new App Version.")
 (def AppVersionCreateDocs "This service adds a new App Version to an existing App.")
 
+(def AppVersionOrderSummary "Set App Version Order")
+(def AppVersionOrderDocs "This service allows App Versions to be reordered.")
+
 (def AppDeleteSummary "Logically Deleting an App")
 (def AppDeleteDocs
   "An app can be marked as deleted in the DE without being completely removed from the database using this service.
@@ -352,6 +355,10 @@
 
 (defschema AppVersionListing
   {(optional-key :versions) (describe [AppVersionDetails] "The list of available versions for this app")})
+
+(defschema AppVersionOrderRequest
+  {:versions (describe [(st/optional-keys AppVersionDetails [:version])]
+                       "The app versions in descending order, with the newest (or latest) first.")})
 
 (defschema AppBase
   (merge
