@@ -47,7 +47,7 @@
 (defn transform-enum
   "Converts the items in an enumeration using a provided transformation function."
   [enum f]
-  (->> (:vs enum)
+  (->> (st/schema-value enum)
        (map f)
        (apply s/enum)
        (copy-json-schema-meta enum)))
