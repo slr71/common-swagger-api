@@ -40,5 +40,11 @@
       (->optional-param :avus)
       (describe "The Metadata AVU save request")))
 
+(s/defschema AvuSearchQueryParams
+  {(s/optional-key :attribute) (describe [String] "Attribute names to search for.")
+   (s/optional-key :value)     (describe [String] "Values to search for.")
+   (s/optional-key :unit)      (describe [String] "Units to search for.")
+   (s/optional-key :target-id) (describe [UUID] "Target IDs to search for.")})
+
 (def DataTypes ["file" "folder"])
 (def DataTypeEnum (apply s/enum DataTypes))
