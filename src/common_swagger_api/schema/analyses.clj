@@ -181,7 +181,10 @@
    (describe [FileMetadata] "Custom file attributes to associate with result files.")
 
    (optional-key :archive_logs)
-   (describe Boolean "True if the job logs should be uploaded to the data store.")})
+   (describe Boolean "True if the job logs should be uploaded to the data store.")
+
+   (optional-key :mount_data_store)
+   (describe Boolean "True if iRODS CSI Driver mounts should be created in the container.")})
 
 (defschema AnalysisResponse
   {:id         (describe UUID "The ID of the submitted analysis.")
