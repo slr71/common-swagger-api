@@ -1,12 +1,12 @@
 (ns common-swagger-api.schema.data
-  (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema :only [describe
-                                          NonBlankString
-                                          PagingParams
-                                          SortFieldDocs
-                                          SortFieldOptionalKey]]
-        [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
-  (:require [schema.core :as s]
+  (:require [clojure-commons.error-codes :refer [ERR_UNCHECKED_EXCEPTION ERR_SCHEMA_VALIDATION]]
+            [common-swagger-api.schema :refer [describe
+                                               NonBlankString
+                                               PagingParams
+                                               SortFieldDocs
+                                               SortFieldOptionalKey]]
+            [common-swagger-api.schema.filetypes :refer [ValidInfoTypesEnum]]
+            [schema.core :as s]
             [schema-tools.core :as st])
   (:import [java.util UUID]))
 

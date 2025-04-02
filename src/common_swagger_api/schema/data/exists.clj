@@ -1,11 +1,11 @@
 (ns common-swagger-api.schema.data.exists
-  (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema
-         :only [describe
-                doc-only
-                CommonResponses
-                ErrorResponseUnchecked]])
-  (:require [common-swagger-api.schema.data :as data-schema]
+  (:require [clojure-commons.error-codes :as ce]
+            [common-swagger-api.schema
+             :refer [describe
+                     doc-only
+                     CommonResponses
+                     ErrorResponseUnchecked]]
+            [common-swagger-api.schema.data :as data-schema]
             [schema.core :as s]))
 
 (def ExistenceSummary "File and Folder Existence")
@@ -25,7 +25,7 @@
 
 ;; Used only for display as documentation in Swagger UI
 (s/defschema ExistenceResponsePathsMap
-  {:/path/from/request/to/a/file/or/folder
+  {(keyword "/path/from/request/to/a/file/or/folder")
    (describe Boolean "Whether this path from the request exists")})
 
 ;; Used only for display as documentation in Swagger UI
@@ -35,8 +35,8 @@
 
 (def ExistenceErrorCodeResponses
   (conj data-schema/CommonErrorCodeResponses
-        ERR_NOT_A_USER
-        ERR_TOO_MANY_RESULTS))
+        ce/ERR_NOT_A_USER
+        ce/ERR_TOO_MANY_RESULTS))
 
 (s/defschema ExistenceErrorResponses
   (merge ErrorResponseUnchecked

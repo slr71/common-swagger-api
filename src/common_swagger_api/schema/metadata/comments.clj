@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.metadata.comments
-  (:use [common-swagger-api.schema :only [describe NonBlankString StandardUserQueryParams]])
-  (:require [schema.core :as s])
+  (:require [common-swagger-api.schema :refer [describe NonBlankString StandardUserQueryParams]]
+            [schema.core :as s])
   (:import [java.util UUID]))
 
 (def CommenterId (describe String "The username of the person who added the comment."))

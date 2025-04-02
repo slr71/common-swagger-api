@@ -1,7 +1,7 @@
 (ns common-swagger-api.schema.tools
-  (:use [clojure-commons.error-codes]
+  (:require [clojure-commons.error-codes :as ce]
         [common-swagger-api.schema
-         :only [->optional-param
+         :refer [->optional-param
                 CommonResponses
                 describe
                 ErrorResponse
@@ -9,9 +9,9 @@
                 ErrorResponseNotFound
                 ErrorResponseNotWritable
                 PagingParams]]
-        [common-swagger-api.schema.common :only [IncludeHiddenParams]]
+        [common-swagger-api.schema.common :refer [IncludeHiddenParams]]
         [common-swagger-api.schema.containers
-         :only [coerce-settings-long-values
+         :refer [coerce-settings-long-values
                 DevicesParamOptional
                 Image
                 NewToolContainer
@@ -20,7 +20,7 @@
                 VolumesFromParamOptional
                 VolumesParamOptional]]
         [schema.core
-         :only [defschema
+         :refer [defschema
                 enum
                 Int
                 optional-key]])
@@ -55,7 +55,7 @@
   "Deletes a private Tool, as long as it is not in use by any Apps.
    The requesting user must have ownership permission for the Tool.
    If the Tool is already in use in private Apps,
-   then an `ERR_NOT_WRITEABLE` will be returned along with a listing of the Apps using this Tool,
+   then an `ce/ERR_NOT_WRITEABLE` will be returned along with a listing of the Apps using this Tool,
    unless the `force-delete` flag is set to `true`.")
 
 (def ToolDetailsSummary "Get a Tool")
@@ -324,13 +324,13 @@
 
 (defschema ErrorPrivateToolRequestBadParam
   (assoc ErrorResponse
-    :error_code (describe (enum ERR_EXISTS ERR_BAD_OR_MISSING_FIELD) "Exists or Bad Field error code")))
+    :error_code (describe (enum ce/ERR_EXISTS ce/ERR_BAD_OR_MISSING_FIELD) "Exists or Bad Field error code")))
 
 (def PrivateToolImportResponse400
   {:schema      ErrorPrivateToolRequestBadParam
    :description "
-* `ERR_EXISTS`: A Tool with the given `name` already exists.
-* `ERR_BAD_OR_MISSING_FIELD`: The image with the given `name` and `tag` has been deprecated."})
+* `ce/ERR_EXISTS`: A Tool with the given `name` already exists.
+* `ce/ERR_BAD_OR_MISSING_FIELD`: The image with the given `name` and `tag` has been deprecated."})
 
 (def PrivateToolImportResponses
   (merge CommonResponses

@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.filetypes
-  (:use [common-swagger-api.schema :only [describe NonBlankString]])
-  (:require [heuristomancer.core :as hm]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [heuristomancer.core :as hm]
             [schema.core :as s]))
 
 (def ValidInfoTypes (conj (hm/supported-formats) "unknown"))
@@ -15,5 +15,5 @@
 
 (s/defschema FileTypeReturn
   (assoc FileType
-    :user (describe NonBlankString "The user performing the request")
-    :path (describe NonBlankString "The iRODS path to the file")))
+         :user (describe NonBlankString "The user performing the request")
+         :path (describe NonBlankString "The iRODS path to the file")))

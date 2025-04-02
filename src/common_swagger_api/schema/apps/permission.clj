@@ -1,14 +1,14 @@
 (ns common-swagger-api.schema.apps.permission
-  (:use [common-swagger-api.schema
-         :only [CommonResponses
-                describe
-                ErrorResponse
-                ErrorResponseForbidden
-                ErrorResponseNotFound
-                NonBlankString]]
-        [common-swagger-api.schema.apps :only [QualifiedAppId]]
-        [common-swagger-api.schema.subjects :only [BaseSubject]]
-        [schema.core :only [defschema enum optional-key]])
+  (:require [common-swagger-api.schema
+             :refer [CommonResponses
+                     describe
+                     ErrorResponse
+                     ErrorResponseForbidden
+                     ErrorResponseNotFound
+                     NonBlankString]]
+            [common-swagger-api.schema.apps :refer [QualifiedAppId]]
+            [common-swagger-api.schema.subjects :refer [BaseSubject]]
+            [schema.core :refer [defschema enum optional-key]])
   (:import (java.util UUID)))
 
 (def AnalysisPermissionListingSummary "List Analysis Permissions")
@@ -82,8 +82,8 @@
 
 (defschema AppPermissionListingRequest
   (describe
-    {:apps (describe [QualifiedAppId] "A List of qualified app identifiers")}
-    "The app permission listing request."))
+   {:apps (describe [QualifiedAppId] "A List of qualified app identifiers")}
+   "The app permission listing request."))
 
 (defschema SubjectPermissionListElement
   {:subject    (describe BaseSubject "The user or group identification")
@@ -91,21 +91,21 @@
 
 (defschema AppPermissionListElement
   (assoc QualifiedAppId
-    (optional-key :name) (describe NonBlankString "The app name")
-    :permissions         (describe [SubjectPermissionListElement] "The list of subject permissions for the app")))
+         (optional-key :name) (describe NonBlankString "The app name")
+         :permissions         (describe [SubjectPermissionListElement] "The list of subject permissions for the app")))
 
 (defschema AppPermissionListing
   {:apps (describe [AppPermissionListElement] "The list of app permissions")})
 
 (defschema AppSharingRequestElement
   (assoc QualifiedAppId
-    :permission (describe AppPermissionEnum "The requested permission level")))
+         :permission (describe AppPermissionEnum "The requested permission level")))
 
 (defschema AppSharingResponseElement
   (assoc AppSharingRequestElement
-    :app_name             (describe NonBlankString "The app name")
-    :success              (describe Boolean "A Boolean flag indicating whether the sharing request succeeded")
-    (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
+         :app_name             (describe NonBlankString "The app name")
+         :success              (describe Boolean "A Boolean flag indicating whether the sharing request succeeded")
+         (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
 
 (defschema SubjectAppSharingRequestElement
   {:subject (describe BaseSubject "The user or group identification")
@@ -113,21 +113,21 @@
 
 (defschema SubjectAppSharingResponseElement
   (assoc SubjectAppSharingRequestElement
-    :apps (describe [AppSharingResponseElement] "The list of app sharing responses for the subject")))
+         :apps (describe [AppSharingResponseElement] "The list of app sharing responses for the subject")))
 
 (defschema AppSharingRequest
   (describe
-    {:sharing (describe [SubjectAppSharingRequestElement] "The list of app sharing requests")}
-    "The app sharing request."))
+   {:sharing (describe [SubjectAppSharingRequestElement] "The list of app sharing requests")}
+   "The app sharing request."))
 
 (defschema AppSharingResponse
   {:sharing (describe [SubjectAppSharingResponseElement] "The list of app sharing responses")})
 
 (defschema AppUnsharingResponseElement
   (assoc QualifiedAppId
-    :app_name             (describe NonBlankString "The app name")
-    :success              (describe Boolean "A Boolean flag indicating whether the unsharing request succeeded")
-    (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
+         :app_name             (describe NonBlankString "The app name")
+         :success              (describe Boolean "A Boolean flag indicating whether the unsharing request succeeded")
+         (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
 
 (defschema SubjectAppUnsharingRequestElement
   {:subject (describe BaseSubject "The user or group identification")
@@ -135,12 +135,12 @@
 
 (defschema SubjectAppUnsharingResponseElement
   (assoc SubjectAppUnsharingRequestElement
-    :apps (describe [AppUnsharingResponseElement] "The list of app sharing responses for the subject")))
+         :apps (describe [AppUnsharingResponseElement] "The list of app sharing responses for the subject")))
 
 (defschema AppUnsharingRequest
   (describe
-    {:unsharing (describe [SubjectAppUnsharingRequestElement] "The list of app unsharing requests")}
-    "The app unsharing request."))
+   {:unsharing (describe [SubjectAppUnsharingRequestElement] "The list of app unsharing requests")}
+   "The app unsharing request."))
 
 (defschema AppUnsharingResponse
   {:unsharing (describe [SubjectAppUnsharingResponseElement] "The list of app unsharing responses")})
@@ -163,9 +163,9 @@
 
 (defschema AnalysisSharingResponseElement
   (assoc AnalysisSharingRequestElement
-    :analysis_name        (describe NonBlankString "The analysis name")
-    :ok                   (describe Boolean "A Boolean flag indicating whether or not the request passed validation")
-    (optional-key :error) (describe ErrorResponse "Information about any validation error that may have occurred")))
+         :analysis_name        (describe NonBlankString "The analysis name")
+         :ok                   (describe Boolean "A Boolean flag indicating whether or not the request passed validation")
+         (optional-key :error) (describe ErrorResponse "Information about any validation error that may have occurred")))
 
 (defschema SubjectAnalysisSharingRequestElement
   {:subject  (describe BaseSubject "The user or group identification.")
@@ -173,7 +173,7 @@
 
 (defschema SubjectAnalysisSharingResponseElement
   (assoc SubjectAnalysisSharingRequestElement
-    :analyses (describe [AnalysisSharingResponseElement] "The list of analysis sharing responses for the subject")))
+         :analyses (describe [AnalysisSharingResponseElement] "The list of analysis sharing responses for the subject")))
 
 (defschema AnalysisSharingRequest
   (-> {:sharing (describe [SubjectAnalysisSharingRequestElement]
@@ -199,7 +199,7 @@
 
 (defschema SubjectAnalysisUnsharingResponseElement
   (assoc SubjectAnalysisUnsharingRequestElement
-    :analyses (describe [AnalysisUnsharingResponseElement] "The list of analysis unsharing responses for the subject")))
+         :analyses (describe [AnalysisUnsharingResponseElement] "The list of analysis unsharing responses for the subject")))
 
 (defschema AnalysisUnsharingRequest
   (-> {:unsharing (describe [SubjectAnalysisUnsharingRequestElement]
@@ -215,8 +215,8 @@
 
 (defschema ToolIdList
   (describe
-    {:tools (describe [UUID] "A List of Tool IDs")}
-    "The Tool permission listing request."))
+   {:tools (describe [UUID] "A List of Tool IDs")}
+   "The Tool permission listing request."))
 
 (defschema ToolPermissionListElement
   {:id          (describe UUID "The Tool ID")
@@ -232,9 +232,9 @@
 
 (defschema ToolSharingResponseElement
   (assoc ToolSharingRequestElement
-    :tool_name            (describe NonBlankString "The Tool name")
-    :success              (describe Boolean "A Boolean flag indicating whether the sharing request succeeded")
-    (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
+         :tool_name            (describe NonBlankString "The Tool name")
+         :success              (describe Boolean "A Boolean flag indicating whether the sharing request succeeded")
+         (optional-key :error) (describe ErrorResponse "Information about any error that may have occurred")))
 
 (defschema SubjectToolSharingRequestElement
   {:subject (describe BaseSubject "The user or group identification.")
@@ -242,12 +242,12 @@
 
 (defschema SubjectToolSharingResponseElement
   (assoc SubjectToolSharingRequestElement
-    :tools (describe [ToolSharingResponseElement] "The list of Tool sharing responses for the subject")))
+         :tools (describe [ToolSharingResponseElement] "The list of Tool sharing responses for the subject")))
 
 (defschema ToolSharingRequest
   (describe
-    {:sharing (describe [SubjectToolSharingRequestElement] "The list of Tool sharing requests")}
-    "The Tool sharing request."))
+   {:sharing (describe [SubjectToolSharingRequestElement] "The list of Tool sharing requests")}
+   "The Tool sharing request."))
 
 (defschema ToolSharingResponse
   {:sharing (describe [SubjectToolSharingResponseElement] "The list of Tool sharing responses")})
@@ -264,13 +264,13 @@
 
 (defschema SubjectToolUnsharingResponseElement
   (assoc SubjectToolUnsharingRequestElement
-    :tools (describe [ToolUnsharingResponseElement] "The list of Tool unsharing responses for the subject")))
+         :tools (describe [ToolUnsharingResponseElement] "The list of Tool unsharing responses for the subject")))
 
 (defschema ToolUnsharingRequest
   (describe
-    {:unsharing
-     (describe [SubjectToolUnsharingRequestElement] "The list of unsharing requests for individual subjects")}
-    "The Tool unsharing request."))
+   {:unsharing
+    (describe [SubjectToolUnsharingRequestElement] "The list of unsharing requests for individual subjects")}
+   "The Tool unsharing request."))
 
 (defschema ToolUnsharingResponse
   {:unsharing

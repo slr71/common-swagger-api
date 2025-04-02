@@ -1,15 +1,14 @@
 (ns common-swagger-api.schema.metadata.tags
-  (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema :only [->optional-param
-                                          describe
-                                          ErrorResponse
-                                          ErrorResponseIllegalArgument
-                                          ErrorResponseNotFound
-                                          ErrorResponseUnchecked
-                                          NonBlankString
-                                          StandardUserQueryParams]]
-        [common-swagger-api.schema.metadata :only [DataTypeEnum]])
-  (:require [schema.core :as s])
+  (:require [clojure-commons.error-codes :as ce]
+            [common-swagger-api.schema :refer [->optional-param
+                                               describe
+                                               ErrorResponse
+                                               ErrorResponseIllegalArgument
+                                               ErrorResponseNotFound
+                                               ErrorResponseUnchecked
+                                               NonBlankString]]
+            [common-swagger-api.schema.metadata :refer [DataTypeEnum]]
+            [schema.core :as s])
   (:import [java.util UUID]))
 
 (def TagIdPathParam (describe UUID "The tag's UUID"))
@@ -93,7 +92,7 @@ authenticated user's tags that contain the fragment.")
 
 (s/defschema ErrorResponseBadTagRequest
   (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_ILLEGAL_ARGUMENT ERR_NOT_UNIQUE) "Bad Tag Request error codes")))
+         :error_code (describe (s/enum ce/ERR_ILLEGAL_ARGUMENT ce/ERR_NOT_UNIQUE) "Bad Tag Request error codes")))
 
 (def TagDefaultErrorResponses
   {500      {:schema      ErrorResponseUnchecked

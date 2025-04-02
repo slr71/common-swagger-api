@@ -1,10 +1,12 @@
 (ns common-swagger-api.schema.groups
-  (:use [common-swagger-api.schema :only [describe NonBlankString ->optional-param]])
-  (:require [common-swagger-api.schema.subjects :as subjects]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString ->optional-param]]
+            [common-swagger-api.schema.subjects :as subjects]
             [schema.core :as s]))
 
 (def ValidGroupPrivileges (s/enum "view" "read" "update" "admin" "optin" "optout" "groupAttrRead" "groupAttrUpdate"))
+
 (def GroupDetailsParamKey (s/optional-key :details))
+
 (defn GroupDetailsParamDesc
   [group-descriptor]
   (describe Boolean (str "Optionally include " group-descriptor " details such as modified date and creator information.")))
@@ -25,17 +27,17 @@
 (defn group [group-descriptor]
   (assoc (base-group group-descriptor)
 
-    (s/optional-key :display_name)
-    (describe String (str "The displayable " group-descriptor " name"))
+         (s/optional-key :display_name)
+         (describe String (str "The displayable " group-descriptor " name"))
 
-    (s/optional-key :extension)
-    (describe String (str "The internal " group-descriptor " name extension"))
+         (s/optional-key :extension)
+         (describe String (str "The internal " group-descriptor " name extension"))
 
-    :id_index
-    (describe String "The sequential ID index number")
+         :id_index
+         (describe String "The sequential ID index number")
 
-    :id
-    (describe String (str "The " group-descriptor " ID"))))
+         :id
+         (describe String (str "The " group-descriptor " ID"))))
 
 (defn group-update [group-descriptor]
   (-> (base-group group-descriptor)
@@ -92,8 +94,8 @@
 
 (defn group-with-detail [group-descriptor]
   (assoc (group group-descriptor)
-    (s/optional-key :detail)
-    (describe (group-detail group-descriptor) (str "Detailed information about the " group-descriptor))))
+         (s/optional-key :detail)
+         (describe (group-detail group-descriptor) (str "Detailed information about the " group-descriptor))))
 
 (defn group-list [group-descriptor plural-group-descriptor]
   {:groups (describe [(group group-descriptor)] (str "The list of " plural-group-descriptor " in the result set"))})

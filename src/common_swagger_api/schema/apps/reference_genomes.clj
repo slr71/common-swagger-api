@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.apps.reference-genomes
-  (:use [common-swagger-api.schema :only [describe]]
-        [schema.core :only [defschema optional-key]])
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :refer [defschema optional-key]])
   (:import (java.util Date UUID)))
 
 (def ReferenceGenomeDetailsSummary "Get a Reference Genome.")

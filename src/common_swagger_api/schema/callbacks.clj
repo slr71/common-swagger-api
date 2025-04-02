@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.callbacks
-  (:use [common-swagger-api.schema :only [describe]]
-        [schema.core :only [defschema optional-key Keyword Any]]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :refer [defschema Keyword Any]]))
 
 (defschema AgaveJobStatusUpdateParams
   {:status      (describe String "The status assigned to the job by Agave")

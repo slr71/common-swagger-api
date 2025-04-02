@@ -1,7 +1,7 @@
 (ns common-swagger-api.schema.apps.admin.reference-genomes
-  (:use [common-swagger-api.schema :only [->optional-param describe]]
-        [common-swagger-api.schema.apps.reference-genomes :only [ReferenceGenome]]
-        [schema.core :only [defschema optional-key]]))
+  (:require [common-swagger-api.schema :refer [->optional-param describe]]
+            [common-swagger-api.schema.apps.reference-genomes :refer [ReferenceGenome]]
+            [schema.core :refer [defschema optional-key]]))
 
 (def ReferenceGenomeAddSummary "Add a Reference Genome")
 (def ReferenceGenomeAddDocs

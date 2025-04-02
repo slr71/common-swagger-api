@@ -1,9 +1,9 @@
 (ns common-swagger-api.schema.apps.bootstrap
-  (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.apps :only [SystemId]]
-        [common-swagger-api.schema.apps.workspace :only [Workspace]]
-        [common-swagger-api.schema.webhooks :only [WebhookList]]
-        [schema.core :only [defschema]]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.apps :refer [SystemId]]
+            [common-swagger-api.schema.apps.workspace :refer [Workspace]]
+            [common-swagger-api.schema.webhooks :refer [WebhookList]]
+            [schema.core :refer [defschema]]))
 
 (defschema SystemIds
   {:de_system_id   (describe SystemId "The internal system ID used by the Discovery Environment.")

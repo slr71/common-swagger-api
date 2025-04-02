@@ -1,13 +1,13 @@
 (ns common-swagger-api.schema.tools.admin
-  (:use [common-swagger-api.schema
-         :only [->optional-param
-                describe
-                CommonResponses
-                ErrorResponseExists
-                ErrorResponseNotFound
-                ErrorResponseNotWritable]]
-        [schema.core :only [defschema optional-key]])
-  (:require [common-swagger-api.schema.tools :as schema])
+  (:require [common-swagger-api.schema
+             :refer [->optional-param
+                     describe
+                     CommonResponses
+                     ErrorResponseExists
+                     ErrorResponseNotFound
+                     ErrorResponseNotWritable]]
+            [common-swagger-api.schema.tools :as schema]
+            [schema.core :refer [defschema optional-key]])
   (:import [java.util UUID]))
 
 (def ToolDeleteSummary "Delete a Tool")

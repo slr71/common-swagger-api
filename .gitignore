@@ -18,5 +18,5 @@ test2junit
 .idea
 .nrepl-port
 .eastwood
-.clj-kondo
+.clj-kondo/.cache
 .lsp

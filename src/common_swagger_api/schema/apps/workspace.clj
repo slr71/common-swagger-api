@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.apps.workspace
-  (:use [common-swagger-api.schema :only [describe]]
-        [schema.core :only [defschema optional-key]])
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :refer [defschema]])
   (:import (java.util UUID)))
 
 (def WorkspaceId (describe UUID "The workspace ID."))

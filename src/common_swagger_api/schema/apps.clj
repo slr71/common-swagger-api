@@ -1,31 +1,31 @@
 (ns common-swagger-api.schema.apps
-  (:use [common-swagger-api.schema
-         :only [->optional-param
-                CommonResponses
-                describe
-                ErrorResponseNotFound
-                NonBlankString
-                optional-key->keyword
-                PagingParams
-                SortFieldDocs
-                SortFieldOptionalKey]]
-        [common-swagger-api.schema.apps.rating :only [Rating]]
-        [common-swagger-api.schema.containers :only [Settings]]
-        [common-swagger-api.schema.metadata :only [AvuListRequest]]
-        [common-swagger-api.schema.ontologies :only [OntologyHierarchyList]]
-        [common-swagger-api.schema.tools
-         :only [Tool
-                ToolDetails
-                ToolListingImage
-                ToolListingItem]]
-        [schema.core
-         :only [defschema
-                enum
-                optional-key
-                recursive
-                Any
-                Int]])
   (:require [clojure.set :as sets]
+            [common-swagger-api.schema
+             :refer [->optional-param
+                     CommonResponses
+                     describe
+                     ErrorResponseNotFound
+                     NonBlankString
+                     optional-key->keyword
+                     PagingParams
+                     SortFieldDocs
+                     SortFieldOptionalKey]]
+            [common-swagger-api.schema.apps.rating :refer [Rating]]
+            [common-swagger-api.schema.containers :refer [Settings]]
+            [common-swagger-api.schema.metadata :refer [AvuListRequest]]
+            [common-swagger-api.schema.ontologies :refer [OntologyHierarchyList]]
+            [common-swagger-api.schema.tools
+             :refer [Tool
+                     ToolDetails
+                     ToolListingImage
+                     ToolListingItem]]
+            [schema.core
+             :refer [defschema
+                     enum
+                     optional-key
+                     recursive
+                     Any
+                     Int]]
             [schema-tools.core :as st])
   (:import [java.util UUID Date]))
 
@@ -362,13 +362,13 @@
 
 (defschema AppBase
   (merge
-    {:id                              AppIdParam
-     :name                            (describe String "The App's name")
-     :description                     (describe String "The App's description")
-     (optional-key :integration_date) (describe Date "The App's Date of public submission")
-     (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
-     (optional-key :system_id)        SystemId}
-    (st/optional-keys AppVersionDetails)))
+   {:id                              AppIdParam
+    :name                            (describe String "The App's name")
+    :description                     (describe String "The App's description")
+    (optional-key :integration_date) (describe Date "The App's Date of public submission")
+    (optional-key :edited_date)      (describe Date "The App's Date of its last edit")
+    (optional-key :system_id)        SystemId}
+   (st/optional-keys AppVersionDetails)))
 
 (defschema AppLimitCheckResult
   {:limitCheckID   (describe String "An identifier indicating which limit check failed")
@@ -609,11 +609,11 @@
               :references           AppReferencesParam
               :job_stats            (describe AppListingJobStats AppListingJobStatsDocs)
               :categories           (describe
-                                      [AppDetailCategory]
-                                      "The list of Categories associated with the App")
+                                     [AppDetailCategory]
+                                     "The list of Categories associated with the App")
               :suggested_categories (describe
-                                      [AppDetailCategory]
-                                      "The list of Categories the integrator wishes to associate with the App")}
+                                     [AppDetailCategory]
+                                     "The list of Categories the integrator wishes to associate with the App")}
              AppVersionListing
              OntologyHierarchyList)
       (st/optional-keys [:job_stats :hierarchies])))
