@@ -55,7 +55,7 @@
   "Deletes a private Tool, as long as it is not in use by any Apps.
    The requesting user must have ownership permission for the Tool.
    If the Tool is already in use in private Apps,
-   then an `ce/ERR_NOT_WRITEABLE` will be returned along with a listing of the Apps using this Tool,
+   then an `ERR_NOT_WRITEABLE` will be returned along with a listing of the Apps using this Tool,
    unless the `force-delete` flag is set to `true`.")
 
 (def ToolDetailsSummary "Get a Tool")
@@ -329,8 +329,8 @@
 (def PrivateToolImportResponse400
   {:schema      ErrorPrivateToolRequestBadParam
    :description "
-* `ce/ERR_EXISTS`: A Tool with the given `name` already exists.
-* `ce/ERR_BAD_OR_MISSING_FIELD`: The image with the given `name` and `tag` has been deprecated."})
+* `ERR_EXISTS`: A Tool with the given `name` already exists.
+* `ERR_BAD_OR_MISSING_FIELD`: The image with the given `name` and `tag` has been deprecated."})
 
 (def PrivateToolImportResponses
   (merge CommonResponses
