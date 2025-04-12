@@ -1,14 +1,13 @@
 (ns common-swagger-api.schema.analyses.listing
-  (:use [common-swagger-api.schema :only [describe NonBlankString PagingParams]]
-        [common-swagger-api.schema.analyses]
-        [common-swagger-api.schema.apps :only [SystemId]]
-        [common-swagger-api.schema.common :only [IncludeDeletedParams IncludeHiddenParams]]
-        [schema.core
-         :only [defschema
-                Int
-                maybe
-                optional-key]])
-  (:require [clojure.java.io :as io])
+  (:require [clojure.java.io :as io]
+            [common-swagger-api.schema :refer [describe NonBlankString PagingParams]]
+            [common-swagger-api.schema.analyses :refer [AnalysisStats]]
+            [common-swagger-api.schema.apps :refer [SystemId]]
+            [common-swagger-api.schema.common :refer [IncludeDeletedParams IncludeHiddenParams]]
+            [schema.core
+             :refer [defschema
+                     Int
+                     optional-key]])
   (:import (java.util UUID)))
 
 (def AnalysesDeleteSummary "Delete Multiple Analyses")
@@ -125,11 +124,11 @@
 
 (defschema Analysis
   (assoc BaseAnalysis
-    :app_disabled
-    (describe Boolean "Indicates whether the app is currently disabled. DEPRECATED - always returns `false`.")
+         :app_disabled
+         (describe Boolean "Indicates whether the app is currently disabled. DEPRECATED - always returns `false`.")
 
-    :can_share
-    (describe Boolean "Indicates whether or not the analysis can be shared.")))
+         :can_share
+         (describe Boolean "Indicates whether or not the analysis can be shared.")))
 
 (defschema AnalysisList
   (merge {:analyses  (describe [Analysis] "The list of analyses.")
@@ -182,8 +181,8 @@
 
 (defschema AnalysisStepHistory
   (assoc AnalysisStep
-    :updates (describe [AnalysisStatusUpdate] "The list of updates received for the analysis step.")))
+         :updates (describe [AnalysisStatusUpdate] "The list of updates received for the analysis step.")))
 
 (defschema AnalysisHistory
   (assoc AnalysisStepList
-    :steps (describe [AnalysisStepHistory] "The history of each step in the analysis.")))
+         :steps (describe [AnalysisStepHistory] "The history of each step in the analysis.")))

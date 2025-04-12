@@ -1,7 +1,14 @@
 (ns common-swagger-api.schema.stats
-  (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema])
-  (:require [common-swagger-api.schema.data :as data-schema]
+  (:require [common-swagger-api.schema
+             :refer [->optional-param
+                     CommonResponses
+                     describe
+                     doc-only
+                     ErrorResponseUnchecked
+                     NonBlankString
+                     optional-key->keyword]]
+            [clojure-commons.error-codes :as ce]
+            [common-swagger-api.schema.data :as data-schema]
             [schema.core :as s])
   (:import [java.util UUID]))
 
@@ -109,8 +116,8 @@
 
 ;; Used only for display as documentation in Swagger UI
 (s/defschema StatResponsePathsMap
-  {:/path/from/request/to/a/folder (describe DirStatInfo "A folder's info")
-   :/path/from/request/to/a/file   (describe FileStatInfo "A file's info")})
+  {(keyword ":/path/from/request/to/a/folder") (describe DirStatInfo "A folder's info")
+   (keyword ":/path/from/request/to/a/file")   (describe FileStatInfo "A file's info")})
 
 ;; Used only for display as documentation in Swagger UI
 (s/defschema StatResponseIdsMap
@@ -125,12 +132,12 @@
 (s/defschema StatErrorResponses
   (merge ErrorResponseUnchecked
          {:error_code (apply s/enum (conj data-schema/CommonErrorCodeResponses
-                                          ERR_DOES_NOT_EXIST
-                                          ERR_NOT_READABLE
-                                          ERR_NOT_WRITEABLE
-                                          ERR_NOT_OWNER
-                                          ERR_NOT_A_USER
-                                          ERR_TOO_MANY_RESULTS))}))
+                                          ce/ERR_DOES_NOT_EXIST
+                                          ce/ERR_NOT_READABLE
+                                          ce/ERR_NOT_WRITEABLE
+                                          ce/ERR_NOT_OWNER
+                                          ce/ERR_NOT_A_USER
+                                          ce/ERR_TOO_MANY_RESULTS))}))
 
 (s/defschema StatResponses
   (merge CommonResponses

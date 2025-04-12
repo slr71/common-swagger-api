@@ -1,10 +1,9 @@
 (ns common-swagger-api.schema.permanent-id-requests
-  (:use [common-swagger-api.schema :only [describe
-                                          PagingParams
-                                          SortFieldDocs
-                                          SortFieldOptionalKey]]
-        [clojure-commons.error-codes])
-  (:require [schema-tools.core :as st]
+  (:require [common-swagger-api.schema :refer [describe
+                                               PagingParams
+                                               SortFieldDocs
+                                               SortFieldOptionalKey]]
+            [schema-tools.core :as st]
             [schema.core :as s])
   (:import [java.util UUID]))
 
@@ -100,13 +99,13 @@
 
 (def ValidPermanentIDRequestListSortFields
   (s/enum
-    :type
-    :target_type
-    :requested_by
-    :date_submitted
-    :status
-    :date_updated
-    :updated_by))
+   :type
+   :target_type
+   :requested_by
+   :date_submitted
+   :status
+   :date_updated
+   :updated_by))
 
 (s/defschema PermanentIDRequestListPagingParams
   (st/assoc PagingParams

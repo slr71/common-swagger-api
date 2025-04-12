@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.containers
-  (:use [common-swagger-api.schema :only [->optional-param describe]])
   (:require [common-swagger-api.coerce :as coerce]
+            [common-swagger-api.schema :refer [->optional-param describe]]
             [schema.core :as s]))
 
 (defn coerce-settings-long-values

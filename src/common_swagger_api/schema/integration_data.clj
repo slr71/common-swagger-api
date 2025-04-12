@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.integration-data
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [schema.core :only [defschema optional-key]])
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [schema.core :refer [defschema optional-key]])
   (:import [java.util UUID]))
 
 (def IntegrationDataIdPathParam (describe UUID "A UUID that is used to identify the integration data record"))

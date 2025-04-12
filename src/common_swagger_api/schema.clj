@@ -1,8 +1,8 @@
 (ns common-swagger-api.schema
-  (:use [clojure.string :only [blank?]]
-        [clojure-commons.error-codes]
-        [potemkin :only [import-vars]])
-  (:require compojure.api.sweet
+  (:require [clojure.string :refer [blank?]]
+            [clojure-commons.error-codes :as ce]
+            [compojure.api.sweet]
+            [potemkin :refer [import-vars]]
             [ring.swagger.json-schema :as json-schema]
             [schema-tools.core :as st]
             [schema.core :as s]
@@ -112,26 +112,26 @@
 
 (s/defschema ErrorResponseExists
   (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_EXISTS) "Exists error code")))
+    :error_code (describe (s/enum ce/ERR_EXISTS) "Exists error code")))
 
 (s/defschema ErrorResponseNotWritable
   (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_NOT_WRITEABLE) "Not Writeable error code")))
+    :error_code (describe (s/enum ce/ERR_NOT_WRITEABLE) "Not Writeable error code")))
 
 (s/defschema ErrorResponseForbidden
   (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_FORBIDDEN) "Insufficient privileges error code")))
+    :error_code (describe (s/enum ce/ERR_FORBIDDEN) "Insufficient privileges error code")))
 
 (s/defschema ErrorResponseNotFound
   (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_NOT_FOUND) "Not Found error code")))
+    :error_code (describe (s/enum ce/ERR_NOT_FOUND) "Not Found error code")))
 
 (s/defschema ErrorResponseIllegalArgument
   (assoc ErrorResponse
-    :error_code (describe (s/enum ERR_ILLEGAL_ARGUMENT) "Illegal Argument error code")))
+    :error_code (describe (s/enum ce/ERR_ILLEGAL_ARGUMENT) "Illegal Argument error code")))
 
 (s/defschema ErrorResponseUnchecked
-  {:error_code              (describe (s/enum ERR_UNCHECKED_EXCEPTION ERR_SCHEMA_VALIDATION)
+  {:error_code              (describe (s/enum ce/ERR_UNCHECKED_EXCEPTION ce/ERR_SCHEMA_VALIDATION)
                                       "Response schema validation and Unchecked error codes")
    (s/optional-key :reason) (describe s/Any "A brief text or object describing the reason for the error")})
 
@@ -143,11 +143,11 @@
 
 (defrecord DocOnly [schema-real schema-doc]
   s/Schema
-  (spec [this]
+  (spec [_this]
     (variant/variant-spec
      spec/+no-precondition+
      [{:schema schema-real}]))
-  (explain [this] (list 'doc-only (s/explain schema-real) (s/explain schema-doc))))
+  (explain [_this] (list 'doc-only (s/explain schema-real) (s/explain schema-doc))))
 
 (defn doc-only [schema-to-use schema-to-doc]
   (DocOnly. schema-to-use schema-to-doc))

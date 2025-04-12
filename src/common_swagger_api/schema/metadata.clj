@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.metadata
-  (:use [common-swagger-api.schema :only [->optional-param describe]])
-  (:require [schema.core :as s])
+  (:require [common-swagger-api.schema :refer [->optional-param describe]]
+            [schema.core :as s])
   (:import (java.util UUID)))
 
 (def TargetIdParam (describe UUID "The target item's UUID"))

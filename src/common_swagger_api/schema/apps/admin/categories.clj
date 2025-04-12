@@ -1,8 +1,8 @@
 (ns common-swagger-api.schema.apps.admin.categories
-  (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.apps :only [SystemId]]
-        [schema.core :only [defschema]])
-  (:require [common-swagger-api.schema.apps.categories :as categories-schema]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.apps :refer [SystemId]]
+            [common-swagger-api.schema.apps.categories :as categories-schema]
+            [schema.core :refer [defschema]]))
 
 (def AppCategorizationSummary "Categorize Apps")
 (def AppCategorizationDocs

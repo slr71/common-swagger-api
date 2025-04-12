@@ -1,12 +1,12 @@
 (ns common-swagger-api.schema.apps.categories
-  (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.apps
-         :only [AppCategoryIdPathParam
-                AppListingDetail
-                AppListingPagingParams
-                SystemId]]
-        [common-swagger-api.schema.ontologies :only [OntologyHierarchyFilterParams]]
-        [schema.core :only [defschema optional-key recursive]]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.apps
+             :refer [AppCategoryIdPathParam
+                     AppListingDetail
+                     AppListingPagingParams
+                     SystemId]]
+            [common-swagger-api.schema.ontologies :refer [OntologyHierarchyFilterParams]]
+            [schema.core :refer [defschema optional-key recursive]]))
 
 (def AppCategoryListingSummary "List App Categories")
 (def AppCategoryListingDocs
@@ -49,8 +49,8 @@
 (defschema CategoryListingParams
   {(optional-key :public)
    (describe
-     Boolean
-     "If set to `true`, then only app categories that are in a workspace that is marked as public in the database are returned.
+    Boolean
+    "If set to `true`, then only app categories that are in a workspace that is marked as public in the database are returned.
       If set to `false`, then only app categories that are in the user's workspace are returned.
       If not set, then both public and the user's private categories are returned.")})
 

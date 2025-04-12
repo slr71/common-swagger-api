@@ -1,22 +1,19 @@
 (ns common-swagger-api.schema.apps.admin.apps
-  (:use [common-swagger-api.schema
-         :only [->optional-param
-                optional-key->keyword
-                describe
-                CommonResponses
-                ErrorResponseNotFound
-                PagingParams
-                SortFieldDocs
-                SortFieldOptionalKey]]
-        [schema.core :only [defschema enum optional-key]])
   (:require [clojure.set :as sets]
+            [common-swagger-api.schema
+             :refer [optional-key->keyword
+                     describe
+                     CommonResponses
+                     ErrorResponseNotFound
+                     SortFieldDocs
+                     SortFieldOptionalKey]]
             [common-swagger-api.schema.apps :as apps]
+            [schema.core :refer [defschema enum optional-key]]
             [schema-tools.core :as st])
   (:import [java.util Date UUID]))
 
 (def AdminAppPatchSummary "Update App Details and Labels")
 (def AdminAppVersionPatchSummary "Update App Version Details and Labels")
-
 
 (def BlessAppSummary "Mark App Certified")
 (def BlessAppDescription

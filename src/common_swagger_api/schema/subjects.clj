@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.subjects
-  (:use [common-swagger-api.schema :only [describe]])
-  (:require [schema.core :as s]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :as s]))
 
 (s/defschema BaseSubject
   {:id        (describe String "The subject identifier")

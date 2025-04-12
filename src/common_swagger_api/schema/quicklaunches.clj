@@ -1,7 +1,7 @@
 (ns common-swagger-api.schema.quicklaunches
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [common-swagger-api.schema.analyses :only [AnalysisSubmission]])
-  (:require [schema.core :as s]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [common-swagger-api.schema.analyses :refer [AnalysisSubmission]]
+            [schema.core :as s]
             [schema-tools.core :as st])
   (:import [java.util UUID]))
 

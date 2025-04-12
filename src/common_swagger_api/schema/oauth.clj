@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.oauth
-  (:use [common-swagger-api.schema :only [describe doc-only]])
-  (:require [schema.core :as s]))
+  (:require [common-swagger-api.schema :refer [describe doc-only]]
+            [schema.core :as s]))
 
 (s/defschema RedirectUris
   {(describe s/Keyword "The name of the API")

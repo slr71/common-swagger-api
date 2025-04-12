@@ -1,18 +1,18 @@
 (ns common-swagger-api.schema.analyses
-  (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.apps
-         :only [AppStepResourceRequirements
-                SystemId]]
-        [common-swagger-api.schema.common :only [IncludeDeletedParams IncludeHiddenParams]]
-        [common-swagger-api.schema.containers
-         :only [coerce-settings-long-values]]
-        [schema.core
-         :only [defschema
-                enum
-                optional-key
-                Any
-                Keyword]])
   (:require [clojure.java.io :as io]
+            [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.apps
+             :refer [AppStepResourceRequirements
+                     SystemId]]
+            [common-swagger-api.schema.common :refer [IncludeDeletedParams IncludeHiddenParams]]
+            [common-swagger-api.schema.containers
+             :refer [coerce-settings-long-values]]
+            [schema.core
+             :refer [defschema
+                     enum
+                     optional-key
+                     Any
+                     Keyword]]
             [schema-tools.core :as st])
   (:import (java.util UUID)))
 
@@ -128,8 +128,8 @@
 
    (optional-key :app_version_id)
    (describe
-     UUID
-     "The ID of the app version used to perform the analysis.
+    UUID
+    "The ID of the app version used to perform the analysis.
       If not provided, then it is assumed the submission is for the latest version of the app")
 
    (optional-key :job_id)
@@ -181,7 +181,10 @@
    (describe [FileMetadata] "Custom file attributes to associate with result files.")
 
    (optional-key :archive_logs)
-   (describe Boolean "True if the job logs should be uploaded to the data store.")})
+   (describe Boolean "True if the job logs should be uploaded to the data store.")
+
+   (optional-key :mount_data_store)
+   (describe Boolean "True if iRODS CSI Driver mounts should be created in the container.")})
 
 (defschema AnalysisResponse
   {:id         (describe UUID "The ID of the submitted analysis.")

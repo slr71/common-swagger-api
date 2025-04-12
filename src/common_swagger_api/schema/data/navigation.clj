@@ -1,9 +1,9 @@
 (ns common-swagger-api.schema.data.navigation
-  (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema :only [describe CommonResponses ErrorResponseUnchecked]]
-        [common-swagger-api.schema.data :as data-schema]
-        [common-swagger-api.schema.stats :as stats-schema])
-  (:require [schema.core :as s]))
+  (:require [clojure-commons.error-codes :as ce]
+            [common-swagger-api.schema :refer [describe CommonResponses ErrorResponseUnchecked]]
+            [common-swagger-api.schema.data :as data-schema]
+            [common-swagger-api.schema.stats :as stats-schema]
+            [schema.core :as s]))
 
 (def NavigationRootSummary "Root Listing")
 (def NavigationRootDocs
@@ -37,9 +37,9 @@
 
 (def NavigationRootErrorCodeResponses
   (conj data-schema/CommonErrorCodeResponses
-        ERR_DOES_NOT_EXIST
-        ERR_NOT_READABLE
-        ERR_NOT_A_USER))
+        ce/ERR_DOES_NOT_EXIST
+        ce/ERR_NOT_READABLE
+        ce/ERR_NOT_A_USER))
 
 (s/defschema NavigationRootErrorResponses
   (merge ErrorResponseUnchecked
@@ -48,7 +48,7 @@
 (s/defschema NavigationErrorResponses
   (merge ErrorResponseUnchecked
          {:error_code (apply s/enum (conj NavigationRootErrorCodeResponses
-                                          ERR_NOT_A_FOLDER))}))
+                                          ce/ERR_NOT_A_FOLDER))}))
 
 (s/defschema NavigationRootResponses
   (merge CommonResponses

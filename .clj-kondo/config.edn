@@ -1,0 +1,4 @@
+{:config-in-ns {common-swagger-api.schema               {:linters {:deprecated-var         {:level :off}
+                                                                   :unknown-require-option {:level :off}}}
+                common-swagger-api.schema.data          {:linters {:deprecated-var {:level :off}}}
+                common-swagger-api.schema.metadata.tags {:linters {:deprecated-var {:level :off}}}}}

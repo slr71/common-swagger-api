@@ -1,7 +1,7 @@
 (ns common-swagger-api.schema.tools
-  (:use [clojure-commons.error-codes]
+  (:require [clojure-commons.error-codes :as ce]
         [common-swagger-api.schema
-         :only [->optional-param
+         :refer [->optional-param
                 CommonResponses
                 describe
                 ErrorResponse
@@ -9,9 +9,9 @@
                 ErrorResponseNotFound
                 ErrorResponseNotWritable
                 PagingParams]]
-        [common-swagger-api.schema.common :only [IncludeHiddenParams]]
+        [common-swagger-api.schema.common :refer [IncludeHiddenParams]]
         [common-swagger-api.schema.containers
-         :only [coerce-settings-long-values
+         :refer [coerce-settings-long-values
                 DevicesParamOptional
                 Image
                 NewToolContainer
@@ -20,7 +20,7 @@
                 VolumesFromParamOptional
                 VolumesParamOptional]]
         [schema.core
-         :only [defschema
+         :refer [defschema
                 enum
                 Int
                 optional-key]])
@@ -324,7 +324,7 @@
 
 (defschema ErrorPrivateToolRequestBadParam
   (assoc ErrorResponse
-    :error_code (describe (enum ERR_EXISTS ERR_BAD_OR_MISSING_FIELD) "Exists or Bad Field error code")))
+    :error_code (describe (enum ce/ERR_EXISTS ce/ERR_BAD_OR_MISSING_FIELD) "Exists or Bad Field error code")))
 
 (def PrivateToolImportResponse400
   {:schema      ErrorPrivateToolRequestBadParam

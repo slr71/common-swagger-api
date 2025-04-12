@@ -1,6 +1,6 @@
 (ns common-swagger-api.schema.ontologies
-  (:use [common-swagger-api.schema :only [describe NonBlankString]])
-  (:require [schema.core :as s])
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [schema.core :as s])
   (:import [java.util Date]))
 
 (def OntologyVersionParam (describe String "The unique version of the Ontology"))
