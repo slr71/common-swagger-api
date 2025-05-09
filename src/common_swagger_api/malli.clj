@@ -25,3 +25,13 @@
     {:description         "The URL for the API documentation"
      :json-schema/example "http://example-api/docs"}
     NonBlankString]])
+
+(def StatusParams
+  [:map
+   [:expecting
+    {:optional            true
+     :description         (str "The service which the requesting client is expecting to see here. "
+                               "Should throw a 500 error if provided and does not match the actual "
+                               "service running here.")
+     :json-schema/example "example-api"}
+    NonBlankString]])
