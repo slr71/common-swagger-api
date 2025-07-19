@@ -2,25 +2,6 @@
   (:require [clojure.string :as string]
             [clojure-commons.error-codes :as ce]))
 
-(defn- add-optional-metadata-tag
-  [elem]
-  (let [field-name (first elem)
-        metadata   (if (> (count elem) 2) (second elem) {})
-        field-type (if (> (count elem) 2) (get elem 2) (second elem))]
-    [field-name (assoc metadata :optional true) field-type]))
-
-(defn make-fields-optional
-  "Makes one or more fields in a malli schema definition optional."
-  [schema & kws]
-  (let [kws (set kws)]
-    (mapv (fn [field] (if (and (vector? field) (kws (first field))) (add-optional-metadata-tag field) field)) schema)))
-
-(defn remove-fields
-  "Removes one or more fields from a malli schema definition."
-  [schema & kws]
-  (let [kws (set kws)]
-    (remove (fn [field] (and (vector? field) (kws (first field)))) schema)))
-
 (def NonBlankString [:and :string [:fn (complement string/blank?)]])
 (def PositiveInt [:and :int [:fn pos?]])
 (def NonNegativeInt [:and :int [:fn #(<= 0 %)]])

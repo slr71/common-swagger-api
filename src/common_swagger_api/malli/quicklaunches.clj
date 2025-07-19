@@ -1,5 +1,6 @@
 (ns common-swagger-api.malli.quicklaunches
-  (:require [common-swagger-api.malli :as m]))
+  (:require [common-swagger-api.malli :as m]
+            [malli.util :as mu]))
 
 (def ExampleQualifiedParameterId "4c39cf86-d573-460a-b73b-f33f89fc70d7_e2071209-e2bb-4632-a1a6-11cd4ce2b246")
 (def ExampleInputFiles ["/path/to/frag_1.fastq" "/path/to/frag_2.fastq" "/path/to/illumina_adapters.fa"])
@@ -28,7 +29,7 @@
     {:optional            true
      :description         "The description of the quick launch"
      :json-schema/example "The best quick launch ever!"}
-    m/NonBlankString]
+    :string]
 
    [:creator
     {:description         "The username ofthe creator of the quick launch"
@@ -58,52 +59,13 @@
 
 (def NewQuickLaunch
   (-> QuickLaunch
-      (m/remove-fields :id :user)
-      (m/make-fields-optional :app_version_id)))
+      (mu/dissoc [:id :user])
+      (mu/optional-keys [:app_version_id])))
 
 (def UpdateQuickLaunch
-  [:map
-   [:name
-    {:optional            true
-     :description         "The name of the quick launch"
-     :json-schema/example "Updated Quick Launch"}
-    m/NonBlankString]
-
-   [:description
-    {:optional            true
-     :description         "The description of the quick launch"
-     :json-schema/example "Updated description"}
-    m/NonBlankString]
-
-   [:creator
-    {:optional            true
-     :description         "The username for the creator of the quick launch"
-     :json-schema/example "user123"}
-    m/NonBlankString]
-
-   [:app_id
-    {:optional            true
-     :description         "The UUID for the app the quick launch is associated with"
-     :json-schema/example "3de587a5-f99f-482e-be05-a0b50dc2e0cc"}
-    :uuid]
-
-   [:app_version_id
-    {:optional            true
-     :description         "The UUID for the app version the quick launch is associated with"
-     :json-schema/example "cdbd8c20-a451-4890-a188-1768292381e6"}
-    :uuid]
-
-   [:is_public
-    {:optional            true
-     :description         "Whether the quick launch is publicly available"
-     :json-schema/example true}
-    :boolean]
-
-   [:submission
-    {:optional            true
-     :description         "The analysis submission configuration"
-     :json-schema/example {}}
-    :any]])
+  (-> QuickLaunch
+      (mu/dissoc [:id])
+      (mu/optional-keys)))
 
 (def QuickLaunchFavorite
   [:map
