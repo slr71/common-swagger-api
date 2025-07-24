@@ -216,7 +216,7 @@
           (describe Boolean "The TreeSelector root's single-selection flag")
 
           (optional-key :selectionCascade)
-          (describe String "The TreeSelector root's cascace option")
+          (describe String "The TreeSelector root's cascade option")
 
           OptionalParameterArgumentsKey
           (describe [AppParameterListItem] TreeSelectorParameterListDocs)

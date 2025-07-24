@@ -13,12 +13,12 @@
   [:map
    [:full_param_id
     {:description         "The fully qualified parameter ID"
-     :json-schema/example "step_1_param_1"}
+     :json-schema/example "4a15eaf3-545b-4f24-8e17-abb4a54841cc_60c827c8-99d2-46f2-9813-f05f68db7020"}
     :string]
 
    [:param_id
     {:description         "The unqualified parameter ID"
-     :json-schema/example "param_1"}
+     :json-schema/example "60c827c8-99d2-46f2-9813-f05f68db7020"}
     :string]
 
    [:param_name
@@ -40,7 +40,7 @@
    [:info_type
     {:optional            true
      :description         "The type of information associated with an input or output parameter"
-     :json-schema/example "File"}
+     :json-schema/example "NucleotideOrPeptideSequence"}
     :string]
 
    [:data_format
@@ -74,7 +74,7 @@
      :json-schema/example "cb6d52b5-65b1-4390-a1cb-8b4777c013f1"}
     :string]
 
-   SystemId
+   (SystemId :system_id)
 
    [:parameters
     {:description "The list of parameters"}
@@ -163,7 +163,7 @@
 
 (def AnalysisSubmission
   [:map
-   SystemId
+   (SystemId :system_id)
 
    [:app_id
     {:description         "The ID of the app used to perform the analysis"
