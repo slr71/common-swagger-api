@@ -1,6 +1,17 @@
 (ns common-swagger-api.malli
   (:require [clojure.string :as string]
-            [clojure-commons.error-codes :as ce]))
+            [clojure-commons.error-codes :as ce]
+            [malli.core :as m]
+            [malli.experimental.time :as met]
+            [malli.registry :as mr]))
+
+(def init-registry
+  (memoize (fn []
+             (mr/set-default-registry!
+              (mr/composite-registry
+               (m/default-schemas)
+               (met/schemas))))))
+(init-registry)
 
 (def NonBlankString [:and :string [:fn (complement string/blank?)]])
 (def PositiveInt [:and :int [:fn pos?]])

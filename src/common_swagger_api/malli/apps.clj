@@ -1,5 +1,6 @@
 (ns common-swagger-api.malli.apps
   (:require [common-swagger-api.malli :refer [NonBlankString]]
+            [common-swagger-api.malli.tools :refer [Tool]]
             [malli.util :as mu]))
 
 (def AppCopySummary "Make a Copy of an App Available for Editing")
@@ -156,10 +157,12 @@
     :json-schema/example "This app performs data analysis..."}
    :string])
 
-(defn AppDocUrlParam [kw]
+(defn AppDocUrlParam [kw & [{:keys [optional] :or {optional false}}]]
   [kw
-   {:description         "The App's documentation URL"
-    :json-schema/example "https://wiki.cyverse.org/wiki/display/DEmanual/Example+App"}
+   (conj
+    {:description         "The App's documentation URL"
+     :json-schema/example "https://wiki.cyverse.org/wiki/display/DEmanual/Example+App"}
+    (when optional [:optional true]))
    :string])
 
 (defn AppIdParam [kw]
@@ -180,16 +183,20 @@
     :json-schema/example "6c9b4f2e-8b3a-4d5e-9c7f-1a2b3c4d5e6f"}
    :uuid])
 
-(defn AppLatestVersionParam [kw]
+(defn AppLatestVersionParam [kw & [{:keys [optional] :or {optional false}}]]
   [kw
-   {:description         "The App's latest version"
-    :json-schema/example "2.1.3"}
+   (conj
+    {:description         "The App's latest version"
+     :json-schema/example "2.1.3"}
+    (when optional [:optional true]))
    :string])
 
-(defn AppLatestVersionIdParam [kw]
+(defn AppLatestVersionIdParam [kw & [{:keys [optional] :or {optional false}}]]
   [kw
-   {:description         "The latest App version ID"
-    :json-schema/example "8e5f7a1b-2c3d-4e5f-9a7b-8c9d0e1f2a3b"}
+   (conj
+    {:description         "The latest App version ID"
+     :json-schema/example "8e5f7a1b-2c3d-4e5f-9a7b-8c9d0e1f2a3b"}
+    (when optional [:optional true]))
    :string])
 
 (defn AppPublicParam [kw]
@@ -198,10 +205,12 @@
     :json-schema/example true}
    :boolean])
 
-(defn AppReferencesParam [kw]
+(defn AppReferencesParam [kw & [{:keys [optional] :or {optional false}}]]
   [kw
-   {:description         "The App's references"
-    :json-schema/example ["https://example.com/paper1" "https://example.com/manual"]}
+   (conj
+    {:description         "The App's references"
+     :json-schema/example ["https://example.com/paper1" "https://example.com/manual"]}
+    (when optional [:optional true]))
    [:vector :string]])
 
 (defn StringAppIdParam [kw]
@@ -210,16 +219,20 @@
     :json-schema/example "my-analysis-app"}
    NonBlankString])
 
-(defn SystemId [kw]
+(defn SystemId [kw & [{:keys [optional] :or {optional false}}]]
   [kw
-   {:description         "The ID of the app execution system"
-    :json-schema/example "de"}
+   (conj
+    {:description         "The ID of the app execution system"
+     :json-schema/example "de"}
+    (when optional [:optional true]))
    NonBlankString])
 
-(defn ToolDeprecatedParam [kw]
+(defn ToolDeprecatedParam [kw & [{:keys [optional] :or {optional false}}]]
   [kw
-   {:description "Flag indicating if this Tool has been deprecated"
-    :json-schema/example false}
+   (conj
+    {:description "Flag indicating if this Tool has been deprecated"
+     :json-schema/example false}
+    (when optional [:optional true]))
    :boolean])
 
 (def ToolListDocs "The tools used to execute the App")
@@ -508,15 +521,8 @@
 
 (def AppVersionDetails
   [:map
-   [:version
-    {:description         "The App's version"
-     :json-schema/example "1.0.0"}
-    :string]
-
-   [:version_id
-    {:description         "The App's version ID"
-     :json-schema/example "550e8400-e29b-41d4-a716-446655440000"}
-    :uuid]])
+   (AppVersionParam :version)
+   (AppVersionIdParam :id)])
 
 (def AppVersionListing
   [:map
@@ -530,3 +536,93 @@
    [:versions
     {:description         "The app versions in descending order, with the newest (or latest) first."}
     [:vector (mu/optional-keys AppVersionDetails [:version])]]])
+
+(def AppBase
+  (mu/merge
+   [:map
+    (AppIdParam :id)
+
+    [:name
+     {:description         "The App's name"
+      :json-schema/example "Word Count"}
+     :string]
+
+    [:description
+     {:description         "The App's description"
+      :json-schema/example "Counts words, chatracters, or lines in one or more files."}
+     :string]
+
+    [:integration_date
+     {:description         "The App's date of public submission"
+      :optional            true
+      :json-schema/example "2025-07-24T14:47:00.000Z"}
+     :time/instant]
+
+    [:edited_date
+     {:description         "The App's Date of its last edit"
+      :optional            true
+      :json-schema/example "2025-07-24T14:47:00.000Z"}
+     :time/instant]
+
+    (SystemId :system_id :optional true)]
+   (mu/optional-keys AppVersionDetails)))
+
+(def AppLimitCheckResult
+  [:map
+   [:limitCheckID
+    {:description         "An identifier indicating which limit check failed"
+     :json-schema/example "CONCURRENT_VICE_ANALYSES"}
+    :string]
+
+   [:reasonCodes
+    {:description         "A list of codes indicating the reason for the limit check failure"
+     :json-schema/example ["ERR_LIMIT_REACHED"]}
+    [:vector :string]]
+
+   [:additionalInfo
+    {:description         "An arbitrary object providing information relevant to the limit check"
+     :json-schema/example {:runningJobs 2 :maxJobs 2 :usingDefaultSetting false}}
+    :any]])
+
+(def AppLimitCheckResultSummary
+  [:map
+   [:canRun
+    {:description         "True if the user is currently permitted to launch an analysis using the app"
+     :json-schema/example true}
+    :boolean]
+
+   [:results
+    {:description (str "A list of individual limit check results providing information about why "
+                       "the check failed. This list will be empty if the user is permitted to use "
+                       "the app")}
+    [:vector AppLimitCheckResult]]])
+
+(def AppLimitChecks
+  [:map
+   [:limitChecks
+    {:description         "Indicates whether or not the user is currently permitted to launch an analysis using the app"
+     :optional            true
+     :json-schema/example {:canRun true :results []}}
+    AppLimitCheckResultSummary]])
+
+(def App
+  (mu/merge
+   AppBase
+   AppVersionListing
+   [:map
+    [:tools
+     {:description ToolListDocs
+      :optional    true}
+     [:vector (mu/merge Tool [:map (ToolDeprecatedParam :deprecated :optional true)])]]
+
+    (AppReferencesParam :references :optional true)
+
+    [:groups
+     {:description GroupListDocs
+      :optional    true}
+     [:vector AppGroup]]]))
+
+(def AppLabelUpdateRequest
+  (-> App
+      (mu/dissoc :versions)
+      (mu/update-properties assoc :description "The App to update.")))
