@@ -65,7 +65,7 @@
      :created_at
      (describe Long (str "The date and time the " group-descriptor " was created (ms since epoch)"))
 
-     :created_by
+     (s/optional-key :created_by)
      (describe String (str "The ID of the subject who created the " group-descriptor))
 
      (s/optional-key :created_by_detail)
