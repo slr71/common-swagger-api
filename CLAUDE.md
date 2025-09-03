@@ -85,3 +85,24 @@ The schema definitions follow a hierarchical structure:
 - Currently uses both Schema (primary) and Malli (being introduced) for validation
 - Deployed to Clojars for use by other CyVerse services
 - Jenkins CI/CD pipeline handles testing and deployment via Docker
+
+## Code Style Guidelines
+
+### General Formatting
+- Keep line lengths to 120 characters or less when possible
+- Ensure each file ends with a newline
+
+## Schema Migration Guidelines
+
+When migrating schemas from `plumatic/schema` to `metosin/malli`:
+
+1. **Namespace Mirroring** - Migrated schemas should maintain parallel namespace structure
+   - Example: `common-swagger-api.schema.apps` → `common-swagger-api.malli.apps`
+
+2. **Code Formatting**
+   - Keep line lengths to 120 characters or fewer when possible
+   - When splitting strings across multiple lines, use `str` to concatenate them
+
+3. **Field Definition Reuse**
+   - When translating map fields, reuse definitions wherever an identical or similar field exists elsewhere
+   - For similar but not identical fields, use functions in `malli.util` to enable reuse while preserving differences
