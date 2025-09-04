@@ -106,3 +106,12 @@ When migrating schemas from `plumatic/schema` to `metosin/malli`:
 3. **Field Definition Reuse**
    - When translating map fields, reuse definitions wherever an identical or similar field exists elsewhere
    - For similar but not identical fields, use functions in `malli.util` to enable reuse while preserving differences
+   - When a field is defined outside of a map (for example, in `common-swagger-api.schema.apps.rating/UserRatingParam`),
+     It's useful to generate a function in the Malli translation so that the field name can be specified as a parameter
+     when the field is used in a map.
+   - When a function is defined for a field, use that function in the same places the corresponding variable was used 
+     in the original schema
+   - Use `malli.util/merge` when combining schemas where the original used `merge`
+
+4. **Schema Definition Order** - The order of schema definitions should be the same in `schema` and `malli` namespaces
+   - This is done to make it easier to tell which schemas still need to be migrated.
