@@ -1,7 +1,6 @@
 (ns common-swagger-api.malli
   (:require [clojure.string :as string]
             [clojure-commons.error-codes :as ce]
-            [malli.core :as m]
             [malli.util :as mu]))
 
 (def NonBlankString [:and :string [:fn (complement string/blank?)]])
@@ -34,14 +33,14 @@
                                "See http://www.postgresql.org/docs/9.2/interactive/queries-limit.html")
      :json-schema/example 50
      :optional            true}
-    [:and :long [:fn pos?]]]
+    [:and :int [:fn pos?]]]
 
    [:offset
     {:description         (str "Skips the first X number of results in the listing array. "
                                "See http://www.postgresql.org/docs/9.2/interactive/queries-limit.html")
      :json-schema/example 0
      :optional            true}
-    [:and :long [:fn (comp not neg?)]]]
+    [:and :int [:fn (comp not neg?)]]]
 
    [:sort-field
     {:description         SortFieldDocs

@@ -3,19 +3,21 @@
 
 (defn UserRatingParam
   "Returns a user rating field definition with the given field name"
-  [field-name]
+  [field-name & [optional?]]
   [field-name
-   {:description         "The current user's rating for this App"
-    :json-schema/example 5}
-   :long])
+   (cond-> {:description         "The current user's rating for this App"
+            :json-schema/example 5}
+     optional? (assoc :optional true))
+   :int])
 
 (defn CommentIdParam
   "Returns a comment ID field definition with the given field name"
-  [field-name]
+  [field-name & [optional?]]
   [field-name
-   {:description         "The ID of the current user's rating comment for this App"
-    :json-schema/example 123}
-   :long])
+   (cond-> {:description         "The ID of the current user's rating comment for this App"
+            :json-schema/example 123}
+     optional? (assoc :optional true))
+   :int])
 
 (def RatingResponse
   [:map {:closed true}
@@ -27,16 +29,16 @@
    [:total
     {:description         "The total number of user ratings for this App"
      :json-schema/example 42}
-    :long]])
+    :int]])
 
 (def Rating
   (mu/merge RatingResponse
     [:map
-     (mu/optional (UserRatingParam :user))
-     (mu/optional (CommentIdParam :comment_id))]))
+     (UserRatingParam :user true)
+     (CommentIdParam :comment_id true)]))
 
 (def RatingRequest
   [:map {:closed true
          :description "The user's new rating for this App."}
    (UserRatingParam :rating)
-   (mu/optional (CommentIdParam :comment_id))])
+   (CommentIdParam :comment_id true)])

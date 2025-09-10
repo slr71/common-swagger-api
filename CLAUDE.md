@@ -91,6 +91,8 @@ The schema definitions follow a hierarchical structure:
 ### General Formatting
 - Keep line lengths to 120 characters or less when possible
 - Ensure each file ends with a newline
+- Remove trailing whitespace.
+- Align keys and values in map definitions when possible.
 
 ## Schema Migration Guidelines
 
@@ -102,6 +104,9 @@ When migrating schemas from `plumatic/schema` to `metosin/malli`:
 2. **Code Formatting**
    - Keep line lengths to 120 characters or fewer when possible
    - When splitting strings across multiple lines, use `str` to concatenate them
+   - Place blank lines betwen field definitions in Malli schemas for redability.
+   - When schema properties contain multiple fields, begin the properties map on a separate line from the field name for
+     readability.
 
 3. **Field Definition Reuse**
    - When translating map fields, reuse definitions wherever an identical or similar field exists elsewhere
@@ -109,9 +114,11 @@ When migrating schemas from `plumatic/schema` to `metosin/malli`:
    - When a field is defined outside of a map (for example, in `common-swagger-api.schema.apps.rating/UserRatingParam`),
      It's useful to generate a function in the Malli translation so that the field name can be specified as a parameter
      when the field is used in a map.
-   - When a function is defined for a field, use that function in the same places the corresponding variable was used 
+   - When a function is defined for a field, use that function in the same places the corresponding variable was used
      in the original schema
    - Use `malli.util/merge` when combining schemas where the original used `merge`
+   - When a Schema is just a modification of an existing map, use as much of the original map as possible. Do not expand
+     the map when translating it to Malli.
 
 4. **Schema Definition Order** - The order of schema definitions should be the same in `schema` and `malli` namespaces
    - This is done to make it easier to tell which schemas still need to be migrated.
