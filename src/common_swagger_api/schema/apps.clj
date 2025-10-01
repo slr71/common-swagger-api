@@ -436,6 +436,8 @@
                        :min_memory_limit
                        :min_cpu_cores
                        :max_cpu_cores
+                       :min_gpus
+                       :max_gpus
                        :min_disk_space])
       (merge {(optional-key :default_max_cpu_cores) (describe Double "The default limit of CPU cores requested to run the tool container")
               (optional-key :default_cpu_cores)     (describe Double "The default minimum of CPU cores requested to run the tool container")
