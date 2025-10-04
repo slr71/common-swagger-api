@@ -122,3 +122,8 @@ When migrating schemas from `plumatic/schema` to `metosin/malli`:
 
 4. **Schema Definition Order** - The order of schema definitions should be the same in `schema` and `malli` namespaces
    - This is done to make it easier to tell which schemas still need to be migrated.
+
+5. **Example Values** - When migrating a field, please add an example value for any field that either has a scalar type
+     (for example, a string or a UUID) or is a vector of scalar types. There's no need to add example values for fields
+     whose values are described by another schema. Please be sure to use the correct keyword for example values. The
+     keyword to use is `:json-schema/example`.
