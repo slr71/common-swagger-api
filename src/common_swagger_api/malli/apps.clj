@@ -1,7 +1,7 @@
 (ns common-swagger-api.malli.apps
   (:require
-   [common-swagger-api.malli :refer [NonBlankString]]
-   [malli.core :as m]))
+   [malli.core :as m]
+   [malli.util :as mu]))
 
 ;; Endpoint description definitions
 
@@ -194,17 +194,15 @@
   [:boolean {:description         "Whether the App has been published and is viewable by all users"
              :json-schema/example true}])
 
-(def AppReferencesParam
-  [[:vector :string] {:description         "The App's references"
-                      :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}])
-
 (def StringAppIdParam
-  [:and NonBlankString {:description         "The App identifier"
-                        :json-schema/example "app-id-12345"}])
+  [:string {:description         "The App identifier"
+            :json-schema/example "app-id-12345"
+            :min                 1}])
 
 (def SystemId
-  [:and NonBlankString {:description         "The ID of the app execution system"
-                        :json-schema/example "de"}])
+  [:string {:description         "The ID of the app execution system"
+            :json-schema/example "de"
+            :min                 1}])
 
 (def ToolDeprecatedParam
   [:boolean {:description         "Flag indicating if this Tool has been deprecated"
@@ -302,20 +300,343 @@
                            [:vector [:ref ::AppParameterListGroup]]]]}}
      [:ref ::AppParameterListGroup]]))
 
+(def AppParameterListItemOrTree
+  (mu/merge
+   AppParameterListItem
+   [:map
+    [:isSingleSelect
+     {:optional            true
+      :description         "The TreeSelector root's single-selection flag"
+      :json-schema/example true}
+     :boolean]
+
+    [:selectionCascade
+     {:optional            true
+      :description         "The TreeSelector root's cascace option"
+      :json-schema/example "up"}
+     :string]
+
+    [:arguments
+     {:optional    true
+      :description TreeSelectorParameterListDocs}
+     [:vector AppParameterListItem]]
+
+    [:groups
+     {:optional    true
+      :description TreeSelectorGroupListDocs}
+     [:vector AppParameterListGroup]]]))
 
 (def AppParameterValidator
   [:map {:closed true}
    [:type
-    {:description         (str "The validation rule's type, which describes how a property value should be validated. For "
-                               "example, if the type is `IntAbove` then the property value entered by the user must be an "
-                               "integer above a specific value, which is specified in the parameter list. You can use the "
-                               "`rule-types` endpoint to get a list of validation rule types")
+    {:description
+     (str "The validation rule's type, which describes how a property value should be validated. For "
+          "example, if the type is `IntAbove` then the property value entered by the user must be an "
+          "integer above a specific value, which is specified in the parameter list. You can use the "
+          "`rule-types` endpoint to get a list of validation rule types")
      :json-schema/example "IntAbove"}
     :string]
 
    [:params
-    {:description         (str "The list of parameters to use when validating a Parameter value. For example, to ensure that a "
-                               "Parameter contains a value that is an integer greater than zero, you would use a validation "
-                               "rule of type `IntAbove` along with a parameter list of `[0]`")
+    {:description
+     (str "The list of parameters to use when validating a Parameter value. For example, to ensure that a "
+          "Parameter contains a value that is an integer greater than zero, you would use a validation "
+          "rule of type `IntAbove` along with a parameter list of `[0]`")
      :json-schema/example [0]}
     [:vector :any]]])
+
+(def AppFileParameters
+  [:map {:closed true}
+   [:format
+    {:optional            true
+     :description         "The Input/Output Parameter's file format"
+     :json-schema/example "fasta"}
+    :string]
+
+   [:file_info_type
+    {:optional            true
+     :description         "The Input/Output Parameter's info type"
+     :json-schema/example "SequenceAlignment"}
+    :string]
+
+   [:is_implicit
+    {:optional            true
+     :description
+     (str "Whether the Output Parameter name is specified on the command line (but still be referenced in "
+          "Pipelines), or implicitly determined by the app itself. If the output file name is implicit "
+          "then the output file name either must always be the same or it must follow a naming convention "
+          "that can easily be matched with a glob pattern")
+     :json-schema/example false}
+    :boolean]
+
+   [:repeat_option_flag
+    {:optional            true
+     :description
+     (str "Whether or not the command-line option flag should preceed each file of a MultiFileSelector "
+          "on the command line when the App is run")
+     :json-schema/example false}
+    :boolean]
+
+   [:data_source
+    {:optional            true
+     :description         "The Output Parameter's source"
+     :json-schema/example "stdout"}
+    :string]
+
+   [:retain
+    {:optional            true
+     :description         "Whether or not the Input should be copied back to the job output directory in iRODS"
+     :json-schema/example true}
+    :boolean]])
+
+(def AppParameter
+  [:map {:closed true}
+   [:id
+    {:description         "A UUID that is used to identify the Parameter"
+     :json-schema/example #uuid "abc12345-def6-7890-abcd-ef1234567890"}
+    :uuid]
+
+   [:name
+    {:optional    true
+     :description
+     (str "The Parameter's name. In most cases, this field indicates the command-line option used to "
+          "identify the Parameter on the command line. In these cases, the Parameter is assumed to be "
+          "positional and no command-line option is used if the name is blank. For Parameters that "
+          "specify a limited set of selection values, however, this is not the case. Instead, the "
+          "Parameter arguments specify both the command-line flag and the Parameter value to use for each "
+          "option that is selected")
+     :json-schema/example "--input"}
+    :string]
+
+   [:defaultValue
+    {:optional            true
+     :description         "The Parameter's default value"
+     :json-schema/example "default_value"}
+    :any]
+
+   [:value
+    {:optional            true
+     :description         "The Parameter's value, used for previewing this parameter on the command-line."
+     :json-schema/example "example_value"}
+    :any]
+
+   [:label
+    {:optional            true
+     :description         "The Parameter's prompt to display in the UI"
+     :json-schema/example "Input File"}
+    :string]
+
+   [:description
+    {:optional            true
+     :description         "The Parameter's description"
+     :json-schema/example "Specify the input file for processing"}
+    :string]
+
+   [:order
+    {:optional    true
+     :description
+     (str "The relative command-line order for the Parameter. If this field is not specified then the "
+          "arguments will appear on the command-line in the order in which they appear in the import JSON. "
+          "If you're not specifying the order, please be sure that the argument order is unimportant for "
+          "the tool being integrated")
+     :json-schema/example 1}
+    :int]
+
+   [:required
+    {:optional            true
+     :description         "Whether or not a value is required for this Parameter"
+     :json-schema/example true}
+    :boolean]
+
+   [:isVisible
+    {:optional            true
+     :description         "The Parameter's intended visibility in the job submission UI"
+     :json-schema/example true}
+    :boolean]
+
+   [:omit_if_blank
+    {:optional    true
+     :description
+     (str "Whether the command-line option should be omitted if the Parameter value is blank. This is "
+          "most useful for optional arguments that use command-line flags in conjunction with a value. In "
+          "this case, it is an error to include the command-line flag without a corresponding value. This "
+          "flag indicates that the command-line flag should be omitted if the value is blank. This can "
+          "also be used for positional arguments, but this flag tends to be useful only for trailing "
+          "positional arguments")
+     :json-schema/example false}
+    :boolean]
+
+   [:type
+    {:description
+     (str "The Parameter's type name. Must contain the name of one of the Parameter types defined in the "
+          "database. You can get the list of defined and undeprecated Parameter types using the "
+          "`parameter-types` endpoint")
+     :json-schema/example "FileInput"}
+    :string]
+
+   [:file_parameters
+    {:optional    true
+     :description "The File Parameter specific details"}
+    AppFileParameters]
+
+   [:arguments
+    {:optional    true
+     :description ListItemOrTreeDocs}
+    [:vector AppParameterListItemOrTree]]
+
+   [:validators
+    {:optional    true
+     :description
+     (str "The Parameter's validation rules, which contains a list of rules that can be used to verify "
+          "that Parameter values entered by a user are valid. Note that in cases where the user is given "
+          "a list of possibilities to choose from, no validation rules are required because the selection "
+          "list itself can be used to validate the Parameter value")}
+    [:vector AppParameterValidator]]])
+
+(def AppGroup
+  [:map {:closed true}
+   [:id
+    {:description         "A UUID that is used to identify the Parameter Group"
+     :json-schema/example #uuid "fedcba98-7654-3210-fedc-ba9876543210"}
+    :uuid]
+
+   [:name
+    {:optional            true
+     :description         "The Parameter Group's name"
+     :json-schema/example "input_parameters"}
+    :string]
+
+   [:description
+    {:optional            true
+     :description         "The Parameter Group's description"
+     :json-schema/example "Input file and configuration parameters"}
+    :string]
+
+   [:label
+    {:description         "The label used to identify the Parameter Group in the UI"
+     :json-schema/example "Input Parameters"}
+    :string]
+
+   [:isVisible
+    {:optional            true
+     :description         "The Parameter Group's intended visibility in the job submission UI"
+     :json-schema/example true}
+    :boolean]
+
+   [:parameters
+    {:optional    true
+     :description ParameterListDocs}
+    [:vector AppParameter]]])
+
+(def AppVersionDetails
+  [:map {:closed true}
+   [:version AppVersionParam]
+   [:version_id AppVersionIdParam]])
+
+(def AppVersionListing
+  [:map {:closed true}
+   [:versions
+    {:optional    true
+     :description "The list of available versions for this app"}
+    [:vector AppVersionDetails]]])
+
+(def AppVersionOrderRequest
+  [:map {:closed true}
+   [:versions
+    {:description "The app versions in descending order, with the newest (or latest) first."}
+    [:vector (mu/optional-keys AppVersionDetails [:version])]]])
+
+(def AppBase
+  (mu/merge
+   [:map
+    [:id AppIdParam]
+
+    [:name
+     {:description         "The App's name"
+      :json-schema/example "BLAST"}
+     :string]
+
+    [:description
+     {:description         "The App's description"
+      :json-schema/example "Basic Local Alignment Search Tool for sequence comparison"}
+     :string]
+
+    [:integration_date
+     {:optional            true
+      :description         "The App's Date of public submission"
+      :json-schema/example #inst "2024-01-15T10:30:00.000-00:00"}
+     inst?]
+
+    [:edited_date
+     {:optional            true
+      :description         "The App's Date of its last edit"
+      :json-schema/example #inst "2024-10-20T14:45:00.000-00:00"}
+     inst?]
+
+    [:system_id
+     {:optional true}
+     SystemId]]
+   (mu/optional-keys AppVersionDetails)))
+
+(def AppLimitCheckResult
+  [:map {:closed true}
+   [:limitCheckID
+    {:description         "An identifier indicating which limit check failed"
+     :json-schema/example "concurrent-job-limit"}
+    :string]
+
+   [:reasonCodes
+    {:description         "A list of codes indicating the reason for the limit check failure"
+     :json-schema/example ["MAX_JOBS_EXCEEDED" "QUOTA_LIMIT_REACHED"]}
+    [:vector :string]]
+
+   [:additionalInfo
+    {:description         "An arbitrary object providing information relevant to the limit check"
+     :json-schema/example {:current_jobs 10 :max_jobs 5}}
+    :any]])
+
+(def AppLimitCheckResultSummary
+  [:map {:closed true}
+   [:canRun
+    {:description
+     "True if the user is currently permitted to launch an analysis using the app"
+     :json-schema/example true}
+    :boolean]
+
+   [:results
+    {:description
+     (str "A list of individual limit check results providing information about why "
+          "the check failed. This list will be empty if the user is permitted to use "
+          "the app")
+     :json-schema/example []}
+    [:vector AppLimitCheckResult]]])
+
+(def AppLimitChecks
+  [:map {:closed true}
+   [:limitChecks
+    {:optional    true
+     :description
+     "Indicates whether or not the user is currently permitted to launch an analysis using the app"}
+    AppLimitCheckResultSummary]])
+
+(def AppTools
+  [:map
+   [:tools
+    {:description ToolListDocs}
+    [:vector (mu/merge ToolDeprecatedParam [:map [:deprecated {:optional true} ToolDeprecatedParam]])]]
+
+   [:references
+    {:description         "The App's references"
+     :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]
+     :optional            true}
+    [:vector :string]]
+
+   [:groups
+    {:optional    true
+     :description GroupListDocs}
+    [:vector AppGroup]]])
+
+(def App
+  (-> AppBase
+      (mu/merge AppVersionListing)
+      (mu/merge AppTools)))

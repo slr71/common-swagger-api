@@ -1,9 +1,9 @@
 (ns common-swagger-api.malli
-  (:require [clojure.string :as string]
-            [clojure-commons.error-codes :as ce]
-            [malli.util :as mu]))
+  (:require
+   [clojure-commons.error-codes :as ce]
+   [malli.util :as mu]))
 
-(def NonBlankString [:and :string [:fn (complement string/blank?)]])
+(def NonBlankString [:re "\\S+"])
 
 (def StandardUserQueryParams
   [:map {:closed true}

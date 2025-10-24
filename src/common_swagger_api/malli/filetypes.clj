@@ -1,7 +1,8 @@
 (ns common-swagger-api.malli.filetypes
-  (:require [common-swagger-api.malli :refer [NonBlankString]]
-            [heuristomancer.core :as hm]
-            [malli.util :as mu]))
+  (:require
+   [common-swagger-api.malli :refer [NonBlankString]]
+   [heuristomancer.core :as hm]
+   [malli.util :as mu]))
 
 (def ValidInfoTypes (conj (hm/supported-formats) "unknown"))
 
