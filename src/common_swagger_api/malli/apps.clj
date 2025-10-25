@@ -1,5 +1,7 @@
 (ns common-swagger-api.malli.apps
   (:require
+   [common-swagger-api.malli.containers :refer [Settings]]
+   [common-swagger-api.malli.tools :refer [ToolDetails]]
    [malli.core :as m]
    [malli.util :as mu]))
 
@@ -623,7 +625,7 @@
   [:map
    [:tools
     {:description ToolListDocs}
-    [:vector (mu/merge ToolDeprecatedParam [:map [:deprecated {:optional true} ToolDeprecatedParam]])]]
+    [:vector {:min 1} (mu/merge ToolDeprecatedParam [:map [:deprecated {:optional true} ToolDeprecatedParam]])]]
 
    [:references
     {:description         "The App's references"
@@ -640,3 +642,208 @@
   (-> AppBase
       (mu/merge AppVersionListing)
       (mu/merge AppTools)))
+
+(def AppLabelUpdateRequest
+  (mu/update-properties
+   (mu/dissoc App :versions)
+   assoc :description "The App to update."))
+
+(def AppFileParameterDetails
+  [:map {:closed true}
+   [:id
+    {:description         "The Parameter's ID"
+     :json-schema/example "param_123"}
+    :string]
+
+   [:name
+    {:description         "The Parameter's name"
+     :json-schema/example "output_alignment"}
+    :string]
+
+   [:description
+    {:description         "The Parameter's description"
+     :json-schema/example "The output alignment file from the analysis"}
+    :string]
+
+   [:label
+    {:description         "The Input Parameter's label or the Output Parameter's value"
+     :json-schema/example "Output Alignment"}
+    :string]
+
+   [:format
+    {:description         "The Parameter's file format"
+     :json-schema/example "bam"}
+    :string]
+
+   [:required
+    {:description         "Whether or not a value is required for this Parameter"
+     :json-schema/example true}
+    :boolean]])
+
+(def AppTask
+  [:map {:closed true}
+   [:system_id
+    {:description         "The Task's System ID"
+     :json-schema/example "de"}
+    :string]
+
+   [:id
+    {:description         "The Task's ID"
+     :json-schema/example "task_456"}
+    :string]
+
+   [:name
+    {:description         "The Task's name"
+     :json-schema/example "BLAST Analysis"}
+    :string]
+
+   [:description
+    {:description         "The Task's description"
+     :json-schema/example "Performs BLAST sequence alignment analysis"}
+    :string]
+
+   [:tool
+    {:optional    true
+     :description "The Task's tool details"}
+    ToolDetails]
+
+   [:inputs
+    {:description "The Task's input parameters"}
+    [:vector AppFileParameterDetails]]
+
+   [:outputs
+    {:description "The Task's output parameters"}
+    [:vector AppFileParameterDetails]]])
+
+(def AppTaskListing
+  (mu/merge
+   AppBase
+   [:map
+    [:id
+     {:description         "The App's ID."
+      :json-schema/example "app_789"}
+     :string]
+
+    [:tasks
+     {:description "The App's tasks"}
+     [:vector AppTask]]]))
+
+(def AppParameterJobView
+  (mu/merge
+   AppParameter
+   [:map
+    {:closed true}
+
+    [:id
+     {:description
+      (str "A string consisting of the App's step ID and the Parameter ID separated by an underscore. "
+           "Both identifiers are necessary because the same task may be associated with a single App, "
+           "which would cause duplicate keys in the job submission JSON. The step ID is prepended to "
+           "the Parameter ID in order to ensure that all parameter value keys are unique.")
+      :json-schema/example "step_123_param_456"}
+     :string]]))
+
+(def AppStepResourceRequirements
+  (-> (mu/select-keys
+       Settings
+       [:memory_limit
+        :min_memory_limit
+        :min_cpu_cores
+        :max_cpu_cores
+        :min_disk_space])
+      (mu/merge
+       [:map
+        {:description "The Tool resource requirements for this step"
+         :closed      true}
+
+        [:default_max_cpu_cores
+         {:optional            true
+          :description         "The default limit of CPU cores requested to run the tool container"
+          :json-schema/example 2.0}
+         :double]
+
+        [:default_cpu_cores
+         {:optional            true
+          :description         "The default minimum of CPU cores requested to run the tool container"
+          :json-schema/example 1.0}
+         :double]
+
+        [:default_memory
+         {:optional            true
+          :description         "The default amount of memory (in bytes) requested to run the tool container"
+          :json-schema/example 536870912}
+         :int]
+
+        [:default_disk_space
+         {:optional            true
+          :description         "The default amount of disk space requested to run the tool container"
+          :json-schema/example 5368709120}
+         :int]
+
+        [:step_number
+         {:description         "The sequential step number of the Tool in the analysis"
+          :json-schema/example 1}
+         :int]])))
+
+(def AppGroupJobView
+  (mu/merge
+   AppGroup
+   [:map
+    {:closed true}
+
+    [:id
+     {:description         "The app group ID."
+      :json-schema/example "step_123_group_456"}
+     :string]
+
+    [:step_number
+     {:description         "The step number associated with this parameter group"
+      :json-schema/example 1}
+     :int]
+
+    [:parameters
+     {:optional    true
+      :description ParameterListDocs}
+     [:vector AppParameterJobView]]]))
+
+(def AppJobView
+  (-> (mu/merge AppBase AppLimitChecks)
+      (mu/merge AppVersionListing)
+      (mu/merge
+        [:map
+    {:closed true}
+
+    [:id
+     {:description         "The app ID."
+      :json-schema/example "app-id-abc123"}
+     :string]
+
+    [:app_type
+     {:description         "DE or External."
+      :json-schema/example "DE"}
+     :string]
+
+    [:label
+     {:description         "An alias for the App's name"
+      :json-schema/example "BLAST Analysis Tool"}
+     :string]
+
+    [:deleted AppDeletedParam]
+
+    [:disabled AppDisabledParam]
+
+    [:debug
+     {:optional            true
+      :description         "True if input files should be retained for the job by default."
+      :json-schema/example false}
+     :boolean]
+
+    [:requirements
+     {:optional    true
+      :description "The list of resource requirements for each step"}
+     [:vector AppStepResourceRequirements]]
+
+    [:groups
+     {:optional    true
+      :description GroupListDocs}
+     [:vector AppGroupJobView]]])))
