@@ -1,7 +1,11 @@
 (ns common-swagger-api.malli.apps
   (:require
+   [clojure.set :as sets]
+   [common-swagger-api.malli :refer [PagingParams SortFieldDocs]]
+   [common-swagger-api.malli.apps.rating :as rating]
    [common-swagger-api.malli.containers :refer [Settings]]
-   [common-swagger-api.malli.tools :refer [ToolDetails]]
+   [common-swagger-api.malli.ontologies :refer [OntologyClassHierarchy]]
+   [common-swagger-api.malli.tools :refer [Tool ToolDetails ToolListingImage]]
    [malli.core :as m]
    [malli.util :as mu]))
 
@@ -847,3 +851,287 @@
      {:optional    true
       :description GroupListDocs}
      [:vector AppGroupJobView]]])))
+
+(def AppDetailCategory
+  [:map {:closed true}
+   [:id AppCategoryIdPathParam]
+
+   [:name
+    {:description         "The App Category's name"
+     :json-schema/example "Bioinformatics"}
+    :string]])
+
+(def AppDetailsTool
+  (mu/merge
+   (mu/dissoc Tool :id)
+   [:map {:closed true}
+    [:id
+     {:description         "The tool identifier."
+      :json-schema/example "tool-abc123"}
+     :string]
+
+    [:container
+     {:optional true}
+     ToolListingImage]]))
+
+(def AppListingJobStats
+  [:map {:closed true}
+   [:job_count_completed
+    {:description         "The number of times this app has run to `Completed` status"
+     :json-schema/example 42}
+    :int]
+
+   [:job_last_completed
+    {:optional            true
+     :description         "The last date this app has run to `Completed` status"
+     :json-schema/example #inst "2025-10-25T16:30:00.000-00:00"}
+    inst?]])
+
+(def AppToolListing
+  [:map {:closed true}
+   [:tools
+    {:description "Listing of App Tools"}
+    [:vector AppDetailsTool]]])
+
+(def AppDocumentation
+  [:map {:closed true}
+   [:app_id
+    {:optional true}
+    StringAppIdParam]
+
+   [:version_id
+    {:optional true}
+    AppLatestVersionIdParam]
+
+   [:documentation AppDocParam]
+
+   [:references
+    {:description         "The App's references"
+     :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}
+    [:vector :string]]
+
+   [:created_on
+    {:optional            true
+     :description         "The Date the App's documentation was created"
+     :json-schema/example #inst "2024-02-10T09:15:00.000-00:00"}
+    inst?]
+
+   [:modified_on
+    {:optional            true
+     :description         "The Date the App's documentation was last modified"
+     :json-schema/example #inst "2024-10-15T11:20:00.000-00:00"}
+    inst?]
+
+   [:created_by
+    {:optional            true
+     :description         "The user that created the App's documentation"
+     :json-schema/example "jsmith"}
+    :string]
+
+   [:modified_by
+    {:optional            true
+     :description         "The user that last modified the App's documentation"
+     :json-schema/example "jdoe"}
+    :string]])
+
+(def AppDocumentationRequest
+  (mu/update-properties
+   (mu/dissoc AppDocumentation :references)
+   assoc :description "The App Documentation Request"))
+
+(def PipelineEligibility
+  [:map {:closed true}
+   [:is_valid
+    {:description         "Whether the App can be used in a Pipeline"
+     :json-schema/example true}
+    :boolean]
+
+   [:reason
+    {:description         "The reason an App cannot be used in a Pipeline"
+     :json-schema/example "This app contains tasks that are not public"}
+    :string]])
+
+(def AppListingDetail
+  (-> (mu/merge AppBase AppLimitChecks)
+      (mu/merge
+       [:map
+        {:closed true}
+
+        [:id
+         {:description         "The app ID."
+          :json-schema/example "app-id-abc123"}
+         :string]
+
+        [:app_type
+         {:description         "The type ID of the App"
+          :json-schema/example "DE"}
+         :string]
+
+        [:overall_job_type
+         {:optional            true
+          :description         "The type of the App's tool(s)"
+          :json-schema/example "executable"}
+         :string]
+
+        [:can_favor
+         {:description         "Whether the current user can favorite this App"
+          :json-schema/example true}
+         :boolean]
+
+        [:can_rate
+         {:description         "Whether the current user can rate this App"
+          :json-schema/example true}
+         :boolean]
+
+        [:can_run
+         {:description
+          (str "This flag is calculated by comparing the number of steps in the app to the number of steps "
+               "that have a tool associated with them. If the numbers are different then this flag is set to "
+               "`false`. The idea is that every step in the analysis has to have, at the very least, a tool "
+               "associated with it in order to run successfully")
+          :json-schema/example true}
+         :boolean]
+
+        [:deleted AppDeletedParam]
+
+        [:disabled AppDisabledParam]
+
+        [:version
+         {:optional true}
+         AppLatestVersionParam]
+
+        [:version_id
+         {:optional true}
+         AppLatestVersionIdParam]
+
+        [:integrator_email
+         {:description         "The App integrator's email address"
+          :json-schema/example "jsmith@example.org"}
+         :string]
+
+        [:integrator_name
+         {:description         "The App integrator's full name"
+          :json-schema/example "John Smith"}
+         :string]
+
+        [:is_favorite
+         {:optional            true
+          :description         "Whether the current user has marked the App as a favorite"
+          :json-schema/example true}
+         :boolean]
+
+        [:is_public AppPublicParam]
+
+        [:beta
+         {:optional            true
+          :description         "Whether the App has been marked as `beta` release status"
+          :json-schema/example false}
+         :boolean]
+
+        [:isBlessed
+         {:optional    true
+          :description
+          (str "Whether the App has been marked as having been reviewed and certified by Discovery Environment "
+               "administrators")
+          :json-schema/example true}
+         :boolean]
+
+        [:pipeline_eligibility
+         {:description "Whether the App can be used in a Pipeline"}
+         PipelineEligibility]
+
+        [:rating
+         {:description "The App's rating details"}
+         rating/Rating]
+
+        [:step_count
+         {:description         "The number of Tasks this App executes"
+          :json-schema/example 1}
+         :int]
+
+        [:wiki_url
+         {:optional true}
+         AppDocUrlParam]
+
+        [:permission
+         {:description         "The user's access level for the app."
+          :json-schema/example "own"}
+         :string]])))
+
+(def AppDetails
+  (-> AppListingDetail
+      (mu/merge
+       [:map
+        {:closed true}
+
+        [:tools
+         {:description ToolListDocs}
+         [:vector AppDetailsTool]]
+
+        [:references
+         {:description         "The App's references"
+          :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}
+         [:vector :string]]
+
+        [:job_stats
+         {:optional    true
+          :description AppListingJobStatsDocs}
+         AppListingJobStats]
+
+        [:categories
+         {:description "The list of Categories associated with the App"}
+         [:vector AppDetailCategory]]
+
+        [:suggested_categories
+         {:description "The list of Categories the integrator wishes to associate with the App"}
+         [:vector AppDetailCategory]]
+
+        [:hierarchies
+         {:optional    true
+          :description "A list of Ontology Class hierarchies"}
+         [:vector OntologyClassHierarchy]]])
+      (mu/merge AppVersionListing)))
+
+(def AppListing
+  [:map {:closed true}
+   [:total
+    {:description         "The total number of Apps in the listing"
+     :json-schema/example 42}
+    :int]
+
+   [:apps
+    {:description "A listing of App details"}
+    [:vector AppListingDetail]]])
+
+(def AppListingValidSortFields
+  (-> (mu/keys AppListingDetail)
+      (conj :average_rating :user_rating)
+      set
+      (sets/difference #{:app_type
+                         :can_favor
+                         :can_rate
+                         :can_run
+                         :pipeline_eligibility
+                         :rating})))
+
+(def AppSearchValidSortFields
+  (-> AppListingValidSortFields
+      (sets/difference #{:average_rating :user_rating})
+      (conj :average :total)))
+
+(def AppFilterParams
+  [:map {:closed true}
+   [:app-type
+    {:optional            true
+     :description         "The type of app to include in the listing."
+     :json-schema/example "DE"}
+    :string]])
+
+(def AppListingPagingParams
+  (-> (mu/merge PagingParams AppFilterParams)
+      (mu/merge
+        [:map {:closed true}
+         [ :sort-field
+          {:description SortFieldDocs
+           :optional    true}
+          (into [:enum] AppListingValidSortFields)]])))

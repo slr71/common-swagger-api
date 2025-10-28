@@ -2766,3 +2766,844 @@
                         :deleted false
                         :disabled false
                         :unknown_key "also-not-allowed"}))))))
+
+(deftest test-AppListingJobStats
+  (testing "AppListingJobStats validation"
+    (testing "valid job stats"
+      (testing "with all fields"
+        (is (valid? apps/AppListingJobStats
+                    {:job_count_completed 42
+                     :job_last_completed #inst "2025-10-25T16:30:00.000-00:00"}))
+        (is (valid? apps/AppListingJobStats
+                    {:job_count_completed 100
+                     :job_last_completed #inst "2024-01-15T10:30:00.000-00:00"}))
+        (is (valid? apps/AppListingJobStats
+                    {:job_count_completed 0
+                     :job_last_completed #inst "2023-12-31T23:59:59.999-00:00"})))
+
+      (testing "without optional job_last_completed field"
+        (is (valid? apps/AppListingJobStats
+                    {:job_count_completed 42}))
+        (is (valid? apps/AppListingJobStats
+                    {:job_count_completed 0}))
+        (is (valid? apps/AppListingJobStats
+                    {:job_count_completed 999}))))
+
+    (testing "invalid job stats"
+      (testing "missing required fields"
+        (is (not (valid? apps/AppListingJobStats {})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_last_completed #inst "2025-10-25T16:30:00.000-00:00"}))))
+
+      (testing "invalid field types"
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed "42"
+                          :job_last_completed #inst "2025-10-25T16:30:00.000-00:00"})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed 42.5
+                          :job_last_completed #inst "2025-10-25T16:30:00.000-00:00"})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed nil})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed true})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed 42
+                          :job_last_completed "2025-10-25T16:30:00.000-00:00"})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed 42
+                          :job_last_completed 1729872600000})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed 42
+                          :job_last_completed nil}))))
+
+      (testing "extra fields not allowed"
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed 42
+                          :job_last_completed #inst "2025-10-25T16:30:00.000-00:00"
+                          :extra-field "not-allowed"})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed 42
+                          :job_count_failed 5})))
+        (is (not (valid? apps/AppListingJobStats
+                         {:job_count_completed 42
+                          :job_last_completed #inst "2025-10-25T16:30:00.000-00:00"
+                          :job_first_completed #inst "2024-01-01T00:00:00.000-00:00"})))))))
+
+(deftest test-AppDetailCategory
+  (testing "AppDetailCategory validation"
+    (testing "valid app detail category"
+      (is (valid? apps/AppDetailCategory
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "Bioinformatics"}))
+      (is (valid? apps/AppDetailCategory
+                  {:id #uuid "987e6543-e21b-32c1-b456-426614174001"
+                   :name "Data Science"}))
+      (is (valid? apps/AppDetailCategory
+                  {:id #uuid "456e7890-b12c-34d5-e678-901234567890"
+                   :name "Image Analysis"}))
+      (is (valid? apps/AppDetailCategory
+                  {:id #uuid "abc12345-def6-7890-abcd-ef1234567890"
+                   :name "A"})))
+
+    (testing "invalid app detail category"
+      (testing "missing required fields"
+        (is (not (valid? apps/AppDetailCategory {})))
+        (is (not (valid? apps/AppDetailCategory {:id #uuid "123e4567-e89b-12d3-a456-426614174000"})))
+        (is (not (valid? apps/AppDetailCategory {:name "Bioinformatics"}))))
+
+      (testing "invalid field types"
+        (is (not (valid? apps/AppDetailCategory
+                         {:id "not-a-uuid"
+                          :name "Bioinformatics"})))
+        (is (not (valid? apps/AppDetailCategory
+                         {:id 123
+                          :name "Bioinformatics"})))
+        (is (not (valid? apps/AppDetailCategory
+                         {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                          :name 123})))
+        (is (not (valid? apps/AppDetailCategory
+                         {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                          :name nil})))
+        (is (not (valid? apps/AppDetailCategory
+                         {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                          :name true}))))
+
+      (testing "extra fields not allowed"
+        (is (not (valid? apps/AppDetailCategory
+                         {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                          :name "Bioinformatics"
+                          :extra-field "not-allowed"})))
+        (is (not (valid? apps/AppDetailCategory
+                         {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                          :name "Bioinformatics"
+                          :description "This should not be here"})))))))
+
+(deftest test-PipelineEligibility
+  (testing "PipelineEligibility validation"
+    (testing "valid pipeline eligibility"
+      (is (valid? apps/PipelineEligibility
+                  {:is_valid true
+                   :reason "This app contains tasks that are not public"}))
+      (is (valid? apps/PipelineEligibility
+                  {:is_valid false
+                   :reason "App cannot be used in a pipeline because it contains private tools"}))
+      (is (valid? apps/PipelineEligibility
+                  {:is_valid true
+                   :reason ""}))
+      (is (valid? apps/PipelineEligibility
+                  {:is_valid false
+                   :reason "All tasks must be public to use in a pipeline"})))
+
+    (testing "invalid pipeline eligibility"
+      (testing "missing required fields"
+        (is (not (valid? apps/PipelineEligibility {})))
+        (is (not (valid? apps/PipelineEligibility {:is_valid true})))
+        (is (not (valid? apps/PipelineEligibility {:reason "Some reason"}))))
+
+      (testing "invalid field types"
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid "not-a-boolean"
+                          :reason "Some reason"})))
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid 1
+                          :reason "Some reason"})))
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid nil
+                          :reason "Some reason"})))
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid true
+                          :reason 123})))
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid true
+                          :reason nil})))
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid true
+                          :reason true}))))
+
+      (testing "extra fields not allowed"
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid true
+                          :reason "Some reason"
+                          :extra-field "not-allowed"})))
+        (is (not (valid? apps/PipelineEligibility
+                         {:is_valid false
+                          :reason "App has private components"
+                          :details "Additional details should not be here"})))))))
+
+(deftest test-AppListingDetail
+  (testing "AppListingDetail validation"
+    (let [minimal-rating {:average 4.5
+                          :total   42}
+          minimal-pipeline {:is_valid true
+                            :reason   ""}
+          base-app-listing {:id                    "app-id-123"
+                            :name                  "BLAST"
+                            :description           "Basic sequence alignment"
+                            :app_type              "DE"
+                            :can_favor             true
+                            :can_rate              true
+                            :can_run               true
+                            :deleted               false
+                            :disabled              false
+                            :integrator_email      "user@example.org"
+                            :integrator_name       "Test User"
+                            :is_public             true
+                            :pipeline_eligibility  minimal-pipeline
+                            :rating                minimal-rating
+                            :step_count            1
+                            :permission            "own"}]
+
+      (testing "valid app listing with minimal required fields"
+        (is (valid? apps/AppListingDetail base-app-listing)))
+
+      (testing "valid app listing with all optional fields"
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :system_id "de"
+                           :integration_date #inst "2024-01-15T10:30:00.000-00:00"
+                           :edited_date #inst "2024-10-20T14:45:00.000-00:00"
+                           :overall_job_type "executable"
+                           :version "1.2.0"
+                           :version_id "version-id-456"
+                           :is_favorite true
+                           :beta false
+                           :isBlessed true
+                           :wiki_url "https://wiki.example.org/apps/blast"
+                           :limitChecks {:canRun  true
+                                         :results []}))))
+
+      (testing "valid app listing with complex rating including user data"
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :rating {:average    4.5
+                                    :total      42
+                                    :user       5
+                                    :comment_id 123}))))
+
+      (testing "valid app listing with complex pipeline eligibility"
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :pipeline_eligibility {:is_valid false
+                                                  :reason   "App contains private tasks"}))))
+
+      (testing "valid app listing with limit checks indicating failure"
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :limitChecks {:canRun  false
+                                         :results [{:limitCheckID   "concurrent-job-limit"
+                                                    :reasonCodes    ["MAX_JOBS_EXCEEDED"]
+                                                    :additionalInfo {:current_jobs 10
+                                                                     :max_jobs     5}}]}))))
+
+      (testing "valid app listing with multiple limit check results"
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :limitChecks {:canRun  false
+                                         :results [{:limitCheckID   "concurrent-job-limit"
+                                                    :reasonCodes    ["MAX_JOBS_EXCEEDED"]
+                                                    :additionalInfo {:current_jobs 10
+                                                                     :max_jobs     5}}
+                                                   {:limitCheckID   "quota-limit"
+                                                    :reasonCodes    ["QUOTA_EXCEEDED" "DISK_FULL"]
+                                                    :additionalInfo {:used  1000
+                                                                     :limit 800}}]}))))
+
+      (testing "missing required fields"
+        (is (not (valid? apps/AppListingDetail {})))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :id))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :name))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :description))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :app_type))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :can_favor))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :can_rate))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :can_run))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :deleted))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :disabled))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :integrator_email))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :integrator_name))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :is_public))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :pipeline_eligibility))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :rating))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :step_count))))
+        (is (not (valid? apps/AppListingDetail (dissoc base-app-listing :permission)))))
+
+      (testing "invalid field types"
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :id 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :name 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :description nil))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :app_type 456))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :overall_job_type 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :can_favor "true"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :can_rate "false"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :can_run 1))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :deleted "false"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :disabled "true"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :version 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :version_id 456))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :integrator_email 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :integrator_name nil))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :is_favorite "yes"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :is_public "true"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :beta "false"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :isBlessed "true"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :pipeline_eligibility "eligible"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :rating "5 stars"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :step_count "1"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :step_count 1.5))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :wiki_url 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :permission 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :system_id 123))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :integration_date "2024-01-15"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :edited_date "2024-10-20")))))
+
+      (testing "invalid nested rating structure"
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :rating {}))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :rating {:average 4.5}))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :rating {:total 42}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :rating {:average "4.5"
+                                         :total   42}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :rating {:average 4.5
+                                         :total   "42"}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :rating {:average 4.5
+                                         :total   42
+                                         :user    "5"})))))
+
+      (testing "invalid nested pipeline eligibility structure"
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :pipeline_eligibility {}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :pipeline_eligibility {:is_valid true}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :pipeline_eligibility {:reason "Some reason"}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :pipeline_eligibility {:is_valid "true"
+                                                       :reason   "Some reason"}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :pipeline_eligibility {:is_valid true
+                                                       :reason   123})))))
+
+      (testing "invalid nested limit checks structure"
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :limitChecks {}))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :limitChecks {:canRun true}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :limitChecks {:canRun  "true"
+                                              :results []}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :limitChecks {:canRun  true
+                                              :results "[]"}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :limitChecks {:canRun  true
+                                              :results [{:limitCheckID "test"}]}))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :limitChecks {:canRun  true
+                                              :results [{:limitCheckID   "test"
+                                                         :reasonCodes    ["CODE"]
+                                                         :additionalInfo {}
+                                                         :extra-field    "not-allowed"}]})))))
+
+      (testing "extra fields not allowed at top level"
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :extra-field "not-allowed"))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :custom_data {:key "value"}))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :tags ["tag1" "tag2"])))))
+
+      (testing "optional fields can be omitted"
+        (is (valid? apps/AppListingDetail base-app-listing))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :system_id "de")))
+        (is (valid? apps/AppListingDetail (dissoc (assoc base-app-listing :system_id "de") :system_id)))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :overall_job_type "executable")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :version "1.0.0")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :version_id "v123")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :is_favorite false)))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :beta true)))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :isBlessed false)))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :wiki_url "https://example.org")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :integration_date #inst "2024-01-01")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :edited_date #inst "2024-02-01")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :limitChecks {:canRun  true
+                                                                                 :results []}))))
+
+      (testing "step_count must be integer not long/double"
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :step_count 1)))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :step_count 100)))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :step_count 0)))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :step_count 1.5))))
+        (is (not (valid? apps/AppListingDetail (assoc base-app-listing :step_count 2.0)))))
+
+      (testing "boundary cases for string fields"
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :id "")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :name "")))
+        (is (valid? apps/AppListingDetail (assoc base-app-listing :description "")))
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :id (apply str (repeat 1000 "x")))))
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :name (apply str (repeat 1000 "y"))))))
+
+      (testing "all boolean fields accept only true/false"
+        (doseq [field [:can_favor :can_rate :can_run :deleted :disabled :is_public]]
+          (is (valid? apps/AppListingDetail (assoc base-app-listing field true)))
+          (is (valid? apps/AppListingDetail (assoc base-app-listing field false)))
+          (is (not (valid? apps/AppListingDetail (assoc base-app-listing field nil))))
+          (is (not (valid? apps/AppListingDetail (assoc base-app-listing field "true"))))
+          (is (not (valid? apps/AppListingDetail (assoc base-app-listing field 1))))
+          (is (not (valid? apps/AppListingDetail (assoc base-app-listing field 0)))))
+
+        (doseq [field [:is_favorite :beta :isBlessed]]
+          (is (valid? apps/AppListingDetail (assoc base-app-listing field true)))
+          (is (valid? apps/AppListingDetail (assoc base-app-listing field false)))
+          (is (not (valid? apps/AppListingDetail (assoc base-app-listing field "true"))))
+          (is (not (valid? apps/AppListingDetail (assoc base-app-listing field 1))))))
+
+      (testing "date fields accept inst types"
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :integration_date #inst "2024-01-15T10:30:00.000-00:00")))
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :edited_date #inst "2024-10-20T14:45:00.000-00:00")))
+        (is (valid? apps/AppListingDetail
+                    (assoc base-app-listing
+                           :integration_date #inst "2024-01-15T10:30:00.000-00:00"
+                           :edited_date #inst "2024-10-20T14:45:00.000-00:00")))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :integration_date "2024-01-15T10:30:00Z"))))
+        (is (not (valid? apps/AppListingDetail
+                         (assoc base-app-listing
+                                :edited_date "2024-10-20"))))))))
+
+(deftest test-AppListing
+  (testing "AppListing validation"
+    (let [minimal-rating {:average 4.5
+                          :total   42}
+          minimal-pipeline {:is_valid true
+                            :reason   ""}
+          base-app-listing-detail {:id                   "app-id-123"
+                                   :name                 "BLAST"
+                                   :description          "Basic sequence alignment"
+                                   :app_type             "DE"
+                                   :can_favor            true
+                                   :can_rate             true
+                                   :can_run              true
+                                   :deleted              false
+                                   :disabled             false
+                                   :integrator_email     "user@example.org"
+                                   :integrator_name      "Test User"
+                                   :is_public            true
+                                   :pipeline_eligibility minimal-pipeline
+                                   :rating               minimal-rating
+                                   :step_count           1
+                                   :permission           "own"}
+          minimal-app-listing {:total 0
+                               :apps  []}
+          single-app-listing {:total 1
+                              :apps  [base-app-listing-detail]}]
+
+      (testing "valid app listing with no apps"
+        (is (valid? apps/AppListing minimal-app-listing)))
+
+      (testing "valid app listing with single app"
+        (is (valid? apps/AppListing single-app-listing)))
+
+      (testing "valid app listing with multiple apps"
+        (is (valid? apps/AppListing
+                    {:total 3
+                     :apps  [base-app-listing-detail
+                             (assoc base-app-listing-detail :id "app-id-456" :name "BWA")
+                             (assoc base-app-listing-detail :id "app-id-789" :name "Bowtie2")]})))
+
+      (testing "valid app listing with apps containing optional fields"
+        (is (valid? apps/AppListing
+                    {:total 1
+                     :apps  [(assoc base-app-listing-detail
+                                    :system_id "de"
+                                    :integration_date #inst "2024-01-15T10:30:00.000-00:00"
+                                    :edited_date #inst "2024-10-20T14:45:00.000-00:00"
+                                    :overall_job_type "executable"
+                                    :version "1.2.0"
+                                    :version_id "version-id-456"
+                                    :is_favorite true
+                                    :beta false
+                                    :isBlessed true
+                                    :wiki_url "https://wiki.example.org/apps/blast"
+                                    :limitChecks {:canRun  true
+                                                  :results []})]})))
+
+      (testing "valid app listing with large total"
+        (is (valid? apps/AppListing
+                    {:total 1000
+                     :apps  [base-app-listing-detail]})))
+
+      (testing "valid app listing with zero total and empty apps list"
+        (is (valid? apps/AppListing
+                    {:total 0
+                     :apps  []})))
+
+      (testing "missing required fields"
+        (is (not (valid? apps/AppListing {})))
+        (is (not (valid? apps/AppListing {:total 0})))
+        (is (not (valid? apps/AppListing {:apps []})))
+        (is (not (valid? apps/AppListing {:total 1 :apps [base-app-listing-detail] :extra-field "not-allowed"}))))
+
+      (testing "invalid field types for total"
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :total "0"))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :total 0.0))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :total 1.5))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :total nil))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :total true)))))
+
+      (testing "invalid field types for apps"
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :apps nil))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :apps "[]"))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :apps {}))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :apps base-app-listing-detail)))))
+
+      (testing "invalid app listing detail in apps vector"
+        (is (not (valid? apps/AppListing
+                         {:total 1
+                          :apps  [{}]})))
+        (is (not (valid? apps/AppListing
+                         {:total 1
+                          :apps  [(dissoc base-app-listing-detail :id)]})))
+        (is (not (valid? apps/AppListing
+                         {:total 1
+                          :apps  [(dissoc base-app-listing-detail :name)]})))
+        (is (not (valid? apps/AppListing
+                         {:total 1
+                          :apps  [(assoc base-app-listing-detail :id 123)]})))
+        (is (not (valid? apps/AppListing
+                         {:total 1
+                          :apps  [(assoc base-app-listing-detail :extra-field "not-allowed")]}))))
+
+      (testing "extra fields not allowed"
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :extra-field "not-allowed"))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :custom_data {:key "value"}))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :metadata "extra")))))
+
+      (testing "boundary cases for total"
+        (is (valid? apps/AppListing (assoc minimal-app-listing :total 0)))
+        (is (valid? apps/AppListing (assoc minimal-app-listing :total 1)))
+        (is (valid? apps/AppListing (assoc minimal-app-listing :total 999999)))
+        (is (valid? apps/AppListing (assoc minimal-app-listing :total -1)))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :total 1.0))))
+        (is (not (valid? apps/AppListing (assoc minimal-app-listing :total 0.5)))))
+
+      (testing "apps vector can contain multiple complete app listings"
+        (let [app2 (assoc base-app-listing-detail
+                          :id "app-id-456"
+                          :name "Different App"
+                          :description "Another app"
+                          :version "2.0.0"
+                          :is_favorite false
+                          :beta true)
+              app3 (assoc base-app-listing-detail
+                          :id "app-id-789"
+                          :name "Third App"
+                          :description "Yet another app"
+                          :overall_job_type "interactive"
+                          :limitChecks {:canRun  false
+                                        :results [{:limitCheckID   "concurrent-job-limit"
+                                                   :reasonCodes    ["MAX_JOBS_EXCEEDED"]
+                                                   :additionalInfo {:current_jobs 10
+                                                                    :max_jobs     5}}]})]
+          (is (valid? apps/AppListing
+                      {:total 3
+                       :apps  [base-app-listing-detail app2 app3]}))))
+
+      (testing "apps with complex nested structures"
+        (is (valid? apps/AppListing
+                    {:total 1
+                     :apps  [(assoc base-app-listing-detail
+                                    :rating {:average    4.8
+                                             :total      100
+                                             :user       5
+                                             :comment_id 456}
+                                    :pipeline_eligibility {:is_valid false
+                                                           :reason   "Contains private tasks"}
+                                    :limitChecks {:canRun  false
+                                                  :results [{:limitCheckID   "quota-limit"
+                                                             :reasonCodes    ["QUOTA_EXCEEDED"]
+                                                             :additionalInfo {:used  1000
+                                                                              :limit 800}}]})]})))
+
+      (testing "empty apps vector with various totals"
+        (is (valid? apps/AppListing {:total 0 :apps []}))
+        (is (valid? apps/AppListing {:total -1 :apps []}))
+        (is (valid? apps/AppListing {:total 1000 :apps []})))
+
+      (testing "apps vector with heterogeneous optional fields"
+        (let [app-with-version (assoc base-app-listing-detail :version "1.0.0")
+              app-with-dates (assoc base-app-listing-detail
+                                    :id "app-with-dates"
+                                    :integration_date #inst "2024-01-01T00:00:00.000-00:00"
+                                    :edited_date #inst "2024-02-01T00:00:00.000-00:00")
+              app-with-flags (assoc base-app-listing-detail
+                                    :id "app-with-flags"
+                                    :is_favorite true
+                                    :beta true
+                                    :isBlessed false)]
+          (is (valid? apps/AppListing
+                      {:total 3
+                       :apps  [app-with-version app-with-dates app-with-flags]})))))))
+
+(deftest test-AppListingValidSortFields
+  (testing "AppListingValidSortFields contains expected fields"
+    (testing "contains all AppListingDetail fields except excluded ones"
+      (is (contains? apps/AppListingValidSortFields :id))
+      (is (contains? apps/AppListingValidSortFields :name))
+      (is (contains? apps/AppListingValidSortFields :description))
+      (is (contains? apps/AppListingValidSortFields :integration_date))
+      (is (contains? apps/AppListingValidSortFields :edited_date))
+      (is (contains? apps/AppListingValidSortFields :system_id))
+      (is (contains? apps/AppListingValidSortFields :version))
+      (is (contains? apps/AppListingValidSortFields :version_id))
+      (is (contains? apps/AppListingValidSortFields :limitChecks))
+      (is (contains? apps/AppListingValidSortFields :overall_job_type))
+      (is (contains? apps/AppListingValidSortFields :deleted))
+      (is (contains? apps/AppListingValidSortFields :disabled))
+      (is (contains? apps/AppListingValidSortFields :integrator_email))
+      (is (contains? apps/AppListingValidSortFields :integrator_name))
+      (is (contains? apps/AppListingValidSortFields :is_favorite))
+      (is (contains? apps/AppListingValidSortFields :is_public))
+      (is (contains? apps/AppListingValidSortFields :beta))
+      (is (contains? apps/AppListingValidSortFields :isBlessed))
+      (is (contains? apps/AppListingValidSortFields :step_count))
+      (is (contains? apps/AppListingValidSortFields :wiki_url))
+      (is (contains? apps/AppListingValidSortFields :permission)))
+
+    (testing "contains added rating fields"
+      (is (contains? apps/AppListingValidSortFields :average_rating))
+      (is (contains? apps/AppListingValidSortFields :user_rating)))
+
+    (testing "does not contain excluded fields"
+      (is (not (contains? apps/AppListingValidSortFields :app_type)))
+      (is (not (contains? apps/AppListingValidSortFields :can_favor)))
+      (is (not (contains? apps/AppListingValidSortFields :can_rate)))
+      (is (not (contains? apps/AppListingValidSortFields :can_run)))
+      (is (not (contains? apps/AppListingValidSortFields :pipeline_eligibility)))
+      (is (not (contains? apps/AppListingValidSortFields :rating))))
+
+    (testing "is a set of keywords"
+      (is (set? apps/AppListingValidSortFields))
+      (is (every? keyword? apps/AppListingValidSortFields)))
+
+    (testing "has expected size"
+      (is (= 23 (count apps/AppListingValidSortFields))))))
+
+(deftest test-AppSearchValidSortFields
+  (testing "AppSearchValidSortFields contains expected fields"
+    (testing "contains all AppListingDetail fields except excluded ones"
+      (is (contains? apps/AppSearchValidSortFields :id))
+      (is (contains? apps/AppSearchValidSortFields :name))
+      (is (contains? apps/AppSearchValidSortFields :description))
+      (is (contains? apps/AppSearchValidSortFields :integration_date))
+      (is (contains? apps/AppSearchValidSortFields :edited_date))
+      (is (contains? apps/AppSearchValidSortFields :system_id))
+      (is (contains? apps/AppSearchValidSortFields :version))
+      (is (contains? apps/AppSearchValidSortFields :version_id))
+      (is (contains? apps/AppSearchValidSortFields :limitChecks))
+      (is (contains? apps/AppSearchValidSortFields :overall_job_type))
+      (is (contains? apps/AppSearchValidSortFields :deleted))
+      (is (contains? apps/AppSearchValidSortFields :disabled))
+      (is (contains? apps/AppSearchValidSortFields :integrator_email))
+      (is (contains? apps/AppSearchValidSortFields :integrator_name))
+      (is (contains? apps/AppSearchValidSortFields :is_favorite))
+      (is (contains? apps/AppSearchValidSortFields :is_public))
+      (is (contains? apps/AppSearchValidSortFields :beta))
+      (is (contains? apps/AppSearchValidSortFields :isBlessed))
+      (is (contains? apps/AppSearchValidSortFields :step_count))
+      (is (contains? apps/AppSearchValidSortFields :wiki_url))
+      (is (contains? apps/AppSearchValidSortFields :permission)))
+
+    (testing "contains search-specific rating fields"
+      (is (contains? apps/AppSearchValidSortFields :average))
+      (is (contains? apps/AppSearchValidSortFields :total)))
+
+    (testing "does not contain listing-specific rating fields"
+      (is (not (contains? apps/AppSearchValidSortFields :average_rating)))
+      (is (not (contains? apps/AppSearchValidSortFields :user_rating))))
+
+    (testing "does not contain excluded fields from AppListingValidSortFields"
+      (is (not (contains? apps/AppSearchValidSortFields :app_type)))
+      (is (not (contains? apps/AppSearchValidSortFields :can_favor)))
+      (is (not (contains? apps/AppSearchValidSortFields :can_rate)))
+      (is (not (contains? apps/AppSearchValidSortFields :can_run)))
+      (is (not (contains? apps/AppSearchValidSortFields :pipeline_eligibility)))
+      (is (not (contains? apps/AppSearchValidSortFields :rating))))
+
+    (testing "is a set of keywords"
+      (is (set? apps/AppSearchValidSortFields))
+      (is (every? keyword? apps/AppSearchValidSortFields)))
+
+    (testing "has expected size"
+      (is (= 23 (count apps/AppSearchValidSortFields))))
+
+    (testing "is derived from AppListingValidSortFields"
+      (let [expected-fields (-> apps/AppListingValidSortFields
+                                (clojure.set/difference #{:average_rating :user_rating})
+                                (conj :average :total))]
+        (is (= expected-fields apps/AppSearchValidSortFields))))))
+
+(deftest test-AppFilterParams
+  (testing "AppFilterParams validation"
+    (testing "valid filter params with app-type"
+      (is (valid? apps/AppFilterParams {:app-type "DE"}))
+      (is (valid? apps/AppFilterParams {:app-type "External"}))
+      (is (valid? apps/AppFilterParams {:app-type "agave"}))
+      (is (valid? apps/AppFilterParams {:app-type ""})))
+
+    (testing "valid filter params without app-type (optional field)"
+      (is (valid? apps/AppFilterParams {})))
+
+    (testing "invalid filter params - wrong type for app-type"
+      (is (not (valid? apps/AppFilterParams {:app-type 123})))
+      (is (not (valid? apps/AppFilterParams {:app-type true})))
+      (is (not (valid? apps/AppFilterParams {:app-type nil})))
+      (is (not (valid? apps/AppFilterParams {:app-type []})))
+      (is (not (valid? apps/AppFilterParams {:app-type {}}))))
+
+    (testing "invalid filter params - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppFilterParams {:app-type "DE" :extra-field "value"})))
+      (is (not (valid? apps/AppFilterParams {:unknown-key "value"})))
+      (is (not (valid? apps/AppFilterParams {:app-type "DE" :another-field 123}))))
+
+    (testing "invalid filter params - not a map"
+      (is (not (valid? apps/AppFilterParams "string")))
+      (is (not (valid? apps/AppFilterParams 123)))
+      (is (not (valid? apps/AppFilterParams [])))
+      (is (not (valid? apps/AppFilterParams nil))))))
+
+(deftest test-AppListingPagingParams
+  (testing "AppListingPagingParams validation"
+    (testing "valid params with no fields (all optional)"
+      (is (valid? apps/AppListingPagingParams {})))
+
+    (testing "valid params with limit"
+      (is (valid? apps/AppListingPagingParams {:limit 50}))
+      (is (valid? apps/AppListingPagingParams {:limit 1}))
+      (is (valid? apps/AppListingPagingParams {:limit 1000})))
+
+    (testing "valid params with offset"
+      (is (valid? apps/AppListingPagingParams {:offset 0}))
+      (is (valid? apps/AppListingPagingParams {:offset 100}))
+      (is (valid? apps/AppListingPagingParams {:offset 999})))
+
+    (testing "valid params with sort-field from AppListingValidSortFields"
+      (is (valid? apps/AppListingPagingParams {:sort-field :name}))
+      (is (valid? apps/AppListingPagingParams {:sort-field :id}))
+      (is (valid? apps/AppListingPagingParams {:sort-field :integration_date}))
+      (is (valid? apps/AppListingPagingParams {:sort-field :edited_date}))
+      (is (valid? apps/AppListingPagingParams {:sort-field :average_rating}))
+      (is (valid? apps/AppListingPagingParams {:sort-field :user_rating})))
+
+    (testing "valid params with sort-dir from PagingParams"
+      (is (valid? apps/AppListingPagingParams {:sort-dir "ASC"}))
+      (is (valid? apps/AppListingPagingParams {:sort-dir "DESC"})))
+
+    (testing "valid params with app-type from AppFilterParams"
+      (is (valid? apps/AppListingPagingParams {:app-type "DE"}))
+      (is (valid? apps/AppListingPagingParams {:app-type "External"}))
+      (is (valid? apps/AppListingPagingParams {:app-type "agave"}))
+      (is (valid? apps/AppListingPagingParams {:app-type ""})))
+
+    (testing "valid params with all fields"
+      (is (valid? apps/AppListingPagingParams
+                  {:limit 50
+                   :offset 0
+                   :sort-field :name
+                   :sort-dir "ASC"
+                   :app-type "DE"}))
+      (is (valid? apps/AppListingPagingParams
+                  {:limit 100
+                   :offset 200
+                   :sort-field :integration_date
+                   :sort-dir "DESC"
+                   :app-type "External"})))
+
+    (testing "valid params with subset of fields"
+      (is (valid? apps/AppListingPagingParams {:limit 25 :offset 50}))
+      (is (valid? apps/AppListingPagingParams {:sort-field :name :sort-dir "DESC"}))
+      (is (valid? apps/AppListingPagingParams {:limit 100 :app-type "DE"}))
+      (is (valid? apps/AppListingPagingParams {:offset 0 :sort-field :edited_date})))
+
+    (testing "invalid params - invalid limit (not positive)"
+      (is (not (valid? apps/AppListingPagingParams {:limit 0})))
+      (is (not (valid? apps/AppListingPagingParams {:limit -1})))
+      (is (not (valid? apps/AppListingPagingParams {:limit -100}))))
+
+    (testing "invalid params - invalid limit (wrong type)"
+      (is (not (valid? apps/AppListingPagingParams {:limit "50"})))
+      (is (not (valid? apps/AppListingPagingParams {:limit 50.5})))
+      (is (not (valid? apps/AppListingPagingParams {:limit nil})))
+      (is (not (valid? apps/AppListingPagingParams {:limit true}))))
+
+    (testing "invalid params - invalid offset (negative)"
+      (is (not (valid? apps/AppListingPagingParams {:offset -1})))
+      (is (not (valid? apps/AppListingPagingParams {:offset -100}))))
+
+    (testing "invalid params - invalid offset (wrong type)"
+      (is (not (valid? apps/AppListingPagingParams {:offset "0"})))
+      (is (not (valid? apps/AppListingPagingParams {:offset 10.5})))
+      (is (not (valid? apps/AppListingPagingParams {:offset nil})))
+      (is (not (valid? apps/AppListingPagingParams {:offset false}))))
+
+    (testing "invalid params - invalid sort-field (not in enum)"
+      (is (not (valid? apps/AppListingPagingParams {:sort-field :invalid_field})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field :app_type})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field :can_favor})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field :can_rate})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field :can_run})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field :pipeline_eligibility})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field :rating}))))
+
+    (testing "invalid params - invalid sort-field (wrong type)"
+      (is (not (valid? apps/AppListingPagingParams {:sort-field "name"})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field 123})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field nil})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-field true}))))
+
+    (testing "invalid params - invalid sort-dir (not in enum)"
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir "asc"})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir "desc"})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir "ascending"})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir "ASCENDING"})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir "invalid"}))))
+
+    (testing "invalid params - invalid sort-dir (wrong type)"
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir :ASC})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir 123})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir nil})))
+      (is (not (valid? apps/AppListingPagingParams {:sort-dir true}))))
+
+    (testing "invalid params - invalid app-type (wrong type)"
+      (is (not (valid? apps/AppListingPagingParams {:app-type 123})))
+      (is (not (valid? apps/AppListingPagingParams {:app-type true})))
+      (is (not (valid? apps/AppListingPagingParams {:app-type nil})))
+      (is (not (valid? apps/AppListingPagingParams {:app-type []})))
+      (is (not (valid? apps/AppListingPagingParams {:app-type {}}))))
+
+    (testing "invalid params - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppListingPagingParams {:extra-field "value"})))
+      (is (not (valid? apps/AppListingPagingParams {:unknown-key "value"})))
+      (is (not (valid? apps/AppListingPagingParams {:limit 50 :extra-field "value"})))
+      (is (not (valid? apps/AppListingPagingParams {:app-type "DE" :another-field 123}))))
+
+    (testing "invalid params - not a map"
+      (is (not (valid? apps/AppListingPagingParams "string")))
+      (is (not (valid? apps/AppListingPagingParams 123)))
+      (is (not (valid? apps/AppListingPagingParams [])))
+      (is (not (valid? apps/AppListingPagingParams nil))))))
