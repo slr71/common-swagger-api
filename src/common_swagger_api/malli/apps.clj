@@ -1135,3 +1135,128 @@
           {:description SortFieldDocs
            :optional    true}
           (into [:enum] AppListingValidSortFields)]])))
+
+(def AppJobStatsStartDateParamDocs "Filters out the app stats before this start date")
+
+(def AppJobStatsEndDateParamDocs "Filters out the apps stats after this end date")
+
+(def AppSearchParams
+  (-> (mu/merge PagingParams AppFilterParams)
+      (mu/merge
+        [:map {:closed true}
+
+         [:search
+          {:optional            true
+           :description         "The pattern to match in an App's Name, Description, Integrator Name, or Tool Name."
+           :json-schema/example "BLAST"}
+          :string]
+
+         [:start_date
+          {:optional            true
+           :description         AppJobStatsStartDateParamDocs
+           :json-schema/example #inst "2024-01-01T00:00:00.000-00:00"}
+          inst?]
+
+         [:end_date
+          {:optional            true
+           :description         AppJobStatsEndDateParamDocs
+           :json-schema/example #inst "2025-12-31T23:59:59.000-00:00"}
+          inst?]
+
+         [:sort-field
+          {:description SortFieldDocs
+           :optional    true}
+          (into [:enum] AppSearchValidSortFields)]])))
+
+(def QualifiedAppId
+  [:map {:closed true}
+   [:system_id SystemId]
+   [:app_id StringAppIdParam]])
+
+(def AppDeletionRequest
+  [:map
+   {:closed      true
+    :description "List of App IDs to delete."}
+
+   [:app_ids
+    {:description "A list of qualified app identifiers"}
+    [:vector QualifiedAppId]]
+
+   [:root_deletion_request
+    {:description "Set to `true` to delete one or more public apps"
+     :optional    true}
+    :boolean]])
+
+(def AppParameterListItemRequest
+  (mu/optional-keys AppParameterListItem [:id]))
+
+;; FIXME: This is a little clunky because it replicates all of the fields in AppParameterListGroup. I haven't
+;; found a way to get it to work with merging schemas defined outside of the registry, though, and I'm not sure
+;; why. I'm leaving this as-is for now with the hopes of returning to it later.
+(def AppParameterListGroupRequest
+  (m/schema
+   [:schema {:registry {::AppParameterListGroupRequest
+                        [:map {:closed true}
+                         [:id
+                          {:description         "A UUID that is used to identify the List Item"
+                           :json-schema/example #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                           :optional            true}
+                          :uuid]
+
+                         [:name
+                          {:optional            true
+                           :description         "The List Item's name"
+                           :json-schema/example "genome_size_group"}
+                          :string]
+
+                         [:value
+                          {:optional            true
+                           :description         "The List Item's value"
+                           :json-schema/example "size_group"}
+                          :string]
+
+                         [:description
+                          {:optional            true
+                           :description         "The List Item's description"
+                           :json-schema/example "Genome size selection group"}
+                          :string]
+
+                         [:display
+                          {:optional            true
+                           :description         "The List Item's display label"
+                           :json-schema/example "Genome Size"}
+                          :string]
+
+                         [:isDefault
+                          {:optional            true
+                           :description         "Flags this Item as the List's default selection"
+                           :json-schema/example false}
+                          :boolean]
+
+                         [:arguments
+                          {:optional    true
+                           :description TreeSelectorGroupParameterListDocs}
+                          [:vector AppParameterListItemRequest]]
+
+                         [:groups
+                          {:optional    true
+                           :description TreeSelectorGroupGroupListDocs}
+                          [:vector [:ref ::AppParameterListGroupRequest]]]]}}
+    [:ref ::AppParameterListGroupRequest]]))
+
+(def AppParameterListItemOrTreeRequest
+  (-> AppParameterListItemOrTree
+      (mu/optional-keys [:id])
+      (mu/dissoc :arguments)
+      (mu/dissoc :groups)
+      (mu/merge
+        [:map {:closed true}
+         [:arguments
+          {:description TreeSelectorParameterListDocs
+           :optional    true}
+          [:vector AppParameterListItemRequest]]
+
+         [:groups
+          {:description TreeSelectorGroupListDocs
+           :optional    true}
+          [:vector AppParameterListGroupRequest]]])))

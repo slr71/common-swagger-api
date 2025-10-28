@@ -146,6 +146,1194 @@
                        {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
                         :extra-field "not-allowed"}))))))
 
+(deftest test-AppParameterListItemRequest
+  (testing "AppParameterListItemRequest validation"
+    (testing "valid list item request - without id"
+      (is (valid? apps/AppParameterListItemRequest {}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "small_genome"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value "1"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "small_genome"
+                   :value "1"
+                   :description "Small genome (< 2 Mb)"
+                   :display "Small Genome"
+                   :isDefault false}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "large_genome"
+                   :value "2"
+                   :isDefault true}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:description "Medium genome (2-10 Mb)"
+                   :display "Medium Genome"})))
+
+    (testing "valid list item request - with id"
+      (is (valid? apps/AppParameterListItemRequest
+                  {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                   :name "small_genome"
+                   :value "1"
+                   :description "Small genome (< 2 Mb)"
+                   :display "Small Genome"
+                   :isDefault false}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:id #uuid "456e7890-b12c-34d5-e678-901234567890"
+                   :name "large_genome"
+                   :isDefault true})))
+
+    (testing "valid list item request - various valid name values"
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "a"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "genome_size"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "genome-size"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "GenomeSize"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "genome.size"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "genome size with spaces"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:name "123"})))
+
+    (testing "valid list item request - various valid value values"
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value "0"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value "1"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value "true"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value "false"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value "complex-value-123"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value "value with spaces"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:value ""})))
+
+    (testing "valid list item request - various valid description values"
+      (is (valid? apps/AppParameterListItemRequest
+                  {:description "Short"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:description "A longer description with multiple words and punctuation!"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:description ""})))
+
+    (testing "valid list item request - various valid display values"
+      (is (valid? apps/AppParameterListItemRequest
+                  {:display "Display"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:display "Display Label With Spaces"}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:display ""})))
+
+    (testing "valid list item request - various valid isDefault values"
+      (is (valid? apps/AppParameterListItemRequest
+                  {:isDefault true}))
+      (is (valid? apps/AppParameterListItemRequest
+                  {:isDefault false})))
+
+    (testing "valid list item request - all optional fields"
+      (is (valid? apps/AppParameterListItemRequest
+                  {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                   :name "complete_item"
+                   :value "complete"
+                   :description "Complete item with all fields"
+                   :display "Complete Item"
+                   :isDefault true})))
+
+    (testing "invalid list item request - invalid id type"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id "not-a-uuid"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id 123})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id nil})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id true})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id :keyword})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id []})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id {}}))))
+
+    (testing "invalid list item request - invalid name type"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name 123})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name true})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name :keyword})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name []})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name {}})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name nil}))))
+
+    (testing "invalid list item request - invalid value type"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:value 123})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:value true})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:value :keyword})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:value []})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:value {}})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:value nil}))))
+
+    (testing "invalid list item request - invalid description type"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:description 123})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:description true})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:description :keyword})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:description []})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:description {}})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:description nil}))))
+
+    (testing "invalid list item request - invalid display type"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:display 123})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:display true})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:display :keyword})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:display []})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:display {}})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:display nil}))))
+
+    (testing "invalid list item request - invalid isDefault type"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault "not-a-boolean"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault 1})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault 0})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault "true"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault "false"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault :true})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault []})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault {}})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:isDefault nil}))))
+
+    (testing "invalid list item request - multiple invalid fields"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id "not-a-uuid"
+                        :name 123})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name true
+                        :value []
+                        :isDefault "not-boolean"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id nil
+                        :description {}
+                        :display []}))))
+
+    (testing "invalid list item request - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:extra-field "value"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name "valid_name"
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                        :name "valid_name"
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:unknown-key "unknown-value"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:name "valid"
+                        :label "not-a-valid-field"})))
+      (is (not (valid? apps/AppParameterListItemRequest
+                       {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                        :name "valid"
+                        :type "not-a-valid-field"}))))
+
+    (testing "invalid list item request - not a map"
+      (is (not (valid? apps/AppParameterListItemRequest "string")))
+      (is (not (valid? apps/AppParameterListItemRequest 123)))
+      (is (not (valid? apps/AppParameterListItemRequest [])))
+      (is (not (valid? apps/AppParameterListItemRequest nil)))
+      (is (not (valid? apps/AppParameterListItemRequest true)))
+      (is (not (valid? apps/AppParameterListItemRequest :keyword))))))
+
+(deftest test-AppParameterListGroupRequest
+  (testing "AppParameterListGroupRequest validation"
+    (testing "valid list group request - empty map"
+      (is (valid? apps/AppParameterListGroupRequest {})))
+
+    (testing "valid list group request - without id"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "genome_size_group"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "genome_size_group"
+                   :value "size_group"
+                   :description "Genome size selection group"
+                   :display "Genome Size"
+                   :isDefault false}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "options_group"
+                   :description "Options for analysis"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:display "Display Only Group"})))
+
+    (testing "valid list group request - with id"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "genome_size_group"
+                   :value "size_group"
+                   :description "Genome size selection group"
+                   :display "Genome Size"
+                   :isDefault false}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "456e7890-b12c-34d5-e678-901234567890"
+                   :name "options_group"
+                   :isDefault true})))
+
+    (testing "valid list group request - with arguments only"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:arguments []}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:arguments [{:name "small_genome"
+                                :value "1"}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:arguments [{:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                                :name "small_genome"
+                                :value "1"}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "genome_sizes"
+                   :arguments [{:name "small_genome"
+                                :value "1"
+                                :description "Small genome (< 2 Mb)"
+                                :display "Small Genome"
+                                :isDefault false}
+                               {:name "large_genome"
+                                :value "2"
+                                :description "Large genome (> 2 Mb)"
+                                :display "Large Genome"
+                                :isDefault true}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "abc12345-def6-7890-1234-567890abcdef"
+                   :name "multiple_options"
+                   :arguments [{:id #uuid "111e1111-a11a-11a1-a111-111111111111"
+                                :name "option1"
+                                :value "val1"}
+                               {:id #uuid "222e2222-b22b-22b2-b222-222222222222"
+                                :name "option2"
+                                :value "val2"}
+                               {:name "option3"
+                                :value "val3"}]})))
+
+    (testing "valid list group request - with groups only (recursive)"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:groups []}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:groups [{:name "sub_group"}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:groups [{:id #uuid "333e3333-c33c-33c3-c333-333333333333"
+                             :name "sub_group"}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "parent_group"
+                   :groups [{:name "child_group_1"}
+                            {:name "child_group_2"}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "444e4444-d44d-44d4-d444-444444444444"
+                   :name "hierarchical_group"
+                   :groups [{:id #uuid "555e5555-e55e-55e5-e555-555555555555"
+                             :name "level1_group1"}
+                            {:name "level1_group2"
+                             :groups [{:name "level2_group1"}]}]})))
+
+    (testing "valid list group request - with both arguments and groups"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:arguments []
+                   :groups []}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "mixed_group"
+                   :arguments [{:name "option1" :value "val1"}]
+                   :groups [{:name "sub_group"}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "666e6666-f66f-66f6-f666-666666666666"
+                   :name "complete_group"
+                   :value "complete_value"
+                   :description "Complete group with all features"
+                   :display "Complete Group"
+                   :isDefault false
+                   :arguments [{:id #uuid "777e7777-a77a-77a7-a777-777777777777"
+                                :name "arg1"
+                                :value "val1"}
+                               {:name "arg2"
+                                :value "val2"}]
+                   :groups [{:id #uuid "888e8888-a88a-88a8-a888-888888888888"
+                             :name "nested_group1"}
+                            {:name "nested_group2"
+                             :arguments [{:name "nested_arg"}]}]})))
+
+    (testing "valid list group request - deeply nested recursive structure"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "root"
+                   :groups [{:name "level1"
+                             :groups [{:name "level2"
+                                       :groups [{:name "level3"
+                                                 :arguments [{:name "deep_arg"
+                                                              :value "deep_val"}]}]}]}]}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "999e9999-a99a-99a9-a999-999999999999"
+                   :name "complex_hierarchy"
+                   :arguments [{:id #uuid "aaa1111a-b11b-11b1-b111-111111111aaa"
+                                :name "root_arg"}]
+                   :groups [{:id #uuid "bbb2222b-c22c-22c2-c222-222222222bbb"
+                             :name "branch1"
+                             :arguments [{:name "branch1_arg"}]
+                             :groups [{:name "leaf1"
+                                       :arguments [{:name "leaf1_arg"}]}
+                                      {:name "leaf2"}]}
+                            {:name "branch2"
+                             :groups [{:name "branch2_leaf"}]}]})))
+
+    (testing "valid list group request - various valid name values"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "a"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "group_name"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "group-name"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "GroupName"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "group.name"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "group name with spaces"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:name "123"})))
+
+    (testing "valid list group request - various valid value values"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:value "simple"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:value "value_with_underscore"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:value "value-with-dash"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:value ""})))
+
+    (testing "valid list group request - various valid description values"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:description "Short description"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:description "A longer description with multiple words, punctuation, and numbers like 123!"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:description ""})))
+
+    (testing "valid list group request - various valid display values"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:display "Display"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:display "Display Label With Spaces"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:display "Display: With Punctuation!"}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:display ""})))
+
+    (testing "valid list group request - various valid isDefault values"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:isDefault true}))
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:isDefault false})))
+
+    (testing "valid list group request - all optional fields"
+      (is (valid? apps/AppParameterListGroupRequest
+                  {:id #uuid "ccc3333c-d33d-33d3-d333-333333333ccc"
+                   :name "complete_group"
+                   :value "complete_value"
+                   :description "Complete group with all optional fields"
+                   :display "Complete Group"
+                   :isDefault true
+                   :arguments [{:id #uuid "ddd4444d-e44e-44e4-e444-444444444ddd"
+                                :name "complete_arg"
+                                :value "complete_arg_value"
+                                :description "Complete argument"
+                                :display "Complete Argument"
+                                :isDefault false}]
+                   :groups [{:id #uuid "eee5555e-f55f-55f5-f555-555555555eee"
+                             :name "complete_nested_group"
+                             :value "nested_value"
+                             :description "Nested group description"
+                             :display "Nested Group"
+                             :isDefault false}]})))
+
+    (testing "invalid list group request - invalid id type"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id "not-a-uuid"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id nil})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id :keyword})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id []})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id {}}))))
+
+    (testing "invalid list group request - invalid name type"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name :keyword})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name []})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name {}})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name nil}))))
+
+    (testing "invalid list group request - invalid value type"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:value 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:value true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:value :keyword})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:value []})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:value {}})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:value nil}))))
+
+    (testing "invalid list group request - invalid description type"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:description 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:description true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:description :keyword})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:description []})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:description {}})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:description nil}))))
+
+    (testing "invalid list group request - invalid display type"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:display 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:display true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:display :keyword})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:display []})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:display {}})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:display nil}))))
+
+    (testing "invalid list group request - invalid isDefault type"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault "not-a-boolean"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault 1})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault 0})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault "true"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault "false"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault :true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault []})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault {}})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:isDefault nil}))))
+
+    (testing "invalid list group request - arguments not a vector"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments "not-a-vector"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments {:name "map-not-allowed"}})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments nil})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments :keyword}))))
+
+    (testing "invalid list group request - groups not a vector"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups "not-a-vector"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups {:name "map-not-allowed"}})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups nil})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups true})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups :keyword}))))
+
+    (testing "invalid list group request - arguments contains invalid AppParameterListItemRequest"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments [{:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments [{:name 123}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments [{:isDefault "not-a-boolean"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments [{:extra-field "not-allowed"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments [{:name "valid"}
+                                    {:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name "group"
+                        :arguments [{:name "valid1"}
+                                    {:name 123}
+                                    {:name "valid2"}]}))))
+
+    (testing "invalid list group request - groups contains invalid AppParameterListGroupRequest"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:name 123}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:isDefault "not-a-boolean"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:extra-field "not-allowed"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:name "valid"}
+                                 {:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name "parent"
+                        :groups [{:name "valid1"}
+                                 {:arguments "not-a-vector"}
+                                 {:name "valid2"}]}))))
+
+    (testing "invalid list group request - nested groups with invalid structure"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:groups [{:name 123}]}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:name "level1"
+                                  :groups [{:arguments [{:id "not-a-uuid"}]}]}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name "root"
+                        :groups [{:name "level1"
+                                  :groups [{:name "level2"
+                                            :groups [{:name 456}]}]}]})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups [{:groups [{:groups [{:isDefault "invalid"}]}]}]}))))
+
+    (testing "invalid list group request - multiple invalid fields"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id "not-a-uuid"
+                        :name 123})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name true
+                        :value []
+                        :isDefault "not-boolean"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id nil
+                        :description {}
+                        :display []
+                        :arguments "not-a-vector"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name 123
+                        :arguments "not-a-vector"
+                        :groups "not-a-vector"}))))
+
+    (testing "invalid list group request - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:extra-field "value"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name "valid_name"
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                        :name "valid_name"
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:unknown-key "unknown-value"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name "valid"
+                        :label "not-a-valid-field"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:name "valid"
+                        :type "not-a-valid-field"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:arguments []
+                        :invalid-field "value"})))
+      (is (not (valid? apps/AppParameterListGroupRequest
+                       {:groups []
+                        :extra "not-allowed"}))))
+
+    (testing "invalid list group request - not a map"
+      (is (not (valid? apps/AppParameterListGroupRequest "string")))
+      (is (not (valid? apps/AppParameterListGroupRequest 123)))
+      (is (not (valid? apps/AppParameterListGroupRequest [])))
+      (is (not (valid? apps/AppParameterListGroupRequest nil)))
+      (is (not (valid? apps/AppParameterListGroupRequest true)))
+      (is (not (valid? apps/AppParameterListGroupRequest :keyword))))))
+
+(deftest test-AppParameterListItemOrTreeRequest
+  (testing "AppParameterListItemOrTreeRequest validation"
+    (testing "valid list item or tree request - empty map"
+      (is (valid? apps/AppParameterListItemOrTreeRequest {})))
+
+    (testing "valid list item or tree request - simple item without id"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "organism"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:value "human"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "organism"
+                   :value "human"
+                   :description "Select organism type"
+                   :display "Organism"
+                   :isDefault false}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:display "Display Only"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:description "Description Only"})))
+
+    (testing "valid list item or tree request - simple item with id"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                   :name "organism"
+                   :value "human"
+                   :description "Select organism type"
+                   :display "Organism"
+                   :isDefault false}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "456e7890-b12c-34d5-e678-901234567890"
+                   :name "species"
+                   :isDefault true})))
+
+    (testing "valid list item or tree request - tree selector fields without id"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:isSingleSelect true}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:isSingleSelect false}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:selectionCascade "up"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:selectionCascade "down"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:isSingleSelect true
+                   :selectionCascade "up"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "tree_root"
+                   :display "Tree Selector"
+                   :isSingleSelect false
+                   :selectionCascade "down"})))
+
+    (testing "valid list item or tree request - tree selector fields with id"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "abc12345-def6-7890-1234-567890abcdef"
+                   :isSingleSelect true}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "def67890-abc1-2345-6789-0abcdef12345"
+                   :isSingleSelect true
+                   :selectionCascade "up"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "fedcba98-7654-3210-fedc-ba9876543210"
+                   :name "full_tree"
+                   :display "Full Tree Selector"
+                   :isSingleSelect false
+                   :selectionCascade "down"})))
+
+    (testing "valid list item or tree request - with arguments only (using AppParameterListItemRequest)"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:arguments []}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:arguments [{:name "option1"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:arguments [{:name "option1"
+                                :value "val1"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:arguments [{:id #uuid "111e1111-a11a-11a1-a111-111111111111"
+                                :name "option1"
+                                :value "val1"}
+                               {:id #uuid "222e2222-b22b-22b2-b222-222222222222"
+                                :name "option2"
+                                :value "val2"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "tree_selector"
+                   :arguments [{:name "option1"
+                                :value "val1"
+                                :description "First option"
+                                :display "Option 1"
+                                :isDefault false}
+                               {:name "option2"
+                                :value "val2"
+                                :description "Second option"
+                                :display "Option 2"
+                                :isDefault true}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "333e3333-c33c-33c3-c333-333333333333"
+                   :name "selector_with_args"
+                   :isSingleSelect true
+                   :arguments [{:id #uuid "444e4444-d44d-44d4-d444-444444444444"
+                                :name "arg1"
+                                :value "val1"}
+                               {:name "arg2"
+                                :value "val2"}]})))
+
+    (testing "valid list item or tree request - with groups only (using AppParameterListGroupRequest)"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:groups []}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:groups [{:name "group1"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:groups [{:id #uuid "555e5555-e55e-55e5-e555-555555555555"
+                             :name "group1"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:groups [{:name "group1"}
+                            {:name "group2"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "grouped_tree"
+                   :groups [{:id #uuid "666e6666-f66f-66f6-f666-666666666666"
+                             :name "group1"
+                             :display "Group 1"}
+                            {:name "group2"
+                             :arguments [{:name "nested_option"}]}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "777e7777-a77a-77a7-a777-777777777777"
+                   :name "hierarchical"
+                   :selectionCascade "up"
+                   :groups [{:name "level1"
+                             :groups [{:name "level2"}]}]})))
+
+    (testing "valid list item or tree request - with both arguments and groups"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:arguments []
+                   :groups []}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:arguments [{:name "arg1"}]
+                   :groups [{:name "group1"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "mixed_tree"
+                   :arguments [{:name "root_arg"
+                                :value "root_val"}]
+                   :groups [{:name "root_group"}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "888e8888-a88a-88a8-a888-888888888888"
+                   :name "complete_tree"
+                   :display "Complete Tree Selector"
+                   :isSingleSelect false
+                   :selectionCascade "down"
+                   :arguments [{:id #uuid "999e9999-a99a-99a9-a999-999999999999"
+                                :name "root_option"
+                                :value "root_val"
+                                :display "Root Option"}]
+                   :groups [{:id #uuid "aaa1111a-b11b-11b1-b111-111111111aaa"
+                             :name "root_group"
+                             :display "Root Group"
+                             :arguments [{:name "group_arg"}]}]})))
+
+    (testing "valid list item or tree request - complex nested structure"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "bbb2222b-c22c-22c2-c222-222222222bbb"
+                   :name "complex_selector"
+                   :display "Complex Selector"
+                   :description "A complex tree selector with all features"
+                   :isSingleSelect true
+                   :selectionCascade "up"
+                   :isDefault false
+                   :arguments [{:id #uuid "ccc3333c-d33d-33d3-d333-333333333ccc"
+                                :name "root_arg1"
+                                :value "val1"
+                                :description "First root argument"
+                                :display "Root Arg 1"
+                                :isDefault false}
+                               {:name "root_arg2"
+                                :value "val2"}]
+                   :groups [{:id #uuid "ddd4444d-e44e-44e4-e444-444444444ddd"
+                             :name "group1"
+                             :display "Group 1"
+                             :arguments [{:name "g1_arg1"}
+                                         {:name "g1_arg2"}]
+                             :groups [{:name "subgroup1"}
+                                      {:name "subgroup2"
+                                       :arguments [{:name "sg2_arg"}]}]}
+                            {:name "group2"
+                             :groups [{:name "nested_group"}]}]})))
+
+    (testing "valid list item or tree request - deeply nested groups"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:groups [{:name "level1"
+                             :groups [{:name "level2"
+                                       :groups [{:name "level3"
+                                                 :groups [{:name "level4"
+                                                           :arguments [{:name "deep_arg"}]}]}]}]}]}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "eee5555e-f55f-55f5-f555-555555555eee"
+                   :name "deep_tree"
+                   :arguments [{:name "root_arg"}]
+                   :groups [{:name "branch1"
+                             :arguments [{:name "b1_arg"}]
+                             :groups [{:name "leaf1"
+                                       :arguments [{:id #uuid "fff6666f-a66a-66a6-a666-666666666fff"
+                                                    :name "l1_arg"
+                                                    :value "l1_val"}]}
+                                      {:name "leaf2"}]}
+                            {:name "branch2"
+                             :groups [{:name "b2_leaf"
+                                       :arguments [{:name "b2l_arg"}]}]}]})))
+
+    (testing "valid list item or tree request - various valid field combinations"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "a"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name "selector_name"
+                   :value "selector_value"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:description "Long description with multiple words and special characters!"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:display "Display Label"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:isDefault true}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:isDefault false}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:isSingleSelect true}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:isSingleSelect false}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:selectionCascade "up"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:selectionCascade "down"}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:selectionCascade ""}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:name ""}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:value ""}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:description ""}))
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:display ""})))
+
+    (testing "valid list item or tree request - all optional fields present"
+      (is (valid? apps/AppParameterListItemOrTreeRequest
+                  {:id #uuid "111a111a-b11b-11c1-d111-111111111111"
+                   :name "complete_selector"
+                   :value "complete_value"
+                   :description "Complete selector with all optional fields"
+                   :display "Complete Selector"
+                   :isDefault true
+                   :isSingleSelect false
+                   :selectionCascade "down"
+                   :arguments [{:id #uuid "222b222b-c22c-22d2-e222-222222222222"
+                                :name "complete_arg"
+                                :value "complete_arg_value"
+                                :description "Complete argument with all fields"
+                                :display "Complete Argument"
+                                :isDefault true}]
+                   :groups [{:id #uuid "333c333c-d33d-33e3-f333-333333333333"
+                             :name "complete_group"
+                             :value "complete_group_value"
+                             :description "Complete group with all fields"
+                             :display "Complete Group"
+                             :isDefault false
+                             :arguments [{:name "cg_arg"}]
+                             :groups [{:name "cg_nested"}]}]})))
+
+    (testing "invalid list item or tree request - invalid id type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id "not-a-uuid"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id nil})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id :keyword})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id {}}))))
+
+    (testing "invalid list item or tree request - invalid name type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name :keyword})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name {}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name nil}))))
+
+    (testing "invalid list item or tree request - invalid value type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:value 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:value true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:value :keyword})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:value []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:value {}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:value nil}))))
+
+    (testing "invalid list item or tree request - invalid description type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:description 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:description true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:description :keyword})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:description []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:description {}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:description nil}))))
+
+    (testing "invalid list item or tree request - invalid display type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:display 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:display true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:display :keyword})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:display []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:display {}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:display nil}))))
+
+    (testing "invalid list item or tree request - invalid isDefault type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault "not-a-boolean"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault 1})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault 0})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault "true"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault "false"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault :true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault {}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isDefault nil}))))
+
+    (testing "invalid list item or tree request - invalid isSingleSelect type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isSingleSelect "not-a-boolean"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isSingleSelect 1})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isSingleSelect "true"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isSingleSelect nil})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isSingleSelect []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isSingleSelect {}}))))
+
+    (testing "invalid list item or tree request - invalid selectionCascade type"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:selectionCascade 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:selectionCascade true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:selectionCascade :keyword})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:selectionCascade []})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:selectionCascade {}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:selectionCascade nil}))))
+
+    (testing "invalid list item or tree request - arguments not a vector"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments "not-a-vector"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments {:name "map-not-allowed"}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments nil})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments :keyword}))))
+
+    (testing "invalid list item or tree request - groups not a vector"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups "not-a-vector"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups {:name "map-not-allowed"}})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups nil})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups true})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups :keyword}))))
+
+    (testing "invalid list item or tree request - arguments contains invalid AppParameterListItemRequest"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:name 123}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:isDefault "not-a-boolean"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:extra-field "not-allowed"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:name "valid"}
+                                    {:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:name "valid1"}
+                                    {:value 123}
+                                    {:name "valid2"}]}))))
+
+    (testing "invalid list item or tree request - groups contains invalid AppParameterListGroupRequest"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:name 123}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:isDefault "not-a-boolean"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:extra-field "not-allowed"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:name "valid"}
+                                 {:id "not-a-uuid"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:name "valid1"}
+                                 {:arguments "not-a-vector"}
+                                 {:name "valid2"}]}))))
+
+    (testing "invalid list item or tree request - nested groups with invalid structure"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:groups [{:name 123}]}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:name "level1"
+                                  :groups [{:arguments [{:id "not-a-uuid"}]}]}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups [{:name "level1"
+                                  :groups [{:name "level2"
+                                            :groups [{:isDefault "invalid"}]}]}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:name "arg"}]
+                        :groups [{:groups [{:groups [{:value []}]}]}]}))))
+
+    (testing "invalid list item or tree request - mixed invalid arguments and groups"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:name 123}]
+                        :groups [{:name "valid"}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:name "valid"}]
+                        :groups [{:name 456}]})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments [{:id "not-uuid"}]
+                        :groups [{:id "not-uuid"}]}))))
+
+    (testing "invalid list item or tree request - multiple invalid fields"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id "not-a-uuid"
+                        :name 123})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name true
+                        :value []
+                        :isDefault "not-boolean"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id nil
+                        :description {}
+                        :display []
+                        :isSingleSelect "not-boolean"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name 123
+                        :selectionCascade 456
+                        :arguments "not-a-vector"
+                        :groups "not-a-vector"}))))
+
+    (testing "invalid list item or tree request - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:extra-field "value"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:name "valid_name"
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                        :name "valid_name"
+                        :unknown-field "value"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:label "not-a-valid-field"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:type "not-a-valid-field"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:arguments []
+                        :invalid-field "value"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:groups []
+                        :extra "not-allowed"})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:isSingleSelect true
+                        :order 1})))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest
+                       {:selectionCascade "up"
+                        :required true}))))
+
+    (testing "invalid list item or tree request - not a map"
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest "string")))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest 123)))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest [])))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest nil)))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest true)))
+      (is (not (valid? apps/AppParameterListItemOrTreeRequest :keyword))))))
+
 (deftest test-AppParameterValidator
   (testing "AppParameterValidator validation"
     (testing "valid validator"
@@ -3607,3 +4795,551 @@
       (is (not (valid? apps/AppListingPagingParams 123)))
       (is (not (valid? apps/AppListingPagingParams [])))
       (is (not (valid? apps/AppListingPagingParams nil))))))
+
+(deftest test-AppSearchParams
+  (testing "AppSearchParams validation"
+    (testing "valid params with no fields (all optional)"
+      (is (valid? apps/AppSearchParams {})))
+
+    (testing "valid params with search field"
+      (is (valid? apps/AppSearchParams {:search "BLAST"}))
+      (is (valid? apps/AppSearchParams {:search "genome"}))
+      (is (valid? apps/AppSearchParams {:search ""}))
+      (is (valid? apps/AppSearchParams {:search "RNA-seq analysis"})))
+
+    (testing "valid params with start_date field"
+      (is (valid? apps/AppSearchParams {:start_date #inst "2024-01-01T00:00:00.000-00:00"}))
+      (is (valid? apps/AppSearchParams {:start_date #inst "2020-06-15T12:30:45.000-00:00"}))
+      (is (valid? apps/AppSearchParams {:start_date #inst "2025-12-31T23:59:59.000-00:00"})))
+
+    (testing "valid params with end_date field"
+      (is (valid? apps/AppSearchParams {:end_date #inst "2025-12-31T23:59:59.000-00:00"}))
+      (is (valid? apps/AppSearchParams {:end_date #inst "2024-06-30T00:00:00.000-00:00"}))
+      (is (valid? apps/AppSearchParams {:end_date #inst "2020-01-01T00:00:00.000-00:00"})))
+
+    (testing "valid params with both start_date and end_date"
+      (is (valid? apps/AppSearchParams {:start_date #inst "2024-01-01T00:00:00.000-00:00"
+                                        :end_date #inst "2025-12-31T23:59:59.000-00:00"}))
+      (is (valid? apps/AppSearchParams {:start_date #inst "2020-01-01T00:00:00.000-00:00"
+                                        :end_date #inst "2020-12-31T23:59:59.000-00:00"})))
+
+    (testing "valid params with sort-field from AppSearchValidSortFields"
+      ;; Fields that are in AppSearchValidSortFields (includes :average and :total)
+      (is (valid? apps/AppSearchParams {:sort-field :average}))
+      (is (valid? apps/AppSearchParams {:sort-field :total}))
+      (is (valid? apps/AppSearchParams {:sort-field :name}))
+      (is (valid? apps/AppSearchParams {:sort-field :id}))
+      (is (valid? apps/AppSearchParams {:sort-field :integration_date}))
+      (is (valid? apps/AppSearchParams {:sort-field :edited_date}))
+      (is (valid? apps/AppSearchParams {:sort-field :description}))
+      (is (valid? apps/AppSearchParams {:sort-field :integrator_name}))
+      (is (valid? apps/AppSearchParams {:sort-field :integrator_email})))
+
+    (testing "valid params with limit from PagingParams"
+      (is (valid? apps/AppSearchParams {:limit 50}))
+      (is (valid? apps/AppSearchParams {:limit 1}))
+      (is (valid? apps/AppSearchParams {:limit 1000})))
+
+    (testing "valid params with offset from PagingParams"
+      (is (valid? apps/AppSearchParams {:offset 0}))
+      (is (valid? apps/AppSearchParams {:offset 100}))
+      (is (valid? apps/AppSearchParams {:offset 999})))
+
+    (testing "valid params with sort-dir from PagingParams"
+      (is (valid? apps/AppSearchParams {:sort-dir "ASC"}))
+      (is (valid? apps/AppSearchParams {:sort-dir "DESC"})))
+
+    (testing "valid params with app-type from AppFilterParams"
+      (is (valid? apps/AppSearchParams {:app-type "DE"}))
+      (is (valid? apps/AppSearchParams {:app-type "External"}))
+      (is (valid? apps/AppSearchParams {:app-type "agave"}))
+      (is (valid? apps/AppSearchParams {:app-type ""})))
+
+    (testing "valid params with all fields"
+      (is (valid? apps/AppSearchParams
+                  {:search "BLAST"
+                   :start_date #inst "2024-01-01T00:00:00.000-00:00"
+                   :end_date #inst "2025-12-31T23:59:59.000-00:00"
+                   :sort-field :name
+                   :limit 50
+                   :offset 0
+                   :sort-dir "ASC"
+                   :app-type "DE"}))
+      (is (valid? apps/AppSearchParams
+                  {:search "genome analysis"
+                   :start_date #inst "2020-01-01T00:00:00.000-00:00"
+                   :end_date #inst "2024-06-30T23:59:59.000-00:00"
+                   :sort-field :total
+                   :limit 100
+                   :offset 200
+                   :sort-dir "DESC"
+                   :app-type "External"})))
+
+    (testing "valid params with subset of fields"
+      (is (valid? apps/AppSearchParams {:search "RNA" :limit 25}))
+      (is (valid? apps/AppSearchParams {:start_date #inst "2024-01-01T00:00:00.000-00:00" :offset 50}))
+      (is (valid? apps/AppSearchParams {:end_date #inst "2025-12-31T23:59:59.000-00:00" :sort-field :average}))
+      (is (valid? apps/AppSearchParams {:sort-field :name :sort-dir "DESC"}))
+      (is (valid? apps/AppSearchParams {:limit 100 :app-type "DE"}))
+      (is (valid? apps/AppSearchParams {:search "protein" :start_date #inst "2024-01-01T00:00:00.000-00:00"}))
+      (is (valid? apps/AppSearchParams {:offset 0 :sort-field :edited_date :app-type "agave"})))
+
+    (testing "invalid params - invalid search field (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:search 123})))
+      (is (not (valid? apps/AppSearchParams {:search true})))
+      (is (not (valid? apps/AppSearchParams {:search nil})))
+      (is (not (valid? apps/AppSearchParams {:search []})))
+      (is (not (valid? apps/AppSearchParams {:search {}}))))
+
+    (testing "invalid params - invalid start_date (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:start_date "2024-01-01"})))
+      (is (not (valid? apps/AppSearchParams {:start_date 1704067200000})))
+      (is (not (valid? apps/AppSearchParams {:start_date nil})))
+      (is (not (valid? apps/AppSearchParams {:start_date true})))
+      (is (not (valid? apps/AppSearchParams {:start_date {}}))))
+
+    (testing "invalid params - invalid end_date (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:end_date "2025-12-31"})))
+      (is (not (valid? apps/AppSearchParams {:end_date 1735689599000})))
+      (is (not (valid? apps/AppSearchParams {:end_date nil})))
+      (is (not (valid? apps/AppSearchParams {:end_date false})))
+      (is (not (valid? apps/AppSearchParams {:end_date []}))))
+
+    (testing "invalid params - invalid sort-field (not in AppSearchValidSortFields enum)"
+      ;; Fields that are excluded from AppSearchValidSortFields
+      (is (not (valid? apps/AppSearchParams {:sort-field :average_rating})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :user_rating})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :app_type})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :can_favor})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :can_rate})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :can_run})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :pipeline_eligibility})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :rating})))
+      ;; Completely invalid fields
+      (is (not (valid? apps/AppSearchParams {:sort-field :invalid_field})))
+      (is (not (valid? apps/AppSearchParams {:sort-field :nonexistent}))))
+
+    (testing "invalid params - invalid sort-field (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:sort-field "name"})))
+      (is (not (valid? apps/AppSearchParams {:sort-field 123})))
+      (is (not (valid? apps/AppSearchParams {:sort-field nil})))
+      (is (not (valid? apps/AppSearchParams {:sort-field true}))))
+
+    (testing "invalid params - invalid limit (not positive)"
+      (is (not (valid? apps/AppSearchParams {:limit 0})))
+      (is (not (valid? apps/AppSearchParams {:limit -1})))
+      (is (not (valid? apps/AppSearchParams {:limit -100}))))
+
+    (testing "invalid params - invalid limit (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:limit "50"})))
+      (is (not (valid? apps/AppSearchParams {:limit 50.5})))
+      (is (not (valid? apps/AppSearchParams {:limit nil})))
+      (is (not (valid? apps/AppSearchParams {:limit true}))))
+
+    (testing "invalid params - invalid offset (negative)"
+      (is (not (valid? apps/AppSearchParams {:offset -1})))
+      (is (not (valid? apps/AppSearchParams {:offset -100}))))
+
+    (testing "invalid params - invalid offset (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:offset "0"})))
+      (is (not (valid? apps/AppSearchParams {:offset 10.5})))
+      (is (not (valid? apps/AppSearchParams {:offset nil})))
+      (is (not (valid? apps/AppSearchParams {:offset false}))))
+
+    (testing "invalid params - invalid sort-dir (not in enum)"
+      (is (not (valid? apps/AppSearchParams {:sort-dir "asc"})))
+      (is (not (valid? apps/AppSearchParams {:sort-dir "desc"})))
+      (is (not (valid? apps/AppSearchParams {:sort-dir "ascending"})))
+      (is (not (valid? apps/AppSearchParams {:sort-dir "ASCENDING"})))
+      (is (not (valid? apps/AppSearchParams {:sort-dir "invalid"}))))
+
+    (testing "invalid params - invalid sort-dir (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:sort-dir :ASC})))
+      (is (not (valid? apps/AppSearchParams {:sort-dir 123})))
+      (is (not (valid? apps/AppSearchParams {:sort-dir nil})))
+      (is (not (valid? apps/AppSearchParams {:sort-dir true}))))
+
+    (testing "invalid params - invalid app-type (wrong type)"
+      (is (not (valid? apps/AppSearchParams {:app-type 123})))
+      (is (not (valid? apps/AppSearchParams {:app-type true})))
+      (is (not (valid? apps/AppSearchParams {:app-type nil})))
+      (is (not (valid? apps/AppSearchParams {:app-type []})))
+      (is (not (valid? apps/AppSearchParams {:app-type {}}))))
+
+    (testing "invalid params - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppSearchParams {:extra-field "value"})))
+      (is (not (valid? apps/AppSearchParams {:unknown-key "value"})))
+      (is (not (valid? apps/AppSearchParams {:search "BLAST" :extra-field "value"})))
+      (is (not (valid? apps/AppSearchParams {:limit 50 :unknown "field"})))
+      (is (not (valid? apps/AppSearchParams {:app-type "DE" :another-field 123}))))
+
+    (testing "invalid params - not a map"
+      (is (not (valid? apps/AppSearchParams "string")))
+      (is (not (valid? apps/AppSearchParams 123)))
+      (is (not (valid? apps/AppSearchParams [])))
+      (is (not (valid? apps/AppSearchParams nil))))))
+
+(deftest test-QualifiedAppId
+  (testing "QualifiedAppId validation"
+    (testing "valid qualified app id - all required fields"
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "de"
+                   :app_id "app-id-12345"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "agave"
+                   :app_id "blast-2.2.30"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "osg"
+                   :app_id "tool-abc-123"})))
+
+    (testing "valid qualified app id - various valid system_id values"
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "d"
+                   :app_id "app"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "discovery-environment"
+                   :app_id "app123"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "123"
+                   :app_id "app"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "system-with-dashes"
+                   :app_id "app"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "system_with_underscores"
+                   :app_id "app"})))
+
+    (testing "valid qualified app id - various valid app_id values"
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "de"
+                   :app_id "a"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "de"
+                   :app_id "app-with-dashes"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "de"
+                   :app_id "app_with_underscores"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "de"
+                   :app_id "AppWithMixedCase123"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "de"
+                   :app_id "123456789"}))
+      (is (valid? apps/QualifiedAppId
+                  {:system_id "de"
+                   :app_id "app.with.dots"})))
+
+    (testing "invalid qualified app id - missing required fields"
+      (is (not (valid? apps/QualifiedAppId {})))
+      (is (not (valid? apps/QualifiedAppId {:system_id "de"})))
+      (is (not (valid? apps/QualifiedAppId {:app_id "app-id-12345"}))))
+
+    (testing "invalid qualified app id - empty strings (min length is 1)"
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id ""
+                        :app_id "app-id-12345"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id ""})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id ""
+                        :app_id ""}))))
+
+    (testing "invalid qualified app id - invalid system_id type"
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id 123
+                        :app_id "app-id-12345"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id nil
+                        :app_id "app-id-12345"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id true
+                        :app_id "app-id-12345"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id :de
+                        :app_id "app-id-12345"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id []
+                        :app_id "app-id-12345"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id {}
+                        :app_id "app-id-12345"}))))
+
+    (testing "invalid qualified app id - invalid app_id type"
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id 123})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id nil})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id true})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id :app-id})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id []})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id {}})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id #uuid "123e4567-e89b-12d3-a456-426614174000"}))))
+
+    (testing "invalid qualified app id - both fields invalid"
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id 123
+                        :app_id 456})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id nil
+                        :app_id nil})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id ""
+                        :app_id ""}))))
+
+    (testing "invalid qualified app id - extra fields not allowed (closed map)"
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id "app-id-12345"
+                        :extra-field "value"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id "app-id-12345"
+                        :version "1.0"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id "app-id-12345"
+                        :name "My App"})))
+      (is (not (valid? apps/QualifiedAppId
+                       {:system_id "de"
+                        :app_id "app-id-12345"
+                        :unknown-key "unknown-value"}))))
+
+    (testing "invalid qualified app id - not a map"
+      (is (not (valid? apps/QualifiedAppId "string")))
+      (is (not (valid? apps/QualifiedAppId 123)))
+      (is (not (valid? apps/QualifiedAppId [])))
+      (is (not (valid? apps/QualifiedAppId nil)))
+      (is (not (valid? apps/QualifiedAppId true)))
+      (is (not (valid? apps/QualifiedAppId :keyword))))))
+
+(deftest test-AppDeletionRequest
+  (testing "AppDeletionRequest validation"
+    (testing "valid deletion request - single app"
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-id-12345"}]}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "agave"
+                              :app_id "blast-2.2.30"}]}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "osg"
+                              :app_id "tool-abc-123"}]})))
+
+    (testing "valid deletion request - multiple apps"
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-1"}
+                             {:system_id "de"
+                              :app_id "app-2"}]}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-1"}
+                             {:system_id "agave"
+                              :app_id "app-2"}
+                             {:system_id "osg"
+                              :app_id "app-3"}]}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "system-1"
+                              :app_id "app-alpha"}
+                             {:system_id "system-2"
+                              :app_id "app-beta"}
+                             {:system_id "system-3"
+                              :app_id "app-gamma"}
+                             {:system_id "system-4"
+                              :app_id "app-delta"}]})))
+
+    (testing "valid deletion request - with root_deletion_request true"
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-id-12345"}]
+                   :root_deletion_request true}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-1"}
+                             {:system_id "de"
+                              :app_id "app-2"}]
+                   :root_deletion_request true})))
+
+    (testing "valid deletion request - with root_deletion_request false"
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-id-12345"}]
+                   :root_deletion_request false}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "agave"
+                              :app_id "blast-tool"}
+                             {:system_id "de"
+                              :app_id "analysis-tool"}]
+                   :root_deletion_request false})))
+
+    (testing "valid deletion request - without optional root_deletion_request"
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-id-12345"}]}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids [{:system_id "de"
+                              :app_id "app-1"}
+                             {:system_id "de"
+                              :app_id "app-2"}
+                             {:system_id "de"
+                              :app_id "app-3"}]})))
+
+    (testing "valid deletion request - empty app_ids vector"
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids []}))
+      (is (valid? apps/AppDeletionRequest
+                  {:app_ids []
+                   :root_deletion_request false})))
+
+    (testing "invalid deletion request - missing required app_ids field"
+      (is (not (valid? apps/AppDeletionRequest {})))
+      (is (not (valid? apps/AppDeletionRequest {:root_deletion_request true})))
+      (is (not (valid? apps/AppDeletionRequest {:root_deletion_request false}))))
+
+    (testing "invalid deletion request - app_ids not a vector"
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids "not-a-vector"})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids {:system_id "de"
+                                  :app_id "app-id-12345"}})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids 123})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids nil})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids true})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids :keyword}))))
+
+    (testing "invalid deletion request - app_ids contains invalid QualifiedAppId"
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:app_id "app-id-12345"}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id ""
+                                   :app_id "app-id-12345"}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id ""}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id 123
+                                   :app_id "app-id-12345"}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id 456}]}))))
+
+    (testing "invalid deletion request - app_ids contains mix of valid and invalid QualifiedAppId"
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-1"}
+                                  {:system_id "de"}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-1"}
+                                  {:app_id "app-2"}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-1"}
+                                  {}]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-1"}
+                                  "not-a-map"]}))))
+
+    (testing "invalid deletion request - app_ids contains non-map elements"
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids ["string"]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [123]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [nil]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [true]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [:keyword]})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [[]]}))))
+
+    (testing "invalid deletion request - root_deletion_request not a boolean"
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :root_deletion_request "true"})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :root_deletion_request 1})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :root_deletion_request nil})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :root_deletion_request :true})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :root_deletion_request []})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :root_deletion_request {}}))))
+
+    (testing "invalid deletion request - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :root_deletion_request true
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :user-id "jsmith"})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :delete-all true})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids [{:system_id "de"
+                                   :app_id "app-id-12345"}]
+                        :unknown-key "unknown-value"}))))
+
+    (testing "invalid deletion request - not a map"
+      (is (not (valid? apps/AppDeletionRequest "string")))
+      (is (not (valid? apps/AppDeletionRequest 123)))
+      (is (not (valid? apps/AppDeletionRequest [])))
+      (is (not (valid? apps/AppDeletionRequest nil)))
+      (is (not (valid? apps/AppDeletionRequest true)))
+      (is (not (valid? apps/AppDeletionRequest :keyword))))
+
+    (testing "invalid deletion request - both fields invalid"
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids "not-a-vector"
+                        :root_deletion_request "not-a-boolean"})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids 123
+                        :root_deletion_request nil})))
+      (is (not (valid? apps/AppDeletionRequest
+                       {:app_ids nil
+                        :root_deletion_request 123}))))))
