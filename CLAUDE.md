@@ -90,9 +90,9 @@ The schema definitions follow a hierarchical structure:
 
 ### General Formatting
 - Keep line lengths to 120 characters or less when possible
-- Ensure each file ends with a newline
-- Remove trailing whitespace.
-- Align keys and values in map definitions when possible.
+- **Ensure each file ends with a newline character** - All source files (`.clj`) and test files must end with a single trailing newline
+- Remove trailing whitespace from all lines
+- Align keys and values in map definitions when possible
 
 ## Schema Migration Guidelines
 
