@@ -5,7 +5,8 @@
    [common-swagger-api.malli.apps.rating :as rating]
    [common-swagger-api.malli.containers :refer [Settings]]
    [common-swagger-api.malli.ontologies :refer [OntologyClassHierarchy]]
-   [common-swagger-api.malli.tools :refer [Tool ToolDetails ToolListingImage]]
+   [common-swagger-api.malli.tools :refer [Tool ToolDetails ToolListingImage
+                                           ToolListingItem]]
    [malli.core :as m]
    [malli.util :as mu]))
 
@@ -629,7 +630,7 @@
   [:map
    [:tools
     {:description ToolListDocs}
-    [:vector {:min 1} (mu/merge ToolDeprecatedParam [:map [:deprecated {:optional true} ToolDeprecatedParam]])]]
+    [:vector {:min 1} (mu/merge Tool [:map [:deprecated {:optional true} ToolDeprecatedParam]])]]
 
    [:references
     {:description         "The App's references"
@@ -1131,7 +1132,7 @@
   (-> (mu/merge PagingParams AppFilterParams)
       (mu/merge
         [:map {:closed true}
-         [ :sort-field
+         [:sort-field
           {:description SortFieldDocs
            :optional    true}
           (into [:enum] AppListingValidSortFields)]])))
@@ -1260,3 +1261,54 @@
           {:description TreeSelectorGroupListDocs
            :optional    true}
           [:vector AppParameterListGroupRequest]]])))
+
+(def AppParameterRequest
+  (-> AppParameter
+      (mu/optional-keys [:id])
+      (mu/dissoc :arguments)
+      (mu/merge
+       [:map {:closed true}
+        [:arguments
+         {:optional    true
+          :description ListItemOrTreeDocs}
+         [:vector AppParameterListItemOrTreeRequest]]])))
+
+(def AppGroupRequest
+  (-> AppGroup
+      (mu/optional-keys [:id])
+      (mu/dissoc :parameters)
+      (mu/merge
+       [:map {:closed true}
+        [:parameters
+         {:description ParameterListDocs
+          :optional    true}
+         [:vector AppParameterRequest]]])))
+
+(def AppToolRequest
+  (-> ToolListingItem
+      (mu/optional-keys [:is_public :permission :implementation :container])
+      (mu/merge
+        [:map {:closed true}
+         [:deprecated {:optional true} ToolDeprecatedParam]])))
+
+(def AppRequest
+  (-> App
+      (mu/optional-keys [:id])
+      (mu/dissoc :versions)
+      (mu/merge
+       [:map {:closed true}
+        [:groups
+         {:description GroupListDocs
+          :optional    true}
+         [:vector AppGroupRequest]]
+
+        [:tools
+         {:description ToolListDocs
+          :optional    true}
+         [:vector AppToolRequest]]])))
+
+(def AppVersionRequest
+  (-> AppRequest
+      (mu/dissoc :version_id)
+      (mu/required-keys [:version])
+      (mu/update-properties assoc :description "The App Version to add.")))
