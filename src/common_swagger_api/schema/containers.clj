@@ -33,6 +33,8 @@
        (s/optional-key :min_memory_limit)  (describe Long "The minimum about of memory (in bytes) that is required to run the tool container")
        (s/optional-key :min_cpu_cores)     (describe Double "The minimum number of CPU cores needed to run the tool container")
        (s/optional-key :max_cpu_cores)     (describe Double "The maximum number of CPU cores allowed when running the tool container")
+       (s/optional-key :min_gpus)          (describe s/Int "The minimum number of GPUs needed to run the tool container")
+       (s/optional-key :max_gpus)          (describe s/Int "The maximum number of GPUs allowed when running the tool container")
        (s/optional-key :min_disk_space)    (describe Long "The minimum amount of disk space needed to run the tool container")
        (s/optional-key :network_mode)      (describe s/Str "The network mode for the tool container")
        (s/optional-key :working_directory) (describe s/Str "The working directory in the tool container")
