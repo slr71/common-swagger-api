@@ -50,11 +50,23 @@
                    :cpu_shares 1024
                    :memory_limit 1073741824
                    :min_cpu_cores 1.0
-                   :max_cpu_cores 4.0})))
+                   :max_cpu_cores 4.0}))
+      (is (valid? c/Settings
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :min_gpus 1
+                   :max_gpus 4})))
 
     (testing "invalid settings"
       (is (not (valid? c/Settings {})))
-      (is (not (valid? c/Settings {:cpu_shares 1024}))))))
+      (is (not (valid? c/Settings {:cpu_shares 1024}))))
+
+    (testing "gpu fields are optional"
+      (is (valid? c/Settings
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :min_gpus 1}))
+      (is (valid? c/Settings
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :max_gpus 4})))))
 
 (deftest test-NewSettings
   (testing "NewSettings schema validation"
@@ -64,10 +76,17 @@
                   {:id #uuid "123e4567-e89b-12d3-a456-426614174000"}))
       (is (valid? c/NewSettings
                   {:cpu_shares 1024
-                   :memory_limit 1073741824})))
+                   :memory_limit 1073741824}))
+      (is (valid? c/NewSettings
+                  {:min_gpus 1
+                   :max_gpus 4})))
 
     (testing "id is optional in NewSettings"
-      (is (valid? c/NewSettings {:cpu_shares 1024})))))
+      (is (valid? c/NewSettings {:cpu_shares 1024})))
+
+    (testing "gpu fields are optional in NewSettings"
+      (is (valid? c/NewSettings {:min_gpus 1}))
+      (is (valid? c/NewSettings {:max_gpus 4})))))
 
 (deftest test-Device
   (testing "Device schema validation"

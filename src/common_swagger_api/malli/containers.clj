@@ -1,5 +1,6 @@
 (ns common-swagger-api.malli.containers
-  (:require [malli.util :as mu]))
+  (:require
+   [malli.util :as mu]))
 
 (def Image
   [:map
@@ -91,6 +92,18 @@
      :description         "The maximum number of CPU cores allowed when running the tool container"
      :json-schema/example 4.0}
     :double]
+
+   [:min_gpus
+    {:optional            true
+     :description         "The minimum number of GPUs needed to run the tool container"
+     :json-schema/example 1}
+    :int]
+
+   [:max_gpus
+    {:optional            true
+     :description         "The maximum number of GPUs allowed when running the tool container"
+     :json-schema/example 4}
+    :int]
 
    [:min_disk_space
     {:optional            true
