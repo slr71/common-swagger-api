@@ -5550,3 +5550,380 @@
       (is (not (valid? apps/AppPreviewRequest [])))
       (is (not (valid? apps/AppPreviewRequest nil)))
       (is (not (valid? apps/AppPreviewRequest true))))))
+
+(deftest test-PublishAppRequest
+  (testing "PublishAppRequest validation"
+    (testing "minimal valid request - empty map"
+      (is (valid? apps/PublishAppRequest {})))
+
+    (testing "valid request with all optional fields"
+      (is (valid? apps/PublishAppRequest
+                  {:id #uuid "987e6543-e21b-32c1-b456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool for sequence comparison"
+                   :integration_date #inst "2024-01-15T10:30:00.000-00:00"
+                   :edited_date #inst "2024-10-20T14:45:00.000-00:00"
+                   :system_id "de"
+                   :version "1.2.0"
+                   :version_id #uuid "456e7890-b12c-34d5-e678-901234567890"
+                   :documentation "This tool performs sequence alignment using BLAST algorithm."
+                   :references ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]
+                   :avus [{:attr "analysis_type"
+                           :value "sequence_alignment"
+                           :unit "category"}]})))
+
+    (testing "valid request with partial fields"
+      (is (valid? apps/PublishAppRequest
+                  {:id #uuid "987e6543-e21b-32c1-b456-426614174000"
+                   :name "BLAST"}))
+      (is (valid? apps/PublishAppRequest
+                  {:version "2.0.0"
+                   :documentation "Updated documentation"}))
+      (is (valid? apps/PublishAppRequest
+                  {:references ["https://example.com"]
+                   :system_id "de"})))
+
+    (testing "valid request with simple AVUs"
+      (is (valid? apps/PublishAppRequest
+                  {:avus [{:attr "author"
+                           :value "John Doe"
+                           :unit "text"}
+                          {:attr "license"
+                           :value "MIT"
+                           :unit "string"}]})))
+
+    (testing "valid request with AVUs containing optional fields"
+      (is (valid? apps/PublishAppRequest
+                  {:avus [{:id #uuid "70fc1080-3152-4c09-92b0-f5b9cc70088b"
+                           :attr "attribute-name"
+                           :value "attribute-value"
+                           :unit "attribute-unit"
+                           :target_id #uuid "a14dfe49-f65f-418b-b3c5-6497284251fe"
+                           :created_by "user123"
+                           :modified_by "user321"
+                           :created_on 1757465246000
+                           :modified_on 1757465251000}]})))
+
+    (testing "valid request with nested AVUs - single level"
+      (is (valid? apps/PublishAppRequest
+                  {:avus [{:attr "parent"
+                           :value "parent_value"
+                           :unit "text"
+                           :avus [{:attr "child"
+                                   :value "child_value"
+                                   :unit "text"}]}]})))
+
+    (testing "valid request with nested AVUs - multiple levels"
+      (is (valid? apps/PublishAppRequest
+                  {:avus [{:attr "level1"
+                           :value "value1"
+                           :unit "text"
+                           :avus [{:attr "level2"
+                                   :value "value2"
+                                   :unit "text"
+                                   :avus [{:attr "level3"
+                                           :value "value3"
+                                           :unit "text"
+                                           :avus [{:attr "level4"
+                                                   :value "value4"
+                                                   :unit "text"}]}]}]}]})))
+
+    (testing "valid request with multiple nested AVUs at same level"
+      (is (valid? apps/PublishAppRequest
+                  {:avus [{:attr "parent1"
+                           :value "value1"
+                           :unit "text"
+                           :avus [{:attr "child1a"
+                                   :value "value1a"
+                                   :unit "text"}
+                                  {:attr "child1b"
+                                   :value "value1b"
+                                   :unit "text"}]}
+                          {:attr "parent2"
+                           :value "value2"
+                           :unit "text"
+                           :avus [{:attr "child2a"
+                                   :value "value2a"
+                                   :unit "text"}]}]})))
+
+    (testing "valid request with empty references vector"
+      (is (valid? apps/PublishAppRequest {:references []})))
+
+    (testing "valid request with empty avus vector"
+      (is (valid? apps/PublishAppRequest {:avus []})))
+
+    (testing "invalid request - wrong type for id"
+      (is (not (valid? apps/PublishAppRequest
+                       {:id "not-a-uuid"})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:id 12345}))))
+
+    (testing "invalid request - wrong type for name"
+      (is (not (valid? apps/PublishAppRequest
+                       {:name 123})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:name true}))))
+
+    (testing "invalid request - wrong type for description"
+      (is (not (valid? apps/PublishAppRequest
+                       {:description 456})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:description []}))))
+
+    (testing "invalid request - wrong type for integration_date"
+      (is (not (valid? apps/PublishAppRequest
+                       {:integration_date "2024-01-15"})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:integration_date 1234567890}))))
+
+    (testing "invalid request - wrong type for edited_date"
+      (is (not (valid? apps/PublishAppRequest
+                       {:edited_date "2024-10-20"})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:edited_date 9876543210}))))
+
+    (testing "invalid request - wrong type for system_id"
+      (is (not (valid? apps/PublishAppRequest
+                       {:system_id 123})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:system_id true}))))
+
+    (testing "invalid request - empty system_id"
+      (is (not (valid? apps/PublishAppRequest
+                       {:system_id ""}))))
+
+    (testing "invalid request - wrong type for version"
+      (is (not (valid? apps/PublishAppRequest
+                       {:version 1.2})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:version false}))))
+
+    (testing "invalid request - wrong type for version_id"
+      (is (not (valid? apps/PublishAppRequest
+                       {:version_id "not-a-uuid"})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:version_id 789}))))
+
+    (testing "invalid request - wrong type for documentation"
+      (is (not (valid? apps/PublishAppRequest
+                       {:documentation 999})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:documentation {}}))))
+
+    (testing "invalid request - references not a vector"
+      (is (not (valid? apps/PublishAppRequest
+                       {:references "string"})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:references {:key "value"}}))))
+
+    (testing "invalid request - references vector contains non-strings"
+      (is (not (valid? apps/PublishAppRequest
+                       {:references [123]})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:references ["valid" 456 "also-valid"]})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:references [true false]}))))
+
+    (testing "invalid request - avus not a vector"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus "string"})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus {:attr "value"}}))))
+
+    (testing "invalid request - AVU missing required field attr"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:value "value"
+                                :unit "text"}]}))))
+
+    (testing "invalid request - AVU missing required field value"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :unit "text"}]}))))
+
+    (testing "invalid request - AVU missing required field unit"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"}]}))))
+
+    (testing "invalid request - AVU with wrong type for attr"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr 123
+                                :value "value"
+                                :unit "text"}]}))))
+
+    (testing "invalid request - AVU with wrong type for value"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value 456
+                                :unit "text"}]}))))
+
+    (testing "invalid request - AVU with wrong type for unit"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"
+                                :unit 789}]}))))
+
+    (testing "invalid request - AVU with wrong type for optional id"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:id "not-a-uuid"
+                                :attr "attribute"
+                                :value "value"
+                                :unit "text"}]}))))
+
+    (testing "invalid request - AVU with wrong type for optional target_id"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"
+                                :unit "text"
+                                :target_id "not-a-uuid"}]}))))
+
+    (testing "invalid request - AVU with wrong type for created_by"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"
+                                :unit "text"
+                                :created_by 123}]}))))
+
+    (testing "invalid request - AVU with wrong type for modified_by"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"
+                                :unit "text"
+                                :modified_by true}]}))))
+
+    (testing "invalid request - AVU with wrong type for created_on"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"
+                                :unit "text"
+                                :created_on "not-an-int"}]}))))
+
+    (testing "invalid request - AVU with wrong type for modified_on"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"
+                                :unit "text"
+                                :modified_on "not-an-int"}]}))))
+
+    (testing "invalid request - AVU with extra field (closed map)"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "attribute"
+                                :value "value"
+                                :unit "text"
+                                :extra_field "not-allowed"}]}))))
+
+    (testing "invalid request - nested AVU missing required fields"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "parent"
+                                :value "parent_value"
+                                :unit "text"
+                                :avus [{:attr "child"
+                                        :value "child_value"}]}]}))))
+
+    (testing "invalid request - nested AVU with wrong type"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "parent"
+                                :value "parent_value"
+                                :unit "text"
+                                :avus [{:attr 123
+                                        :value "child_value"
+                                        :unit "text"}]}]}))))
+
+    (testing "invalid request - nested avus not a vector"
+      (is (not (valid? apps/PublishAppRequest
+                       {:avus [{:attr "parent"
+                                :value "parent_value"
+                                :unit "text"
+                                :avus "not-a-vector"}]}))))
+
+    (testing "invalid request - extra field at top level (closed map)"
+      (is (not (valid? apps/PublishAppRequest
+                       {:extra_field "not-allowed"})))
+      (is (not (valid? apps/PublishAppRequest
+                       {:name "BLAST"
+                        :unknown_key "value"}))))
+
+    (testing "invalid request - not a map"
+      (is (not (valid? apps/PublishAppRequest "string")))
+      (is (not (valid? apps/PublishAppRequest 123)))
+      (is (not (valid? apps/PublishAppRequest [])))
+      (is (not (valid? apps/PublishAppRequest nil)))
+      (is (not (valid? apps/PublishAppRequest true))))))
+
+(deftest test-AppPublishableResponse
+  (testing "AppPublishableResponse validation"
+    (testing "valid response - app is publishable without reason"
+      (is (valid? apps/AppPublishableResponse
+                  {:publishable true})))
+
+    (testing "valid response - app is not publishable with reason"
+      (is (valid? apps/AppPublishableResponse
+                  {:publishable false
+                   :reason "HPC apps must be published using the TAPIS API."}))
+      (is (valid? apps/AppPublishableResponse
+                  {:publishable false
+                   :reason "The app is missing required parameters."})))
+
+    (testing "valid response - app is not publishable without reason (reason is optional)"
+      (is (valid? apps/AppPublishableResponse
+                  {:publishable false})))
+
+    (testing "valid response - app is publishable with reason (semantically odd but valid)"
+      (is (valid? apps/AppPublishableResponse
+                  {:publishable true
+                   :reason "Some informational message"})))
+
+    (testing "invalid response - missing required publishable field"
+      (is (not (valid? apps/AppPublishableResponse {})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:reason "Missing publishable field"}))))
+
+    (testing "invalid response - wrong type for publishable field"
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable "true"})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable 1})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable 0})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable nil})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable "false"})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable :true}))))
+
+    (testing "invalid response - wrong type for reason field"
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable false
+                        :reason true})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable false
+                        :reason 123})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable false
+                        :reason :keyword})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable false
+                        :reason []})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable false
+                        :reason {}}))))
+
+    (testing "invalid response - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable true
+                        :extra-field "value"})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable false
+                        :reason "Not publishable"
+                        :unknown-key "value"})))
+      (is (not (valid? apps/AppPublishableResponse
+                       {:publishable true
+                        :additional "field"}))))
+
+    (testing "invalid response - not a map"
+      (is (not (valid? apps/AppPublishableResponse "string")))
+      (is (not (valid? apps/AppPublishableResponse 123)))
+      (is (not (valid? apps/AppPublishableResponse [])))
+      (is (not (valid? apps/AppPublishableResponse nil)))
+      (is (not (valid? apps/AppPublishableResponse true))))))

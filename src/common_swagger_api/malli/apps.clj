@@ -4,6 +4,7 @@
    [common-swagger-api.malli :refer [PagingParams SortFieldDocs]]
    [common-swagger-api.malli.apps.rating :as rating]
    [common-swagger-api.malli.containers :refer [Settings]]
+   [common-swagger-api.malli.metadata :refer [AvuListRequest]]
    [common-swagger-api.malli.ontologies :refer [OntologyClassHierarchy]]
    [common-swagger-api.malli.tools :refer [Tool ToolDetails ToolListingImage
                                            ToolListingItem]]
@@ -1337,3 +1338,142 @@
           :description ToolListDocs}
          [:vector AppToolRequest]]])
       (mu/update-properties assoc :description "The App to preview.")))
+
+(def AppCategoryMetadataAddRequest
+  (mu/update-properties AvuListRequest assoc :description "Community metadata to add to the App."))
+
+(def AppCategoryMetadataDeleteRequest
+  (mu/update-properties AvuListRequest assoc :description "Community metadata to remove from the App."))
+
+;; FIXME: There's a lot of duplication here, but I haven't been able to find a good way to get reuse working with
+;; recursive schema definitions. So far, the only workaround that I've found is to duplicate everything and hope that I
+;; didn't miss any fields. Fix this when we have a better option.
+(def PublishAppRequest
+  (m/schema
+   [:schema
+    {:registry
+     {::avu-request [:map {:closed true}
+                     [:id
+                      {:description         "The AVU's UUID"
+                       :json-schema/example "70fc1080-3152-4c09-92b0-f5b9cc70088b"
+                       :optional            true}
+                      :uuid]
+
+                     [:attr
+                      {:description         "The Attribute's name"
+                       :json-schema/example "attribute-name"}
+                      :string]
+
+                     [:value
+                      {:description         "The Attribute's value"
+                       :json-schema/example "attribute-value"}
+                      :string]
+
+                     [:unit
+                      {:description         "The attribute's unit"
+                       :json-schema/example "attribute-unit"}
+                      :string]
+
+                     [:target_id
+                      {:description         "The target item's UUID"
+                       :json-schema/example "a14dfe49-f65f-418b-b3c5-6497284251fe"
+                       :optional            true}
+                      :uuid]
+
+                     [:created_by
+                      {:description         "The ID of the user who created the AVU"
+                       :json-schema/example "user123"
+                       :optional            true}
+                      :string]
+
+                     [:modified_by
+                      {:description         "The ID of the user who last modified the AVU"
+                       :json-schema/example "user321"
+                       :optional            true}
+                      :string]
+
+                     [:created_on
+                      {:description         "The date the AVU was created in ms since the POSIX epoch"
+                       :json-schema/example 1757465246000
+                       :optional            true}
+                      :int]
+
+                     [:modified_on
+                      {:description         "The date the AVU was late modified in ms since the POSIX epoch"
+                       :json-schema/example 1757465251000
+                       :optional            true}
+                      :int]
+
+                     [:avus
+                      {:description "AVUs attached to this AVU"
+                       :optional    true}
+                      [:vector [:ref ::avu-request]]]]
+      ::publish-request [:map {:closed true, :description "The user's Publish App Request."}
+                         [:id
+                          {:optional true}
+                          AppIdParam]
+
+                         [:name
+                          {:optional            true
+                           :description         "The App's name"
+                           :json-schema/example "BLAST"}
+                          :string]
+
+                         [:description
+                          {:optional            true
+                           :description         "The App's description"
+                           :json-schema/example "Basic Local Alignment Search Tool for sequence comparison"}
+                          :string]
+
+                         [:integration_date
+                          {:optional            true
+                           :description         "The App's Date of public submission"
+                           :json-schema/example #inst "2024-01-15T10:30:00.000-00:00"}
+                          inst?]
+
+                         [:edited_date
+                          {:optional            true
+                           :description         "The App's Date of its last edit"
+                           :json-schema/example #inst "2024-10-20T14:45:00.000-00:00"}
+                          inst?]
+
+                         [:system_id
+                          {:optional true}
+                          SystemId]
+
+                         [:version
+                          {:optional true}
+                          AppVersionParam]
+
+                         [:version_id
+                          {:optional true}
+                          AppVersionIdParam]
+
+                         [:documentation
+                          {:optional true}
+                          AppDocParam]
+
+                         [:references
+                          {:optional            true
+                           :description         "The App's references"
+                           :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}
+                          [:vector :string]]
+
+                         [:avus
+                          {:optional    true
+                           :description "Community metadata to add to the App."}
+                          [:vector [:ref ::avu-request]]]]}}
+    ::publish-request]))
+
+(def AppPublishableResponse
+  [:map {:closed true}
+   [:publishable
+    {:description         "True if the app is publishable."
+     :json-schema/example true}
+    :boolean]
+
+   [:reason
+    {:optional            true
+     :description         "The reason the app can't be published if it's not publishable."
+     :json-schema/example "HPC apps must be published using the TAPIS API."}
+    :string]])
