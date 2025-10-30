@@ -5343,3 +5343,210 @@
       (is (not (valid? apps/AppDeletionRequest
                        {:app_ids nil
                         :root_deletion_request 123}))))))
+
+(deftest test-AppPreviewRequest
+  (testing "AppPreviewRequest validation"
+    (testing "valid preview request - minimal (empty map, all fields optional)"
+      (is (valid? apps/AppPreviewRequest {})))
+
+    (testing "valid preview request - with id only"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"})))
+
+    (testing "valid preview request - with basic required fields from original App"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool"})))
+
+    (testing "valid preview request - with optional fields"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool"
+                   :integration_date #inst "2024-01-15T10:30:00.000-00:00"
+                   :edited_date #inst "2024-10-20T14:45:00.000-00:00"
+                   :system_id "de"})))
+
+    (testing "valid preview request - with versions"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool"
+                   :versions [{:version_id #uuid "456e7890-b12c-34d5-e678-901234567890"
+                               :version "1.0.0"}]})))
+
+    (testing "valid preview request - with groups"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool"
+                   :groups [{:label "Input Parameters"}]})))
+
+    (testing "valid preview request - with is_public"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool"
+                   :is_public true}))
+      (is (valid? apps/AppPreviewRequest
+                  {:is_public false})))
+
+    (testing "valid preview request - with tools"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool"
+                   :tools [{:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                            :name "blastn"
+                            :version "2.12.0"
+                            :type "executable"}]})))
+
+    (testing "valid preview request - comprehensive with all optional fields"
+      (is (valid? apps/AppPreviewRequest
+                  {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                   :name "BLAST"
+                   :description "Basic Local Alignment Search Tool"
+                   :integration_date #inst "2024-01-15T10:30:00.000-00:00"
+                   :edited_date #inst "2024-10-20T14:45:00.000-00:00"
+                   :system_id "de"
+                   :versions [{:version_id #uuid "456e7890-b12c-34d5-e678-901234567890"
+                               :version "1.0.0"}]
+                   :groups [{:label "Input Parameters"
+                             :parameters []}]
+                   :is_public true
+                   :tools [{:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                            :name "blastn"
+                            :version "2.12.0"
+                            :type "executable"}]
+                   :references ["https://doi.org/10.1093/nar/gkv416"]})))
+
+    (testing "valid preview request - with multiple tools"
+      (is (valid? apps/AppPreviewRequest
+                  {:tools [{:id #uuid "789a0123-c45d-67e8-f901-234567890abc"
+                            :name "blastn"
+                            :version "2.12.0"
+                            :type "executable"}
+                           {:id #uuid "abc12345-def6-7890-abcd-ef1234567890"
+                            :name "blastx"
+                            :version "2.12.0"
+                            :type "executable"}]})))
+
+    (testing "valid preview request - with multiple groups"
+      (is (valid? apps/AppPreviewRequest
+                  {:groups [{:label "Input Parameters"}
+                            {:label "Output Parameters"}]})))
+
+    (testing "invalid preview request - wrong id type (must be UUID)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:id "not-a-uuid"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:id 123})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:id "123e4567-e89b-12d3-a456-426614174000"}))))
+
+    (testing "invalid preview request - wrong name type"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:name 123})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:name true})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:name nil}))))
+
+    (testing "invalid preview request - wrong description type"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:description 123})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:description true})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:description nil}))))
+
+    (testing "invalid preview request - wrong versions type (must be vector)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:versions "not-a-vector"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:versions {:version "1.0.0"}})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:versions nil}))))
+
+    (testing "invalid preview request - wrong groups type (must be vector)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:groups "not-a-vector"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:groups {:label "Input Parameters"}})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:groups nil}))))
+
+    (testing "invalid preview request - wrong is_public type (must be boolean)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:is_public "true"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:is_public 1})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:is_public nil}))))
+
+    (testing "invalid preview request - wrong tools type (must be vector)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:tools "not-a-vector"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:tools {:id #uuid "789a0123-c45d-67e8-f901-234567890abc"}})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:tools nil}))))
+
+    (testing "invalid preview request - invalid tool in vector (missing required fields)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:tools [{}]})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:tools [{:name "blastn"}]}))))
+
+    (testing "invalid preview request - invalid group in vector (missing required label)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:groups [{}]})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:groups [{:name "input_params"}]}))))
+
+    (testing "invalid preview request - wrong integration_date type"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:integration_date "2024-01-15"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:integration_date 1705314600000}))))
+
+    (testing "invalid preview request - wrong edited_date type"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:edited_date "2024-10-20"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:edited_date 1729426500000}))))
+
+    (testing "invalid preview request - wrong system_id type"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:system_id 123})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:system_id :de})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:system_id nil}))))
+
+    (testing "invalid preview request - wrong references type (must be vector of strings)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:references "not-a-vector"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:references [123]})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:references [nil]}))))
+
+    (testing "invalid preview request - extra fields not allowed (closed map)"
+      (is (not (valid? apps/AppPreviewRequest
+                       {:extra-field "value"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:id #uuid "123e4567-e89b-12d3-a456-426614174000"
+                        :name "BLAST"
+                        :unknown-key "value"})))
+      (is (not (valid? apps/AppPreviewRequest
+                       {:groups []
+                        :extra "field"}))))
+
+    (testing "invalid preview request - not a map"
+      (is (not (valid? apps/AppPreviewRequest "string")))
+      (is (not (valid? apps/AppPreviewRequest 123)))
+      (is (not (valid? apps/AppPreviewRequest [])))
+      (is (not (valid? apps/AppPreviewRequest nil)))
+      (is (not (valid? apps/AppPreviewRequest true))))))

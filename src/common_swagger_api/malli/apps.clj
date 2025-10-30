@@ -1314,3 +1314,26 @@
       (mu/dissoc :version_id)
       (mu/required-keys [:version])
       (mu/update-properties assoc :description "The App Version to add.")))
+
+(def AppCreateRequest (mu/update-properties AppRequest assoc :description "The App to add."))
+(def AppUpdateRequest (mu/update-properties AppRequest assoc :description "The App to update."))
+
+(def AppPreviewRequest
+  (-> App
+      (mu/optional-keys [:id :name :description :versions])
+      (mu/merge
+       [:map {:closed true}
+        [:groups
+         {:optional    true
+          :description GroupListDocs}
+         [:vector AppGroupRequest]]
+
+        [:is_public
+         {:optional true}
+         AppPublicParam]
+
+        [:tools
+         {:optional true
+          :description ToolListDocs}
+         [:vector AppToolRequest]]])
+      (mu/update-properties assoc :description "The App to preview.")))
