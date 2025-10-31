@@ -15,7 +15,7 @@
       (is (valid? id/IntegrationDataUpdate
                   {:email "test.user@company.org"
                    :name "Test User"})))
-    
+
     (testing "invalid update data"
       ;; Missing required fields
       (is (not (valid? id/IntegrationDataUpdate
@@ -23,7 +23,7 @@
       (is (not (valid? id/IntegrationDataUpdate
                        {:name "John Doe"})))
       (is (not (valid? id/IntegrationDataUpdate {})))
-      
+
       ;; Empty strings not allowed (NonBlankString)
       (is (not (valid? id/IntegrationDataUpdate
                        {:email ""
@@ -37,13 +37,13 @@
       (is (not (valid? id/IntegrationDataUpdate
                        {:email "user@example.com"
                         :name "   "})))
-      
+
       ;; Extra fields not allowed due to :closed true
       (is (not (valid? id/IntegrationDataUpdate
                        {:email "user@example.com"
                         :name "John Doe"
                         :extra "field"})))
-      
+
       ;; Wrong types
       (is (not (valid? id/IntegrationDataUpdate
                        {:email 123
@@ -66,7 +66,7 @@
                   {:email "test@company.org"
                    :name "Test User"
                    :username "testuser"})))
-    
+
     (testing "invalid request data"
       ;; Missing required fields from base schema
       (is (not (valid? id/IntegrationDataRequest
@@ -74,7 +74,7 @@
       (is (not (valid? id/IntegrationDataRequest
                        {:email "user@example.com"
                         :username "johndoe"})))
-      
+
       ;; Empty username not allowed (NonBlankString)
       (is (not (valid? id/IntegrationDataRequest
                        {:email "user@example.com"
@@ -84,7 +84,7 @@
                        {:email "user@example.com"
                         :name "John Doe"
                         :username "   "})))
-      
+
       ;; Extra fields not allowed
       (is (not (valid? id/IntegrationDataRequest
                        {:email "user@example.com"
@@ -109,7 +109,7 @@
                    :name "Test User"
                    :username "testuser"
                    :id #uuid "456e7890-e89b-12d3-a456-426614174000"})))
-    
+
     (testing "invalid integration data"
       ;; Missing required id field
       (is (not (valid? id/IntegrationData
@@ -119,14 +119,14 @@
                        {:email "user@example.com"
                         :name "John Doe"
                         :username "johndoe"})))
-      
+
       ;; Missing required fields from base schemas
       (is (not (valid? id/IntegrationData
                        {:id #uuid "123e4567-e89b-12d3-a456-426614174000"})))
       (is (not (valid? id/IntegrationData
                        {:email "user@example.com"
                         :id #uuid "123e4567-e89b-12d3-a456-426614174000"})))
-      
+
       ;; Wrong type for id
       (is (not (valid? id/IntegrationData
                        {:email "user@example.com"
@@ -136,7 +136,7 @@
                        {:email "user@example.com"
                         :name "John Doe"
                         :id 123})))
-      
+
       ;; Extra fields not allowed
       (is (not (valid? id/IntegrationData
                        {:email "user@example.com"
@@ -165,7 +165,7 @@
                                        :username "user"
                                        :id #uuid "123e4567-e89b-12d3-a456-426614174000"}]
                    :total 1})))
-    
+
     (testing "invalid listing data"
       ;; Missing required fields
       (is (not (valid? id/IntegrationDataListing
@@ -173,7 +173,7 @@
       (is (not (valid? id/IntegrationDataListing
                        {:total 0})))
       (is (not (valid? id/IntegrationDataListing {})))
-      
+
       ;; Wrong types
       (is (not (valid? id/IntegrationDataListing
                        {:integration_data "not-a-vector"
@@ -181,7 +181,7 @@
       (is (not (valid? id/IntegrationDataListing
                        {:integration_data []
                         :total "not-a-number"})))
-      
+
       ;; Invalid items in integration_data vector
       (is (not (valid? id/IntegrationDataListing
                        {:integration_data [{:email "user@example.com"}]  ; Missing required fields
@@ -191,7 +191,7 @@
                                             :name "User"
                                             :id "not-a-uuid"}]
                         :total 1})))
-      
+
       ;; Extra fields not allowed
       (is (not (valid? id/IntegrationDataListing
                        {:integration_data []
@@ -205,12 +205,12 @@
                        :name "John Doe"}
           request-data (assoc update-data :username "johndoe")
           integration-data (assoc request-data :id #uuid "123e4567-e89b-12d3-a456-426614174000")]
-      
+
       (is (valid? id/IntegrationDataUpdate update-data))
       (is (valid? id/IntegrationDataRequest update-data))  ; Should work without username
       (is (valid? id/IntegrationDataRequest request-data))
       (is (valid? id/IntegrationData integration-data))
-      
+
       ;; But not the other way around
       (is (not (valid? id/IntegrationDataUpdate request-data)))  ; username not allowed
       (is (not (valid? id/IntegrationDataRequest integration-data)))  ; id not allowed
