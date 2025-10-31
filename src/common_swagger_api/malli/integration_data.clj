@@ -2,6 +2,10 @@
   (:require [common-swagger-api.malli :refer [NonBlankString]]
             [malli.util :as mu]))
 
+(def IntegrationDataIdPathParam
+  [:uuid {:description         "A UUID that is used to identify the integration data record"
+          :json-schema/example #uuid "123e4567-e89b-12d3-a456-426614174000"}])
+
 (def IntegrationDataUpdate
   [:map {:closed true}
    [:email

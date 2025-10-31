@@ -215,3 +215,20 @@
       (is (not (valid? id/IntegrationDataUpdate request-data)))  ; username not allowed
       (is (not (valid? id/IntegrationDataRequest integration-data)))  ; id not allowed
       (is (not (valid? id/IntegrationDataUpdate integration-data))))))
+
+(deftest test-IntegrationDataIdPathParam
+  (testing "IntegrationDataIdPathParam validation"
+    (testing "valid UUIDs"
+      (is (valid? id/IntegrationDataIdPathParam #uuid "123e4567-e89b-12d3-a456-426614174000"))
+      (is (valid? id/IntegrationDataIdPathParam #uuid "456e7890-b12c-34d5-e678-901234567890"))
+      (is (valid? id/IntegrationDataIdPathParam #uuid "00000000-0000-0000-0000-000000000000"))
+      (is (valid? id/IntegrationDataIdPathParam #uuid "ffffffff-ffff-ffff-ffff-ffffffffffff")))
+
+    (testing "invalid values"
+      ;; Wrong types
+      (is (not (valid? id/IntegrationDataIdPathParam "123e4567-e89b-12d3-a456-426614174000")))  ; String UUID
+      (is (not (valid? id/IntegrationDataIdPathParam "not-a-uuid")))
+      (is (not (valid? id/IntegrationDataIdPathParam 123)))
+      (is (not (valid? id/IntegrationDataIdPathParam nil)))
+      (is (not (valid? id/IntegrationDataIdPathParam {:id "123e4567-e89b-12d3-a456-426614174000"})))
+      (is (not (valid? id/IntegrationDataIdPathParam []))))))
