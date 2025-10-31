@@ -328,3 +328,20 @@
 
       (is (valid? meta/AvuListRequest {:avus [full-avu]}))
       (is (valid? meta/AvuListRequest {:avus [minimal-request]})))))
+
+(deftest test-TargetIdParam
+  (testing "TargetIdParam validation"
+    (testing "valid UUIDs"
+      (is (valid? meta/TargetIdParam #uuid "123e4567-e89b-12d3-a456-426614174000"))
+      (is (valid? meta/TargetIdParam #uuid "a14dfe49-f65f-418b-b3c5-6497284251fe"))
+      (is (valid? meta/TargetIdParam #uuid "00000000-0000-0000-0000-000000000000"))
+      (is (valid? meta/TargetIdParam #uuid "ffffffff-ffff-ffff-ffff-ffffffffffff")))
+
+    (testing "invalid values"
+      ;; Wrong types
+      (is (not (valid? meta/TargetIdParam "123e4567-e89b-12d3-a456-426614174000")))  ; String UUID
+      (is (not (valid? meta/TargetIdParam "not-a-uuid")))
+      (is (not (valid? meta/TargetIdParam 123)))
+      (is (not (valid? meta/TargetIdParam nil)))
+      (is (not (valid? meta/TargetIdParam {:id "123e4567-e89b-12d3-a456-426614174000"})))
+      (is (not (valid? meta/TargetIdParam []))))))

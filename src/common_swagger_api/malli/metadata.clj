@@ -2,6 +2,10 @@
   (:require [malli.util :as mu]
             [malli.core :as m]))
 
+(def TargetIdParam
+  [:uuid {:description         "The target item's UUID"
+          :json-schema/example #uuid "a14dfe49-f65f-418b-b3c5-6497284251fe"}])
+
 (def Avu
   (m/schema
     [:schema
