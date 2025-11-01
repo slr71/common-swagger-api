@@ -202,6 +202,12 @@
   [:boolean {:description         "Whether the App has been published and is viewable by all users"
              :json-schema/example true}])
 
+(def AppReferencesParam
+  [:vector
+   {:description         "The App's references"
+    :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}
+   :string])
+
 (def StringAppIdParam
   [:string {:description         "The App identifier"
             :json-schema/example "app-id-12345"
@@ -634,10 +640,8 @@
     [:vector {:min 1} (mu/merge Tool [:map [:deprecated {:optional true} ToolDeprecatedParam]])]]
 
    [:references
-    {:description         "The App's references"
-     :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]
-     :optional            true}
-    [:vector :string]]
+    {:optional true}
+    AppReferencesParam]
 
    [:groups
     {:optional    true
@@ -909,10 +913,7 @@
 
    [:documentation AppDocParam]
 
-   [:references
-    {:description         "The App's references"
-     :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}
-    [:vector :string]]
+   [:references AppReferencesParam]
 
    [:created_on
     {:optional            true
@@ -1072,10 +1073,7 @@
          {:description ToolListDocs}
          [:vector AppDetailsTool]]
 
-        [:references
-         {:description         "The App's references"
-          :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}
-         [:vector :string]]
+        [:references AppReferencesParam]
 
         [:job_stats
          {:optional    true
@@ -1453,11 +1451,7 @@
                           {:optional true}
                           AppDocParam]
 
-                         [:references
-                          {:optional            true
-                           :description         "The App's references"
-                           :json-schema/example ["https://doi.org/10.1093/nar/gkv416" "PMID: 25916842"]}
-                          [:vector :string]]
+                         [:references {:optional true} AppReferencesParam]
 
                          [:avus
                           {:optional    true
