@@ -1,5 +1,6 @@
 (ns common-swagger-api.malli.permanent-id-requests
   (:require
+   [common-swagger-api.malli :refer [PagingParams SortFieldDocs]]
    [malli.util :as mu]))
 
 (def PermanentIDRequestAdminListSummary "List Permanent ID Requests")
@@ -53,7 +54,7 @@
     {:optional            true
      :description         (str "The original path of the target data set at the time the Permanent ID Request was "
                                "initially created")
-     :json-schema/example "https://doi.org/10.1093/nar/gkv416"}
+     :json-schema/example "/zone/home/username/original_folder"}
     :string]])
 
 (def PermanentIDRequest
@@ -83,62 +84,162 @@
      :json-schema/example "Please fill out the DataCite metadata template for the data set."}
     :string]])
 
-;; FIXME: I haven't been able to find the reason for this, but I kept getting a `StackOverflowError` when I tried to
-;; use malli.util/merge to reuse the `:comments` field from `PermanentIDRequestStatusComments`. Oddly enough, when I
-;; tried to use `malli.util/merge` to merge schemas in the REPL, the `StackOverflowError` didn't occur.
 (def PermanentIDRequestStatusUpdate
-  [:map {:closed true}
-   [:comments
-    {:optional            true
-     :description         "The curator comments of the Permanent ID Request status update"
-     :json-schema/example "Please fill out the DataCite metadata template for the data set."}
-    :string]
+  (reduce
+   mu/merge
+   [PermanentIDRequestStatusComments
+    [:map {:closed true}
+     [:permanent_id
+      {:optional            true
+       :description         (str "The identifier of a completed Permanent ID Request. If the `permanent_id` is "
+                                 "provided in the request, then the Permanent ID Request must not already have "
+                                 "a `permanent_id` set, otherwise an error is returned and the Status is not "
+                                 "updated.")
+       :json-schema/example "https://doi.org/10.1093/nar/gkv416"}
+      :string]
 
-   [:permanent_id
-    {:optional            true
-     :description         (str "The identifier of a completed Permanent ID Request. If the `permanent_id` is "
-                               "provided in the request, then the Permanent ID Request must not already have "
-                               "a `permanent_id` set, otherwise an error is returned and the Status is not "
-                               "updated.")
-     :json-schema/example "https://doi.org/10.1093/nar/gkv416"}
-    :string]
+     [:status
+      {:optional            true
+       :description         (str "The status code of the Permanent ID Request update. The status code is "
+                                 "case-sensitive, and if it isn't defined in the database already then it "
+                                 "will be added to the list of known status codes")
+       :json-schema/example "Submitted"}
+      :string]]]))
 
-   [:status
-    {:optional            true
-     :description         (str "The status code of the Permanent ID Request update. The status code is "
-                               "case-sensitive, and if it isn't defined in the database already then it "
-                               "will be added to the list of known status codes")
-     :json-schema/example "submitted"}
-    :string]])
-
-;; FIXME: I was encountering the same `StackOverflowError` for this schema, which prevented me from reusing the
-;; `:permanent_id` and `:comments` fields.
 (def PermanentIDRequestStatus
-  [:map {:closed true}
-   [:permanent_id
-    {:optional            true
-     :description         "The identifier of a completed Permanent ID Request"
-     :json-schema/example "https://doi.org/10.1093/nar/gkv416"}
-    :string]
+  (mu/closed-schema
+   (reduce
+    mu/merge
+    [PermanentID
+     PermanentIDRequestStatusComments
+     [:map
+      [:status
+       {:optional            true
+        :description         "The status code of the Permanent ID Request update"
+        :json-schema/example "Completion"}
+       :string]
 
-   [:comments
-    {:optional            true
-     :description         "The curator comments of the Permanent ID Request status update"
-     :json-schema/example "Please fill out the DataCite metadata template for the data set."}
-    :string]
+      [:status_date
+       {:description         "The timestamp of the Permanent ID Request status update"
+        :json-schema/example 1762296097000}
+       :int]
 
-   [:status
-    {:optional            true
-     :description         "The status code of the Permanent ID Request update"
-     :json-schema/example "approved"}
-    :string]
+      [:updated_by
+       {:description         "The username that updated the Permanent ID Request status"
+        :json-schema/example "janedoe"}
+       :string]]])))
 
-   [:status_date
-    {:description         "The timestamp of the Permanent ID Request status update"
-     :json-schema/example 1762296097000}
-    :int]
+(def PermanentIDRequestDetails
+  (mu/closed-schema
+   (mu/merge
+    PermanentIDRequestBase
+    [:map
+     [:history
+      {:description "A list of Permanent ID Request status updates"}
+      [:vector PermanentIDRequestStatus]]])))
 
-   [:updated_by
-    {:description         "The username that updated the Permanent ID Request status"
-     :json-schema/example "janedoe"}
-    :string]])
+(def PermanentIDRequestListing
+  (mu/closed-schema
+   (mu/merge
+    PermanentIDRequestBase
+    [:map
+     [:date_submitted
+      {:description         "The timestamp of the Permanent ID Request submission"
+       :json-schema/example 1763063226000}
+      :int]
+
+     [:status
+      {:description         "The current status of the Permanent ID Request"
+       :json-schema/example "Evaluation"}
+      :string]
+
+     [:date_updated
+      {:description         "The timestamp of the last Permanent ID Request status update"
+       :json-schema/example 1763067980000}
+      :int]
+
+     [:updated_by
+      {:description         "The username of the user that last updated the Permanent ID Request status"
+       :json-schema/example "example_user"}
+      :string]])))
+
+(def PermanentIDRequestList
+  (mu/closed-schema
+   [:map
+    [:requests
+     {:description "A list of Permanent ID Requests"}
+     [:vector PermanentIDRequestListing]]
+
+    [:total
+     {:description         "The total number of permanent id requests in the listing"
+      :json-schema/example 27}
+     :int]]))
+
+(def ValidPermanentIDRequestListPagingParams
+  [:enum :type :target_type :requested_by :date_submitted :status :date_updated :updated_by])
+
+(def PermanentIDRequestListPagingParams
+  (mu/closed-schema
+   (mu/merge
+    PagingParams
+    [:map
+     [:sort-field
+      {:optional    true
+       :description SortFieldDocs}
+      ValidPermanentIDRequestListPagingParams]
+
+     [:statuses
+      {:optional            true
+       :description         "Status Codes with which to filter results"
+       :json-schema/example "Rejected"}
+      [:vector :string]]])))
+
+(def PermanentIDRequestStatusCode
+  (mu/closed-schema
+   [:map
+    [:id
+     {:description         "The Status Code's UUID"
+      :json-schema/example #uuid "e1ee158b-7511-4f21-9feb-ff608d5eb80b"}
+     :uuid]
+
+    [:name
+     {:description         "The Status Code"
+      :json-schema/example "Pending"}
+     :string]
+
+    [:description
+     {:description         "A brief description of the Status Code"
+      :json-schema/example "The curators are waiting for a response from the requesting user."}
+     :string]]))
+
+(def PermanentIDRequestStatusCodeList
+  (mu/closed-schema
+    [:map
+     [:status_codes
+      {:description "A list of Permanent ID Request Status Codes"}
+      [:vector PermanentIDRequestStatusCode]]]))
+
+(def PermanentIDRequestType
+  (mu/closed-schema
+   [:map
+    [:id
+     {:description         "The Request Type's UUID"
+      :json-schema/example #uuid "f38d9305-ca90-4c0f-94b5-f7f243855734"}
+     :uuid]
+
+    [:type
+     {:description         "The Request Type"
+      :json-schema/example "DOI"}
+     :string]
+
+    [:description
+     {:description         "A brief description of the Request Type"
+      :json-schema/example "Data Object Identifier"}
+     :string]]))
+
+(def PermanentIDRequestTypeList
+  (mu/closed-schema
+    [:map
+     [:request_types
+      {:description "A list of Permanent ID Request Types"}
+      [:vector PermanentIDRequestType]]]))
