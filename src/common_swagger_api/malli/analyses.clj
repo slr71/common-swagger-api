@@ -1,6 +1,9 @@
 (ns common-swagger-api.malli.analyses
   (:require
+   [clojure.java.io :as io]
    [common-swagger-api.malli.apps :refer [AppStepResourceRequirements SystemId]]
+   [common-swagger-api.malli.common :refer [IncludeDeletedParams
+                                            IncludeHiddenParams]]
    [malli.util :as mu]))
 
 (def AnalysisParametersSummary "Display the parameters used in an analysis.")
@@ -280,7 +283,7 @@
     [:file-metadata
      {:optional    true
       :description "Custom file attributes to associate with result files."}
-     FileMetadata]
+     [:vector FileMetadata]]
 
     [:archive_logs
      {:optional            true
@@ -322,3 +325,202 @@
       :description         "Any paths parsed from an HT Analysis Path List that no longer exist."
       :json-schema/example ["/foo/bar/baz" "/foo/bar/quux"]}
      [:vector :string]]]))
+
+(def AnalysisPod
+  (mu/closed-schema
+   [:map
+    [:name
+     {:description         "The name of a pod in Kubernetes associated with an analysis."
+      :json-schema/example "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05-79c44695b5-v8s4w"}
+     :string]
+
+    [:external_id
+     {:description         "The external ID associated with the pod."
+      :json-schema/example #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+     :uuid]]))
+
+(def AnalysisPodListSummary
+  "List the Kubernetes pods associated with the analysis.")
+
+(def AnalysisPodListDescription
+  "This endpoint returns a listing of pod objects associated with the analysis. Usually will return a single pod.")
+
+(def AnalysisPodList
+  (mu/closed-schema
+    [:map
+     [:pods
+      {:description "A list of pods in Kubernetes associated with an analysis."}
+      [:vector AnalysisPod]]]))
+
+(def AnalysisPodLogSummary
+  "The logs from a pod associated with the analysis")
+
+(def AnalysisPodLogDescription
+  "This endpoint returns the logs from the provided pod associated with the provided analysis.")
+
+(def AnalysisPodLogParameters
+  (mu/closed-schema
+   [:map
+    [:previous
+     {:optional            true
+      :description         "True if the logs of a previously terminated container should be returned"
+      :json-schema/example true}
+     :boolean]
+
+    [:since
+     {:optional            true
+      :description         "Number of seconds in the past to start showing logs"
+      :json-schema/example 3600}
+     :int]
+
+    [:since-time
+     {:optional            true
+      :description         "The time at which to start showing log lines. Expressed as seconds since the epoch."
+      :json-schema/example "1763156075"}
+     :string]
+
+    [:tail-lines
+     {:optional            true
+      :description         "Number of lines from the end of the log to show"
+      :json-schema/example 100}
+     :int]
+
+    [:timestamps
+     {:optional            true
+      :description         "True if timestamps should be prepended to the log lines"
+      :json-schema/example true}
+     :boolean]
+
+    [:container
+     {:optional            true
+      :description         "Name of the container to display logs from. Defaults to 'analysis'"
+      :json-schema/example "analysis"}
+     :string]]))
+
+(def AnalysisPodLogEntry
+  (mu/closed-schema
+   [:map
+    [:since_time
+     {:description         "Contains the seconds since the epoch for the time when the log entry was retrieved"
+      :json-schema/example "1763156649"}
+     :string]
+
+    [:lines
+     {:description         "The lines that make up the log entry"
+      :json-schema/example ["[I 2025-11-14 18:24:35.960 ServerApp] Jupyter Server 2.15.0 is running at:"
+                            "[I 2025-11-14 18:24:35.960 ServerApp] http://a9e6f09ad:8888/lab"
+                            "[I 2025-11-14 18:24:35.960 ServerApp]     http://127.0.0.1:8888/lab"]}
+     [:vector :string]]]))
+
+(def AnalysisTimeLimit
+  (mu/closed-schema
+   [:map
+    [:time_limit
+     {:description         (str "Contains the seconds since the epoch for the analysis's time limit or the string "
+                                "'null' if the time limit isn't set.")
+      :json-schema/example "1763157634"}
+     :string]]))
+
+(def ConcurrentJobLimitUsername
+  [:string
+   {:description         "The username associated with the limit"
+    :json-schema/example "janedoe"}])
+
+(def ConcurrentJobLimitListingSummary
+  "List Concurrent Job Limits")
+
+(def ConcurrentJobLimitListingDescription
+  (str "Lists the concurrent job limits for all users who have one defined. The record describing the default "
+       "limit contains no username. Users without explicit limits defined will use the default limit."))
+
+(def ConcurrentJobLimitRetrievalSummary
+  "Get a User's Concurrent Job Limit")
+
+(def ConcurrentJobLimitRetrievalDescription
+  (str "Gets the concurrent job limit for a user. The limit will either be the limit that was explicitly set for the "
+       "user or the default limit. If the default limit is returned then there will be no username in the response "
+       "body."))
+
+(def ConcurrentJobLimitUpdateSummary
+  "Update a User's Concurrent Job Limit")
+
+(def ConcurrentJobLimitUpdateDescription
+  (str "Updates the concurrent job limit for a user. The user's limit will be set explicitly even if it's equal to "
+       "the default limit."))
+
+(def ConcurrentJobLimitRemovalSummary
+  "Remove a User's Concurrent Job Limit")
+
+(def ConcurrentJobLimitRemovalDescription
+  (str "Removes the explicitly configured concurrent job limit for a user. This effectively returns the user's job "
+       "limit to whatever the default job limit is."))
+
+(def ConcurrentJobLimitListItem
+  (mu/closed-schema
+   [:map
+    [:username
+     {:optional            true
+      :description         "The username of the limited user, omitted for the default setting"
+      :json-schema/example "janedoe"}
+     :string]
+
+    [:concurrent_jobs
+     {:description         "The maximum number of concurrently running jobs"
+      :json-schema/example 2}
+     :int]
+
+    [:is_default
+     {:description         "True for the default setting."
+      :json-schema/example false}
+     :boolean]]))
+
+(def ConcurrentJobLimit
+  (mu/update-entry-properties
+    ConcurrentJobLimitListItem :is_default
+    assoc :description "True if the default setting is being used for the user."))
+
+(def ConcurrentJobLimits
+  (mu/closed-schema
+    [:map
+     [:limits
+      {:description "The list of concurrent job limits"}
+      [:vector ConcurrentJobLimitListItem]]]))
+
+(def ConcurrentJobLimitUpdate
+  (reduce mu/dissoc ConcurrentJobLimit [:username :is_default]))
+
+(def AnalysisStatSummary "List analysis counts by status")
+(def AnalysisStatDescription "This service allows users to retrieve the total count of jobs grouped by job status.")
+
+(def AnalysisCount
+  (mu/closed-schema
+   [:map
+    [:count
+     {:description         "The total number of jobs with the attached job status."
+      :json-schema/example 27}
+     :int]
+
+    [:status
+     {:description         "The status for the attached job count."
+      :json-schema/example "Completed"}
+     :string]]))
+
+(def AnalysisStats
+  (mu/closed-schema
+    [:map
+     [:status-count
+      {:description "List the total number of jobs grouped by job status for a user."}
+      [:vector AnalysisCount]]]))
+
+(def AnalysisStatParams
+  (mu/closed-schema
+   (reduce
+    mu/merge
+    [IncludeHiddenParams
+     IncludeDeletedParams
+     [:map
+      [:filter
+       {:optional            true
+        :description         (slurp (io/resource "docs/analyses/listing/filter-param.md"))
+        :json-schema/example "[{\"field\":\"ownership\",\"value\":\"all\"}]"}
+       :string]]])))

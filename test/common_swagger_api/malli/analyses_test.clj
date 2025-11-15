@@ -1589,14 +1589,36 @@
        :skip-parent-meta true
        :output_dir "/zone/home/username/outputs"}
 
-      ;; With :file-metadata
+      ;; With :file-metadata (empty vector)
       {:system_id "de"
        :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
        :config {}
        :debug false
        :name "my-analysis"
        :notify false
-       :file-metadata {:attr "sample_weight" :value "2" :unit "kg"}
+       :file-metadata []
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; With :file-metadata (single item)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata [{:attr "sample_weight" :value "2" :unit "kg"}]
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; With :file-metadata (multiple items)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata [{:attr "sample_weight" :value "2" :unit "kg"}
+                       {:attr "temperature" :value "25" :unit "C"}
+                       {:attr "experiment_id" :value "EXP-123" :unit ""}]
        :output_dir "/zone/home/username/outputs"}
 
       ;; With :archive_logs
@@ -1638,7 +1660,7 @@
        :starting_step 1
        :uuid #uuid "df97797c-0f8d-41ae-898d-68dcd79abfc8"
        :skip-parent-meta false
-       :file-metadata {:attr "experiment_id" :value "EXP-123" :unit ""}
+       :file-metadata [{:attr "experiment_id" :value "EXP-123" :unit ""}]
        :archive_logs true
        :mount_data_store true}
 
@@ -1990,24 +2012,95 @@
        :skip-parent-meta "true"
        :output_dir "/zone/home/username/outputs"}
 
-      ;; Wrong type for :file-metadata
+      ;; Wrong type for :file-metadata (not a vector - string)
       {:system_id "de"
        :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
        :config {}
        :debug false
        :name "my-analysis"
        :notify false
-       :file-metadata "not a map"
+       :file-metadata "not a vector"
        :output_dir "/zone/home/username/outputs"}
 
-      ;; Invalid :file-metadata (missing required field)
+      ;; Wrong type for :file-metadata (not a vector - single object)
       {:system_id "de"
        :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
        :config {}
        :debug false
        :name "my-analysis"
        :notify false
-       :file-metadata {:attr "sample_weight" :value "2"}
+       :file-metadata {:attr "sample_weight" :value "2" :unit "kg"}
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; Wrong type for :file-metadata (not a vector - number)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata 123
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; Invalid :file-metadata (vector with invalid FileMetadata - missing :unit)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata [{:attr "sample_weight" :value "2"}]
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; Invalid :file-metadata (vector with invalid FileMetadata - missing :value)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata [{:attr "sample_weight" :unit "kg"}]
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; Invalid :file-metadata (vector with invalid FileMetadata - missing :attr)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata [{:value "2" :unit "kg"}]
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; Invalid :file-metadata (vector with extra field)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata [{:attr "sample_weight" :value "2" :unit "kg" :extra "field"}]
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; Invalid :file-metadata (vector containing non-map)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata ["not a map"]
+       :output_dir "/zone/home/username/outputs"}
+
+      ;; Invalid :file-metadata (mixed valid and invalid items)
+      {:system_id "de"
+       :app_id "007a8434-1b84-42e8-b647-4073a62b4b3b"
+       :config {}
+       :debug false
+       :name "my-analysis"
+       :notify false
+       :file-metadata [{:attr "sample_weight" :value "2" :unit "kg"}
+                       {:attr "missing-value" :unit "C"}]
        :output_dir "/zone/home/username/outputs"}
 
       ;; Wrong type for :archive_logs
@@ -2277,3 +2370,1457 @@
       nil
 
       [#uuid "570e5ca1-194d-400a-bc91-fc64324f7367"])))
+
+(deftest test-AnalysisPod
+  (testing "valid analysis pod"
+    (are [obj]
+        (valid? analyses/AnalysisPod obj)
+
+      ;; Minimal valid pod with required fields
+      {:name "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05-79c44695b5-v8s4w"
+       :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+
+      ;; Pod with short name
+      {:name "pod-abc"
+       :external_id #uuid "123e4567-e89b-12d3-a456-426614174000"}
+
+      ;; Pod with long name
+      {:name "very-long-pod-name-with-many-segments-12345678-90ab-cdef-1234-567890abcdef-79c44695b5-v8s4w"
+       :external_id #uuid "12345678-90ab-cdef-1234-567890abcdef"}
+
+      ;; Pod with hyphenated name
+      {:name "analysis-pod-12345-abcde"
+       :external_id #uuid "abcdef12-3456-7890-abcd-ef1234567890"}
+
+      ;; Pod with alphanumeric name
+      {:name "pod123abc456def"
+       :external_id #uuid "98765432-1234-5678-9abc-def012345678"}
+
+      ;; Pod with empty string name (strings allow empty)
+      {:name ""
+       :external_id #uuid "11111111-2222-3333-4444-555555555555"}))
+
+  (testing "invalid analysis pod"
+    (are [obj]
+        (not (valid? analyses/AnalysisPod obj))
+
+      ;; Empty map (missing required fields)
+      {}
+
+      ;; Missing :name
+      {:external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+
+      ;; Missing :external_id
+      {:name "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05-79c44695b5-v8s4w"}
+
+      ;; Wrong type for :name (number instead of string)
+      {:name 123
+       :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+
+      ;; Wrong type for :name (nil)
+      {:name nil
+       :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+
+      ;; Wrong type for :name (boolean)
+      {:name true
+       :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+
+      ;; Wrong type for :name (keyword)
+      {:name :pod-name
+       :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+
+      ;; Wrong type for :external_id (string instead of uuid)
+      {:name "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05-79c44695b5-v8s4w"
+       :external_id "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}
+
+      ;; Wrong type for :external_id (number)
+      {:name "pod-name"
+       :external_id 123}
+
+      ;; Wrong type for :external_id (nil)
+      {:name "pod-name"
+       :external_id nil}
+
+      ;; Extra field not allowed (closed schema)
+      {:name "pod-name"
+       :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"
+       :extra_field "not allowed"}
+
+      {:name "pod-name"
+       :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"
+       :status "Running"}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      nil
+
+      [#uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"])))
+
+(deftest test-AnalysisPodList
+  (testing "valid analysis pod list"
+    (are [obj]
+        (valid? analyses/AnalysisPodList obj)
+
+      ;; Empty pod list
+      {:pods []}
+
+      ;; Single pod
+      {:pods [{:name "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05-79c44695b5-v8s4w"
+               :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}]}
+
+      ;; Multiple pods
+      {:pods [{:name "pod-1-abc123-xyz"
+               :external_id #uuid "11111111-1111-1111-1111-111111111111"}
+              {:name "pod-2-def456-uvw"
+               :external_id #uuid "22222222-2222-2222-2222-222222222222"}
+              {:name "pod-3-ghi789-rst"
+               :external_id #uuid "33333333-3333-3333-3333-333333333333"}]}
+
+      ;; Multiple pods with various name formats
+      {:pods [{:name "short"
+               :external_id #uuid "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"}
+              {:name "very-long-pod-name-with-many-hyphens-12345678-90ab-cdef-1234-567890abcdef"
+               :external_id #uuid "bbbbbbbb-cccc-dddd-eeee-ffffffffffff"}
+              {:name ""
+               :external_id #uuid "cccccccc-dddd-eeee-ffff-000000000000"}]}))
+
+  (testing "invalid analysis pod list"
+    (are [obj]
+        (not (valid? analyses/AnalysisPodList obj))
+
+      ;; Empty map (missing required :pods field)
+      {}
+
+      ;; Wrong field name
+      {:pod-list []}
+
+      ;; :pods is not a vector (string instead)
+      {:pods "not a vector"}
+
+      ;; :pods is not a vector (single pod instead)
+      {:pods {:name "pod-name"
+              :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}}
+
+      ;; :pods is nil
+      {:pods nil}
+
+      ;; Invalid pod in list (missing :name)
+      {:pods [{:external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}]}
+
+      ;; Invalid pod in list (missing :external_id)
+      {:pods [{:name "pod-name"}]}
+
+      ;; Invalid pod in list (wrong type for :name)
+      {:pods [{:name 123
+               :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}]}
+
+      ;; Invalid pod in list (wrong type for :external_id)
+      {:pods [{:name "pod-name"
+               :external_id "not-a-uuid"}]}
+
+      ;; Mix of valid and invalid pods
+      {:pods [{:name "valid-pod"
+               :external_id #uuid "11111111-1111-1111-1111-111111111111"}
+              {:name "invalid-pod"}]}
+
+      ;; Pod with extra field (closed schema)
+      {:pods [{:name "pod-name"
+               :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"
+               :extra_field "not allowed"}]}
+
+      ;; Extra field in pod list (closed schema)
+      {:pods []
+       :extra_field "not allowed"}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      nil
+
+      [{:name "pod-name"
+        :external_id #uuid "cdff6d22-5634-4ad5-92f6-ffc4cee9ad05"}])))
+
+(deftest test-AnalysisPodLogParameters
+  (testing "valid pod log parameters"
+    (are [obj]
+        (valid? analyses/AnalysisPodLogParameters obj)
+
+      ;; Empty map (all fields optional)
+      {}
+
+      ;; Individual fields
+      {:previous true}
+      {:previous false}
+      {:since 3600}
+      {:since 0}
+      {:since 86400}
+      {:since-time "1763156075"}
+      {:since-time "0"}
+      {:tail-lines 100}
+      {:tail-lines 1}
+      {:tail-lines 0}
+      {:timestamps true}
+      {:timestamps false}
+      {:container "analysis"}
+      {:container "init"}
+      {:container ""}
+
+      ;; Various combinations of fields
+      {:previous true :timestamps true}
+      {:since 3600 :tail-lines 100}
+      {:since-time "1763156075" :timestamps true}
+      {:tail-lines 100 :container "analysis"}
+      {:previous true :since 3600 :timestamps true}
+      {:since 3600 :tail-lines 100 :container "analysis"}
+      {:previous false :timestamps false :container "init"}
+
+      ;; All fields present
+      {:previous true
+       :since 3600
+       :since-time "1763156075"
+       :tail-lines 100
+       :timestamps true
+       :container "analysis"}
+
+      ;; All fields with different values
+      {:previous false
+       :since 7200
+       :since-time "1763156000"
+       :tail-lines 50
+       :timestamps false
+       :container "init"}
+
+      ;; Edge case: large values
+      {:since 999999999}
+      {:tail-lines 999999999}
+      {:since-time "9999999999"}
+
+      ;; Empty string for container
+      {:container ""}
+
+      ;; Complex container names
+      {:container "analysis-sidecar"}
+      {:container "log-collector"}))
+
+  (testing "invalid pod log parameters"
+    (are [obj]
+        (not (valid? analyses/AnalysisPodLogParameters obj))
+
+      ;; Wrong types for boolean fields
+      {:previous "true"}
+      {:previous 1}
+      {:previous nil}
+      {:timestamps "false"}
+      {:timestamps 0}
+
+      ;; Wrong types for integer fields
+      {:since "3600"}
+      {:since 3600.5}
+      {:since true}
+      {:since nil}
+      {:tail-lines "100"}
+      {:tail-lines 100.5}
+      {:tail-lines false}
+
+      ;; Wrong types for string fields
+      {:since-time 1763156075}
+      {:since-time true}
+      {:since-time nil}
+      {:container 123}
+      {:container true}
+      {:container nil}
+
+      ;; Extra/unknown fields (closed schema)
+      {:previous true
+       :extra-field "not allowed"}
+      {:since 3600
+       :unknown-field "value"}
+      {:timestamps true
+       :additional "field"}
+      {:container "analysis"
+       :pod-name "some-pod"}
+
+      ;; Not a map
+      "not a map"
+      123
+      true
+      nil
+      []
+      [:previous true])))
+
+(deftest test-AnalysisPodLogEntry
+  (testing "valid analysis pod log entry"
+    (are [obj]
+        (valid? analyses/AnalysisPodLogEntry obj)
+
+      ;; Minimal valid log entry with required fields and empty lines
+      {:since_time "1763156649"
+       :lines []}
+
+      ;; Single line
+      {:since_time "1763156649"
+       :lines ["[I 2025-11-14 18:24:35.960 ServerApp] Jupyter Server 2.15.0 is running at:"]}
+
+      ;; Multiple lines (from schema example)
+      {:since_time "1763156649"
+       :lines ["[I 2025-11-14 18:24:35.960 ServerApp] Jupyter Server 2.15.0 is running at:"
+               "[I 2025-11-14 18:24:35.960 ServerApp] http://a9e6f09ad:8888/lab"
+               "[I 2025-11-14 18:24:35.960 ServerApp]     http://127.0.0.1:8888/lab"]}
+
+      ;; Many lines
+      {:since_time "1763156649"
+       :lines ["Line 1" "Line 2" "Line 3" "Line 4" "Line 5" "Line 6" "Line 7" "Line 8" "Line 9" "Line 10"]}
+
+      ;; Empty string line
+      {:since_time "1763156649"
+       :lines [""]}
+
+      ;; Multiple empty string lines
+      {:since_time "1763156649"
+       :lines ["" "" ""]}
+
+      ;; Whitespace-only lines
+      {:since_time "1763156649"
+       :lines ["   " "\t" "  \n  "]}
+
+      ;; Long line
+      {:since_time "1763156649"
+       :lines ["This is a very long log line that contains a lot of text and goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on"]}
+
+      ;; Special characters in lines
+      {:since_time "1763156649"
+       :lines ["!@#$%^&*()_+-=[]{}|;':\",./<>?" "Special chars: \n\t\r" "Unicode: \u00e9\u00f1\u00fc"]}
+
+      ;; JSON-like content in lines
+      {:since_time "1763156649"
+       :lines ["{\"key\": \"value\", \"number\": 123}" "[1, 2, 3, 4, 5]"]}
+
+      ;; XML-like content in lines
+      {:since_time "1763156649"
+       :lines ["<tag>content</tag>" "<root><child>value</child></root>"]}
+
+      ;; Stack trace-like lines
+      {:since_time "1763156649"
+       :lines ["Exception in thread \"main\" java.lang.NullPointerException"
+               "  at com.example.MyClass.myMethod(MyClass.java:42)"
+               "  at com.example.Main.main(Main.java:10)"]}
+
+      ;; Mixed content
+      {:since_time "1763156649"
+       :lines ["Normal log line"
+               ""
+               "Another line with !@#$ special chars"
+               "Line with numbers: 12345"]}
+
+      ;; Different since_time formats
+      {:since_time "0"
+       :lines ["Line 1"]}
+
+      {:since_time "9999999999"
+       :lines ["Line 1"]}
+
+      ;; Empty string since_time (strings allow empty)
+      {:since_time ""
+       :lines ["Line 1"]}))
+
+  (testing "invalid analysis pod log entry"
+    (are [obj]
+        (not (valid? analyses/AnalysisPodLogEntry obj))
+
+      ;; Empty map (missing required fields)
+      {}
+
+      ;; Missing :since_time
+      {:lines ["Line 1"]}
+
+      ;; Missing :lines
+      {:since_time "1763156649"}
+
+      ;; Wrong type for :since_time (number instead of string)
+      {:since_time 1763156649
+       :lines ["Line 1"]}
+
+      ;; Wrong type for :since_time (nil)
+      {:since_time nil
+       :lines ["Line 1"]}
+
+      ;; Wrong type for :since_time (boolean)
+      {:since_time true
+       :lines ["Line 1"]}
+
+      ;; Wrong type for :since_time (keyword)
+      {:since_time :timestamp
+       :lines ["Line 1"]}
+
+      ;; Wrong type for :lines (not a vector)
+      {:since_time "1763156649"
+       :lines "not a vector"}
+
+      ;; Wrong type for :lines (string instead of vector)
+      {:since_time "1763156649"
+       :lines "Line 1, Line 2"}
+
+      ;; Wrong type for :lines (map)
+      {:since_time "1763156649"
+       :lines {:line "value"}}
+
+      ;; Wrong type for :lines (number)
+      {:since_time "1763156649"
+       :lines 123}
+
+      ;; Wrong type for :lines (nil)
+      {:since_time "1763156649"
+       :lines nil}
+
+      ;; Vector containing non-strings (numbers)
+      {:since_time "1763156649"
+       :lines [123 456]}
+
+      ;; Vector containing non-strings (booleans)
+      {:since_time "1763156649"
+       :lines [true false]}
+
+      ;; Vector containing non-strings (nil)
+      {:since_time "1763156649"
+       :lines [nil]}
+
+      ;; Vector containing non-strings (keywords)
+      {:since_time "1763156649"
+       :lines [:keyword]}
+
+      ;; Vector containing non-strings (maps)
+      {:since_time "1763156649"
+       :lines [{:key "value"}]}
+
+      ;; Vector containing non-strings (vectors)
+      {:since_time "1763156649"
+       :lines [["nested"]]}
+
+      ;; Mixed types in vector
+      {:since_time "1763156649"
+       :lines ["valid string" 123 "another string"]}
+
+      {:since_time "1763156649"
+       :lines ["valid" nil "strings"]}
+
+      {:since_time "1763156649"
+       :lines ["string" true false]}
+
+      ;; Extra field not allowed (closed schema)
+      {:since_time "1763156649"
+       :lines ["Line 1"]
+       :extra_field "not allowed"}
+
+      {:since_time "1763156649"
+       :lines ["Line 1"]
+       :pod_name "some-pod"}
+
+      {:since_time "1763156649"
+       :lines ["Line 1"]
+       :timestamp 1763156649}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      true
+
+      nil
+
+      []
+
+      ["Line 1" "Line 2"])))
+
+(deftest test-AnalysisTimeLimit
+  (testing "valid analysis time limit"
+    (are [obj]
+        (valid? analyses/AnalysisTimeLimit obj)
+
+      ;; Example from schema
+      {:time_limit "1763157634"}
+
+      ;; String "null" when time limit isn't set
+      {:time_limit "null"}
+
+      ;; Zero timestamp
+      {:time_limit "0"}
+
+      ;; Large timestamp
+      {:time_limit "9999999999"}
+
+      ;; Very large timestamp
+      {:time_limit "99999999999999"}
+
+      ;; String with leading zeros
+      {:time_limit "0001763157634"}
+
+      ;; Empty string (strings allow empty)
+      {:time_limit ""}
+
+      ;; Whitespace-only string
+      {:time_limit "   "}
+
+      ;; Arbitrary string values
+      {:time_limit "not a number"}
+
+      {:time_limit "some random text"}
+
+      {:time_limit "NULL"}
+
+      {:time_limit "Null"}
+
+      ;; String with special characters
+      {:time_limit "time-limit-value!@#$"}))
+
+  (testing "invalid analysis time limit"
+    (are [obj]
+        (not (valid? analyses/AnalysisTimeLimit obj))
+
+      ;; Empty map (missing required :time_limit)
+      {}
+
+      ;; Missing :time_limit field
+      {:something_else "1763157634"}
+
+      ;; Wrong type for :time_limit (number instead of string)
+      {:time_limit 1763157634}
+
+      {:time_limit 0}
+
+      {:time_limit 123456789}
+
+      ;; Wrong type for :time_limit (nil)
+      {:time_limit nil}
+
+      ;; Wrong type for :time_limit (boolean)
+      {:time_limit true}
+
+      {:time_limit false}
+
+      ;; Wrong type for :time_limit (keyword)
+      {:time_limit :null}
+
+      {:time_limit :timestamp}
+
+      ;; Wrong type for :time_limit (vector)
+      {:time_limit ["1763157634"]}
+
+      ;; Wrong type for :time_limit (map)
+      {:time_limit {:value "1763157634"}}
+
+      ;; Extra field not allowed (closed schema)
+      {:time_limit "1763157634"
+       :extra_field "not allowed"}
+
+      {:time_limit "1763157634"
+       :timestamp 1763157634}
+
+      {:time_limit "null"
+       :limit_type "soft"}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      true
+
+      false
+
+      nil
+
+      []
+
+      ["1763157634"])))
+
+(deftest test-ConcurrentJobLimitListItem
+  (testing "valid concurrent job limit list item"
+    (are [obj]
+        (valid? analyses/ConcurrentJobLimitListItem obj)
+
+      ;; Minimal valid item with only required fields (:concurrent_jobs and :is_default)
+      {:concurrent_jobs 2
+       :is_default false}
+
+      {:concurrent_jobs 1
+       :is_default true}
+
+      ;; With username
+      {:username "janedoe"
+       :concurrent_jobs 2
+       :is_default false}
+
+      {:username "johndoe"
+       :concurrent_jobs 5
+       :is_default false}
+
+      ;; Default setting (no username, is_default true)
+      {:concurrent_jobs 3
+       :is_default true}
+
+      ;; Edge case: 0 concurrent jobs
+      {:concurrent_jobs 0
+       :is_default false}
+
+      {:username "testuser"
+       :concurrent_jobs 0
+       :is_default false}
+
+      ;; Edge case: very large job count
+      {:concurrent_jobs 999999
+       :is_default false}
+
+      {:username "poweruser"
+       :concurrent_jobs 100
+       :is_default false}
+
+      ;; Edge case: empty username string
+      {:username ""
+       :concurrent_jobs 2
+       :is_default false}
+
+      ;; Various usernames
+      {:username "user.with.dots"
+       :concurrent_jobs 3
+       :is_default false}
+
+      {:username "user_with_underscores"
+       :concurrent_jobs 4
+       :is_default false}
+
+      {:username "user-with-dashes"
+       :concurrent_jobs 5
+       :is_default false}
+
+      {:username "a"
+       :concurrent_jobs 1
+       :is_default false}
+
+      ;; Various boolean values for is_default
+      {:username "user1"
+       :concurrent_jobs 2
+       :is_default true}
+
+      {:username "user2"
+       :concurrent_jobs 3
+       :is_default false}
+
+      ;; Different job counts
+      {:concurrent_jobs 1
+       :is_default false}
+
+      {:concurrent_jobs 10
+       :is_default true}
+
+      {:concurrent_jobs 50
+       :is_default false}
+
+      {:concurrent_jobs 1000
+       :is_default true}
+
+      ;; Admin user with high limit
+      {:username "admin"
+       :concurrent_jobs 100
+       :is_default false}
+
+      ;; Default limit scenarios
+      {:concurrent_jobs 5
+       :is_default true}))
+
+  (testing "invalid concurrent job limit list item"
+    (are [obj]
+        (not (valid? analyses/ConcurrentJobLimitListItem obj))
+
+      ;; Empty map (missing required :concurrent_jobs and :is_default)
+      {}
+
+      ;; Only username (missing required :concurrent_jobs and :is_default)
+      {:username "janedoe"}
+
+      ;; Only concurrent_jobs (missing required :is_default)
+      {:concurrent_jobs 2}
+
+      {:concurrent_jobs 5}
+
+      ;; Only is_default (missing required :concurrent_jobs)
+      {:is_default true}
+
+      {:is_default false}
+
+      ;; Username and is_default without concurrent_jobs
+      {:username "janedoe"
+       :is_default false}
+
+      ;; Username and concurrent_jobs without is_default
+      {:username "janedoe"
+       :concurrent_jobs 2}
+
+      {:username "johndoe"
+       :concurrent_jobs 5}
+
+      ;; Wrong type for :concurrent_jobs (string)
+      {:concurrent_jobs "2"
+       :is_default false}
+
+      {:username "janedoe"
+       :concurrent_jobs "5"
+       :is_default false}
+
+      ;; Wrong type for :concurrent_jobs (float)
+      {:concurrent_jobs 2.5
+       :is_default false}
+
+      {:concurrent_jobs 3.14159
+       :is_default true}
+
+      ;; Wrong type for :concurrent_jobs (boolean)
+      {:concurrent_jobs true
+       :is_default false}
+
+      {:concurrent_jobs false
+       :is_default true}
+
+      ;; Wrong type for :concurrent_jobs (nil)
+      {:concurrent_jobs nil
+       :is_default false}
+
+      ;; Wrong type for :concurrent_jobs (keyword)
+      {:concurrent_jobs :two
+       :is_default false}
+
+      ;; Wrong type for :concurrent_jobs (vector)
+      {:concurrent_jobs [2]
+       :is_default false}
+
+      ;; Wrong type for :concurrent_jobs (map)
+      {:concurrent_jobs {:value 2}
+       :is_default false}
+
+      ;; Wrong type for :username (number)
+      {:username 123
+       :concurrent_jobs 2
+       :is_default false}
+
+      ;; Wrong type for :username (boolean)
+      {:username true
+       :concurrent_jobs 2
+       :is_default false}
+
+      {:username false
+       :concurrent_jobs 2
+       :is_default true}
+
+      ;; Wrong type for :username (nil)
+      {:username nil
+       :concurrent_jobs 2
+       :is_default false}
+
+      ;; Wrong type for :username (keyword)
+      {:username :janedoe
+       :concurrent_jobs 2
+       :is_default false}
+
+      ;; Wrong type for :username (vector)
+      {:username ["janedoe"]
+       :concurrent_jobs 2
+       :is_default false}
+
+      ;; Wrong type for :username (map)
+      {:username {:name "janedoe"}
+       :concurrent_jobs 2
+       :is_default false}
+
+      ;; Wrong type for :is_default (string)
+      {:concurrent_jobs 2
+       :is_default "true"}
+
+      {:concurrent_jobs 2
+       :is_default "false"}
+
+      ;; Wrong type for :is_default (number)
+      {:concurrent_jobs 2
+       :is_default 1}
+
+      {:concurrent_jobs 2
+       :is_default 0}
+
+      ;; Wrong type for :is_default (nil)
+      {:concurrent_jobs 2
+       :is_default nil}
+
+      ;; Wrong type for :is_default (keyword)
+      {:concurrent_jobs 2
+       :is_default :true}
+
+      {:concurrent_jobs 2
+       :is_default :false}
+
+      ;; Wrong type for :is_default (vector)
+      {:concurrent_jobs 2
+       :is_default [true]}
+
+      ;; Wrong type for :is_default (map)
+      {:concurrent_jobs 2
+       :is_default {:value true}}
+
+      ;; Extra field not allowed (closed schema)
+      {:concurrent_jobs 2
+       :is_default false
+       :extra_field "not allowed"}
+
+      {:username "janedoe"
+       :concurrent_jobs 2
+       :is_default false
+       :extra_field "not allowed"}
+
+      {:username "janedoe"
+       :concurrent_jobs 2
+       :is_default false
+       :limit_type "user"}
+
+      {:concurrent_jobs 2
+       :is_default false
+       :user "janedoe"}
+
+      {:concurrent_jobs 2
+       :is_default false
+       :default true}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      true
+
+      false
+
+      nil
+
+      []
+
+      ["janedoe" 2 false])))
+
+(deftest test-ConcurrentJobLimits
+  (testing "valid concurrent job limits"
+    (are [obj]
+        (valid? analyses/ConcurrentJobLimits obj)
+
+      ;; Empty list
+      {:limits []}
+
+      ;; Single item - default setting
+      {:limits [{:concurrent_jobs 5
+                 :is_default true}]}
+
+      ;; Single item - user setting
+      {:limits [{:username "janedoe"
+                 :concurrent_jobs 3
+                 :is_default false}]}
+
+      ;; Multiple items - mix of default and user settings
+      {:limits [{:concurrent_jobs 5
+                 :is_default true}
+                {:username "janedoe"
+                 :concurrent_jobs 3
+                 :is_default false}]}
+
+      {:limits [{:username "alice"
+                 :concurrent_jobs 2
+                 :is_default false}
+                {:username "bob"
+                 :concurrent_jobs 4
+                 :is_default false}
+                {:concurrent_jobs 3
+                 :is_default true}]}
+
+      ;; Multiple items - all user settings
+      {:limits [{:username "alice"
+                 :concurrent_jobs 2
+                 :is_default false}
+                {:username "bob"
+                 :concurrent_jobs 4
+                 :is_default false}
+                {:username "charlie"
+                 :concurrent_jobs 6
+                 :is_default false}]}
+
+      ;; Multiple items - various usernames
+      {:limits [{:username "user.with.dots"
+                 :concurrent_jobs 3
+                 :is_default false}
+                {:username "user_with_underscores"
+                 :concurrent_jobs 4
+                 :is_default false}
+                {:username "user-with-dashes"
+                 :concurrent_jobs 5
+                 :is_default false}]}
+
+      ;; Multiple items - edge case values
+      {:limits [{:username "poweruser"
+                 :concurrent_jobs 100
+                 :is_default false}
+                {:username "restricteduser"
+                 :concurrent_jobs 0
+                 :is_default false}
+                {:concurrent_jobs 5
+                 :is_default true}]}
+
+      ;; Items with and without usernames
+      {:limits [{:concurrent_jobs 10
+                 :is_default true}
+                {:username "user1"
+                 :concurrent_jobs 5
+                 :is_default false}
+                {:username "user2"
+                 :concurrent_jobs 8
+                 :is_default false}]}
+
+      ;; Large list
+      {:limits [{:concurrent_jobs 5
+                 :is_default true}
+                {:username "user1"
+                 :concurrent_jobs 1
+                 :is_default false}
+                {:username "user2"
+                 :concurrent_jobs 2
+                 :is_default false}
+                {:username "user3"
+                 :concurrent_jobs 3
+                 :is_default false}
+                {:username "user4"
+                 :concurrent_jobs 4
+                 :is_default false}
+                {:username "user5"
+                 :concurrent_jobs 5
+                 :is_default false}]}
+
+      ;; Single default item
+      {:limits [{:is_default true
+                 :concurrent_jobs 10}]}))
+
+  (testing "invalid concurrent job limits"
+    (are [obj]
+        (not (valid? analyses/ConcurrentJobLimits obj))
+
+      ;; Empty map (missing required :limits field)
+      {}
+
+      ;; Wrong type for :limits (not a vector) - string
+      {:limits "not a vector"}
+
+      ;; Wrong type for :limits - number
+      {:limits 5}
+
+      ;; Wrong type for :limits - boolean
+      {:limits true}
+
+      {:limits false}
+
+      ;; Wrong type for :limits - nil
+      {:limits nil}
+
+      ;; Wrong type for :limits - keyword
+      {:limits :limits}
+
+      ;; Wrong type for :limits - map
+      {:limits {:username "janedoe"
+                :concurrent_jobs 2
+                :is_default false}}
+
+      ;; Vector containing invalid items - not maps
+      {:limits ["not a map"]}
+
+      {:limits [123]}
+
+      {:limits [true]}
+
+      {:limits [nil]}
+
+      {:limits [:keyword]}
+
+      ;; Vector containing invalid item structures
+      {:limits [{:concurrent_jobs 2}]}
+
+      {:limits [{:is_default true}]}
+
+      {:limits [{:username "janedoe"}]}
+
+      {:limits [{:username "janedoe"
+                 :concurrent_jobs 2}]}
+
+      {:limits [{:username "janedoe"
+                 :is_default false}]}
+
+      ;; Vector containing mix of valid and invalid items
+      {:limits [{:concurrent_jobs 5
+                 :is_default true}
+                {:concurrent_jobs 3}]}
+
+      {:limits [{:concurrent_jobs 5
+                 :is_default true}
+                "not a map"]}
+
+      {:limits [{:username "alice"
+                 :concurrent_jobs 2
+                 :is_default false}
+                {:username "bob"
+                 :concurrent_jobs "not an int"
+                 :is_default false}]}
+
+      ;; Vector containing items with wrong types
+      {:limits [{:concurrent_jobs "5"
+                 :is_default true}]}
+
+      {:limits [{:username 123
+                 :concurrent_jobs 5
+                 :is_default false}]}
+
+      {:limits [{:concurrent_jobs 5
+                 :is_default "true"}]}
+
+      {:limits [{:concurrent_jobs 5.5
+                 :is_default true}]}
+
+      ;; Extra fields (closed schema)
+      {:limits []
+       :extra_field "not allowed"}
+
+      {:limits [{:concurrent_jobs 5
+                 :is_default true}]
+       :total_count 1}
+
+      {:limits [{:concurrent_jobs 5
+                 :is_default true}]
+       :metadata {:foo "bar"}}
+
+      ;; Vector containing items with extra fields
+      {:limits [{:concurrent_jobs 5
+                 :is_default true
+                 :extra_field "not allowed"}]}
+
+      {:limits [{:username "janedoe"
+                 :concurrent_jobs 2
+                 :is_default false
+                 :limit_type "user"}]}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      true
+
+      false
+
+      nil
+
+      []
+
+      [{:concurrent_jobs 5
+        :is_default true}])))
+
+(deftest test-AnalysisCount
+  (testing "valid analysis counts"
+    (are [obj]
+        (valid? analyses/AnalysisCount obj)
+
+      ;; Valid count with typical status
+      {:count 27
+       :status "Completed"}
+
+      ;; Zero count
+      {:count 0
+       :status "Running"}
+
+      ;; Count of 1
+      {:count 1
+       :status "Failed"}
+
+      ;; Large count
+      {:count 999999
+       :status "Submitted"}
+
+      ;; Negative count (valid as int type allows negatives)
+      {:count -1
+       :status "Canceled"}
+
+      ;; Different status values
+      {:count 5
+       :status "Running"}
+
+      {:count 10
+       :status "Failed"}
+
+      {:count 3
+       :status "Submitted"}
+
+      {:count 42
+       :status "Canceled"}
+
+      {:count 7
+       :status "Pending"}
+
+      {:count 15
+       :status "Held"}
+
+      {:count 2
+       :status "Removed"}
+
+      ;; Empty string status (string type allows this)
+      {:count 8
+       :status ""}
+
+      ;; Status with special characters
+      {:count 3
+       :status "Status-With-Dashes"}
+
+      {:count 4
+       :status "Status_With_Underscores"}
+
+      {:count 5
+       :status "Status With Spaces"}))
+
+  (testing "invalid analysis counts"
+    (are [obj]
+        (not (valid? analyses/AnalysisCount obj))
+
+      ;; Empty map (missing required fields)
+      {}
+
+      ;; Missing :count
+      {:status "Completed"}
+
+      ;; Missing :status
+      {:count 27}
+
+      ;; Wrong type for :count (string instead of int)
+      {:count "27"
+       :status "Completed"}
+
+      ;; Wrong type for :count (double instead of int)
+      {:count 27.5
+       :status "Completed"}
+
+      ;; Wrong type for :count (nil)
+      {:count nil
+       :status "Completed"}
+
+      ;; Wrong type for :status (int instead of string)
+      {:count 27
+       :status 123}
+
+      ;; Wrong type for :status (boolean)
+      {:count 27
+       :status true}
+
+      ;; Wrong type for :status (nil)
+      {:count 27
+       :status nil}
+
+      ;; Wrong type for :status (keyword)
+      {:count 27
+       :status :Completed}
+
+      ;; Extra fields (closed schema)
+      {:count 27
+       :status "Completed"
+       :extra-field "not allowed"}
+
+      {:count 27
+       :status "Completed"
+       :description "Should not be here"}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      true
+
+      false
+
+      nil
+
+      []
+
+      [{:count 27
+        :status "Completed"}])))
+
+(deftest test-AnalysisStats
+  (testing "valid analysis stats"
+    (are [obj]
+        (valid? analyses/AnalysisStats obj)
+
+      ;; Empty list
+      {:status-count []}
+
+      ;; Single status count
+      {:status-count [{:count 27
+                       :status "Completed"}]}
+
+      ;; Multiple status counts (different job statuses)
+      {:status-count [{:count 27
+                       :status "Completed"}
+                      {:count 5
+                       :status "Running"}]}
+
+      ;; Multiple status counts with various statuses
+      {:status-count [{:count 27
+                       :status "Completed"}
+                      {:count 5
+                       :status "Running"}
+                      {:count 10
+                       :status "Failed"}
+                      {:count 3
+                       :status "Submitted"}]}
+
+      ;; All common job statuses
+      {:status-count [{:count 100
+                       :status "Completed"}
+                      {:count 15
+                       :status "Running"}
+                      {:count 8
+                       :status "Failed"}
+                      {:count 25
+                       :status "Submitted"}
+                      {:count 12
+                       :status "Canceled"}
+                      {:count 7
+                       :status "Pending"}
+                      {:count 5
+                       :status "Held"}
+                      {:count 2
+                       :status "Removed"}]}
+
+      ;; Zero counts
+      {:status-count [{:count 0
+                       :status "Running"}
+                      {:count 0
+                       :status "Failed"}]}
+
+      ;; Large count values
+      {:status-count [{:count 999999
+                       :status "Completed"}
+                      {:count 123456
+                       :status "Running"}]}
+
+      ;; Single item with zero count
+      {:status-count [{:count 0
+                       :status "Submitted"}]}))
+
+  (testing "invalid analysis stats"
+    (are [obj]
+        (not (valid? analyses/AnalysisStats obj))
+
+      ;; Empty map (missing required :status-count field)
+      {}
+
+      ;; Missing :status-count field
+      {:other-field "value"}
+
+      ;; Wrong type for :status-count (not a vector)
+      {:status-count {:count 27
+                      :status "Completed"}}
+
+      {:status-count "not a vector"}
+
+      {:status-count 123}
+
+      {:status-count true}
+
+      {:status-count nil}
+
+      ;; Vector containing invalid AnalysisCount items
+      ;; Missing :count
+      {:status-count [{:status "Completed"}]}
+
+      ;; Missing :status
+      {:status-count [{:count 27}]}
+
+      ;; Wrong type for :count
+      {:status-count [{:count "27"
+                       :status "Completed"}]}
+
+      ;; Wrong type for :status
+      {:status-count [{:count 27
+                       :status 123}]}
+
+      ;; Extra fields in AnalysisCount (closed schema)
+      {:status-count [{:count 27
+                       :status "Completed"
+                       :extra-field "not allowed"}]}
+
+      ;; Mix of valid and invalid items
+      {:status-count [{:count 27
+                       :status "Completed"}
+                      {:count "invalid"
+                       :status "Running"}]}
+
+      {:status-count [{:count 27
+                       :status "Completed"}
+                      {:status "Missing count"}]}
+
+      ;; Vector containing non-map values
+      {:status-count ["not a map"]}
+
+      {:status-count [123]}
+
+      {:status-count [true]}
+
+      {:status-count [nil]}
+
+      {:status-count [{:count 27
+                       :status "Completed"}
+                      "invalid item"]}
+
+      ;; Extra fields at top level (closed schema)
+      {:status-count []
+       :extra-field "not allowed"}
+
+      {:status-count [{:count 27
+                       :status "Completed"}]
+       :description "Should not be here"}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      true
+
+      false
+
+      nil
+
+      []
+
+      [{:status-count [{:count 27
+                        :status "Completed"}]}])))
+
+(deftest test-AnalysisStatParams
+  (testing "valid analysis stat params"
+    (are [obj]
+        (valid? analyses/AnalysisStatParams obj)
+
+      ;; Empty map (all fields optional)
+      {}
+
+      ;; Individual fields
+      {:include-hidden true}
+
+      {:include-hidden false}
+
+      {:include-deleted true}
+
+      {:include-deleted false}
+
+      {:filter "[{\"field\":\"ownership\",\"value\":\"all\"}]"}
+
+      ;; Combinations of fields
+      {:include-hidden true
+       :include-deleted false}
+
+      {:include-hidden false
+       :include-deleted true}
+
+      {:include-hidden true
+       :filter "[{\"field\":\"ownership\",\"value\":\"all\"}]"}
+
+      {:include-deleted true
+       :filter "[{\"field\":\"status\",\"value\":\"Running\"}]"}
+
+      {:include-hidden true
+       :include-deleted true
+       :filter "[{\"field\":\"ownership\",\"value\":\"mine\"}]"}
+
+      {:include-hidden false
+       :include-deleted false
+       :filter "[{\"field\":\"app_id\",\"value\":\"12345\"}]"}
+
+      ;; Different filter values
+      {:filter ""}
+
+      {:filter "[]"}
+
+      {:filter "[{\"field\":\"name\",\"value\":\"test\"}]"}
+
+      {:filter "[{\"field\":\"ownership\",\"value\":\"all\"},{\"field\":\"status\",\"value\":\"Completed\"}]"}
+
+      ;; Complex filter JSON string
+      {:filter "[{\"field\":\"app_name\",\"value\":\"My Analysis App\"}]"}))
+
+  (testing "invalid analysis stat params"
+    (are [obj]
+        (not (valid? analyses/AnalysisStatParams obj))
+
+      ;; Wrong type for :include-hidden
+      {:include-hidden "true"}
+
+      {:include-hidden 1}
+
+      {:include-hidden nil}
+
+      {:include-hidden "false"}
+
+      ;; Wrong type for :include-deleted
+      {:include-deleted "true"}
+
+      {:include-deleted 1}
+
+      {:include-deleted nil}
+
+      {:include-deleted "false"}
+
+      ;; Wrong type for :filter
+      {:filter 123}
+
+      {:filter true}
+
+      {:filter false}
+
+      {:filter nil}
+
+      {:filter []}
+
+      {:filter {}}
+
+      {:filter ["field" "value"]}
+
+      ;; Extra fields (closed schema)
+      {:extra-field "not allowed"}
+
+      {:include-hidden true
+       :extra-field "not allowed"}
+
+      {:include-deleted false
+       :unknown-field "value"}
+
+      {:filter "[]"
+       :additional-param true}
+
+      {:include-hidden true
+       :include-deleted false
+       :filter "[]"
+       :extra "field"}
+
+      ;; Not a map
+      "not a map"
+
+      123
+
+      true
+
+      false
+
+      nil
+
+      []
+
+      [{:include-hidden true}])))
