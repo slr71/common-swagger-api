@@ -127,3 +127,7 @@ When migrating schemas from `plumatic/schema` to `metosin/malli`:
      (for example, a string or a UUID) or is a vector of scalar types. There's no need to add example values for fields
      whose values are described by another schema. Please be sure to use the correct keyword for example values. The
      keyword to use is `:json-schema/example`.
+
+6. **Type Mappings** - When migrating types from plumatic/schema to Malli:
+   - `Long` should be migrated to `:int` - Malli's `:int` type supports arbitrary precision integers including long integers
+   - Malli does not have an explicit `:long` type; `:int` handles all integer values regardless of size
