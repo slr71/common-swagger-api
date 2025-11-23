@@ -94,6 +94,8 @@
    (mu/merge
     DataStatInfo
     [:map
+     {:description "Information about an iRODS collection."}
+
      [:file-count
       {:description         "The number of files under this directory"
        :json-schema/example 42}
@@ -109,6 +111,8 @@
    (mu/merge
     DataStatInfo
     [:map
+     {:description "Information about an iRODS data item."}
+
      [:file-size
       {:description         "The size in bytes of this file"
        :json-schema/example 57}
@@ -141,3 +145,17 @@
     [:file
      {:description "File info"}
      FileStatInfo]]))
+
+;; FIXME: Moving the descriptions for FileStatInfo and DirStatInfo into their respective definitions was the only way
+;; THAT I could get Malli to accept this schema definition. I'm not sure how this will work when we're generating
+;; OpenAPI docs, though. We'll have to experiment with this when we migrate endpoints that use this schema to Reitit.
+(def PathsMap
+  (mu/closed-schema
+   [:map-of
+    [:keyword
+     {:description         "The iRODS data item's path"
+      :json-schema/example (keyword ":/example/home/janedoe/file.txt")}]
+
+    ;; We could use `:multi` with a dispatch function here, but `:or` will match the first schema that succeeds, which
+    ;; should be suitable for this schema.
+    [:or FileStatInfo DirStatInfo]]))

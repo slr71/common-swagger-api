@@ -776,6 +776,348 @@
       (is (invalid? stats/FileStat
                     {:file nil})))))
 
+(deftest test-PathsMap
+  (testing "PathsMap validation"
+    (testing "valid paths maps"
+      ;; Empty map is valid
+      (is (valid? stats/PathsMap {}))
+
+      ;; Single entry with FileStatInfo
+      (is (valid? stats/PathsMap
+                  {(keyword ":/iplant/home/janedoe/file.txt")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/iplant/home/janedoe/file.txt"
+                    :type :file
+                    :label "file.txt"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :read
+                    :file-size 57
+                    :content-type "text/plain"
+                    :infoType "perl"
+                    :md5 "d5a0bfa9677508d7b379c3e07284a493"}}))
+
+      ;; Single entry with DirStatInfo
+      (is (valid? stats/PathsMap
+                  {(keyword ":/iplant/home/janedoe/mydir")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/iplant/home/janedoe/mydir"
+                    :type :dir
+                    :label "mydir"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :read
+                    :file-count 42
+                    :dir-count 27}}))
+
+      ;; Multiple entries with FileStatInfo
+      (is (valid? stats/PathsMap
+                  {(keyword ":/iplant/home/janedoe/file1.txt")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/iplant/home/janedoe/file1.txt"
+                    :type :file
+                    :label "file1.txt"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :read
+                    :file-size 100
+                    :content-type "text/plain"
+                    :infoType "text"
+                    :md5 "abc123"}
+                   (keyword ":/iplant/home/janedoe/file2.txt")
+                   {:id #uuid "8a950a63-f999-403c-912e-97e11109e68e"
+                    :path "/iplant/home/janedoe/file2.txt"
+                    :type :file
+                    :label "file2.txt"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :write
+                    :file-size 200
+                    :content-type "application/json"
+                    :infoType "json"
+                    :md5 "def456"}}))
+
+      ;; Multiple entries with DirStatInfo
+      (is (valid? stats/PathsMap
+                  {(keyword ":/iplant/home/janedoe/dir1")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/iplant/home/janedoe/dir1"
+                    :type :dir
+                    :label "dir1"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :read
+                    :file-count 10
+                    :dir-count 5}
+                   (keyword ":/iplant/home/janedoe/dir2")
+                   {:id #uuid "8a950a63-f999-403c-912e-97e11109e68e"
+                    :path "/iplant/home/janedoe/dir2"
+                    :type :dir
+                    :label "dir2"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :own
+                    :file-count 20
+                    :dir-count 15}}))
+
+      ;; Mixed FileStatInfo and DirStatInfo entries
+      (is (valid? stats/PathsMap
+                  {(keyword ":/iplant/home/janedoe/file.txt")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/iplant/home/janedoe/file.txt"
+                    :type :file
+                    :label "file.txt"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :read
+                    :file-size 100
+                    :content-type "text/plain"
+                    :infoType "text"
+                    :md5 "abc123"}
+                   (keyword ":/iplant/home/janedoe/mydir")
+                   {:id #uuid "8a950a63-f999-403c-912e-97e11109e68e"
+                    :path "/iplant/home/janedoe/mydir"
+                    :type :dir
+                    :label "mydir"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :write
+                    :file-count 42
+                    :dir-count 27}}))
+
+      ;; With optional share-count in FileStatInfo
+      (is (valid? stats/PathsMap
+                  {(keyword ":/iplant/home/janedoe/shared-file.txt")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/iplant/home/janedoe/shared-file.txt"
+                    :type :file
+                    :label "shared-file.txt"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :own
+                    :share-count 10
+                    :file-size 57
+                    :content-type "text/plain"
+                    :infoType "perl"
+                    :md5 "d5a0bfa9677508d7b379c3e07284a493"}}))
+
+      ;; With optional share-count in DirStatInfo
+      (is (valid? stats/PathsMap
+                  {(keyword ":/iplant/home/janedoe/shared-dir")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/iplant/home/janedoe/shared-dir"
+                    :type :dir
+                    :label "shared-dir"
+                    :date-created 1763771841123
+                    :date-modified 1763772014456
+                    :permission :own
+                    :share-count 5
+                    :file-count 42
+                    :dir-count 27}}))
+
+      ;; Various keyword path formats
+      (is (valid? stats/PathsMap
+                  {(keyword ":/example/home/user/test.txt")
+                   {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                    :path "/example/home/user/test.txt"
+                    :type :file
+                    :label "test.txt"
+                    :date-created 1000
+                    :date-modified 2000
+                    :permission :read
+                    :file-size 100
+                    :content-type "text/plain"
+                    :infoType "text"
+                    :md5 "abc123"}
+                   (keyword ":/a/b/c")
+                   {:id #uuid "8a950a63-f999-403c-912e-97e11109e68e"
+                    :path "/a/b/c"
+                    :type :dir
+                    :label "c"
+                    :date-created 1000
+                    :date-modified 2000
+                    :permission :read
+                    :file-count 0
+                    :dir-count 0}})))
+
+    (testing "invalid paths maps"
+      ;; String keys instead of keywords
+      (is (invalid? stats/PathsMap
+                    {"/iplant/home/janedoe/file.txt"
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/file.txt"
+                      :type :file
+                      :label "file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-size 100
+                      :content-type "text/plain"
+                      :infoType "text"
+                      :md5 "abc123"}}))
+
+      ;; Integer keys instead of keywords
+      (is (invalid? stats/PathsMap
+                    {123
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/path"
+                      :type :file
+                      :label "file"
+                      :date-created 1000
+                      :date-modified 2000
+                      :permission :read
+                      :file-size 100
+                      :content-type "text/plain"
+                      :infoType "text"
+                      :md5 "abc123"}}))
+
+      ;; Invalid FileStatInfo value - missing required field
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/file.txt"
+                      :type :file
+                      :label "file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      ;; Missing file-size
+                      :content-type "text/plain"
+                      :infoType "text"
+                      :md5 "abc123"}}))
+
+      ;; Invalid DirStatInfo value - missing required field
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/mydir")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/mydir"
+                      :type :dir
+                      :label "mydir"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-count 42
+                      ;; Missing dir-count
+                      }}))
+
+      ;; Extra fields in value not allowed due to :closed true
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/file.txt"
+                      :type :file
+                      :label "file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-size 100
+                      :content-type "text/plain"
+                      :infoType "text"
+                      :md5 "abc123"
+                      :extra-field "not allowed"}}))
+
+      ;; Wrong type for value - string instead of map
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt") "not a map"}))
+
+      ;; Wrong type for value - nil
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt") nil}))
+
+      ;; Value doesn't match FileStatInfo or DirStatInfo
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/file.txt"
+                      :type :file
+                      :label "file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read}}))
+
+      ;; Mixed valid and invalid entries
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/valid-file.txt")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/valid-file.txt"
+                      :type :file
+                      :label "valid-file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-size 100
+                      :content-type "text/plain"
+                      :infoType "text"
+                      :md5 "abc123"}
+                     (keyword ":/iplant/home/janedoe/invalid-file.txt")
+                     {:id #uuid "8a950a63-f999-403c-912e-97e11109e68e"
+                      :path "/iplant/home/janedoe/invalid-file.txt"
+                      :type :file
+                      :label "invalid-file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      ;; Missing required fields
+                      }}))
+
+      ;; Wrong type in nested FileStatInfo field
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/file.txt"
+                      :type :file
+                      :label "file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-size "not-a-number"
+                      :content-type "text/plain"
+                      :infoType "text"
+                      :md5 "abc123"}}))
+
+      ;; Wrong type in nested DirStatInfo field
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/mydir")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/mydir"
+                      :type :dir
+                      :label "mydir"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-count "not-a-number"
+                      :dir-count 27}}))
+
+      ;; Invalid enum value in nested stat info
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/file.txt"
+                      :type :folder  ;; Invalid type
+                      :label "file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-size 100
+                      :content-type "text/plain"
+                      :infoType "text"
+                      :md5 "abc123"}}))
+
+      ;; Empty string for NonBlankString field in nested stat info
+      (is (invalid? stats/PathsMap
+                    {(keyword ":/iplant/home/janedoe/file.txt")
+                     {:id #uuid "ca23780a-6acb-47aa-9f9a-eab1ef9a541c"
+                      :path "/iplant/home/janedoe/file.txt"
+                      :type :file
+                      :label "file.txt"
+                      :date-created 1763771841123
+                      :date-modified 1763772014456
+                      :permission :read
+                      :file-size 100
+                      :content-type ""  ;; Empty string for NonBlankString
+                      :infoType "text"
+                      :md5 "abc123"}})))))
+
 (deftest test-edge-cases
   (testing "Edge cases and boundary conditions"
     (testing "very large timestamps and counts"
