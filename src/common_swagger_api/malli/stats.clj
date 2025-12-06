@@ -1,6 +1,8 @@
 (ns common-swagger-api.malli.stats
   (:require
-   [common-swagger-api.malli :refer [NonBlankString]]
+   [clojure-commons.error-codes :as ce]
+   [common-swagger-api.malli :refer [add-enum-values ErrorResponseUnchecked
+                                     NonBlankString]]
    [common-swagger-api.malli.data :as data-schema]
    [malli.util :as mu]))
 
@@ -134,7 +136,9 @@
       :string]])))
 
 (def FilteredStatInfo
-  (mu/optional-keys (mu/merge DirStatInfo FileStatInfo)))
+  (as-> (mu/merge DirStatInfo FileStatInfo) s
+    (mu/optional-keys s)
+    (mu/update-properties s assoc :description "The data item's info")))
 
 (def AvailableStatFields
   (mu/keys FilteredStatInfo))
@@ -147,7 +151,7 @@
      FileStatInfo]]))
 
 ;; FIXME: Moving the descriptions for FileStatInfo and DirStatInfo into their respective definitions was the only way
-;; THAT I could get Malli to accept this schema definition. I'm not sure how this will work when we're generating
+;; That I could get Malli to accept this schema definition. I'm not sure how this will work when we're generating
 ;; OpenAPI docs, though. We'll have to experiment with this when we migrate endpoints that use this schema to Reitit.
 (def PathsMap
   (mu/closed-schema
@@ -159,3 +163,82 @@
     ;; We could use `:multi` with a dispatch function here, but `:or` will match the first schema that succeeds, which
     ;; should be suitable for this schema.
     [:or FileStatInfo DirStatInfo]]))
+
+;; FIXME: I moved the description for FilteredStatInfo into its definition becuase of the same limitation that was
+;; encountered in PathsMap.
+(def FilteredPathsMap
+  (mu/closed-schema
+   [:map-of
+    [:keyword
+     {:description         "The iRODS data item's path"
+      :json-schema/example (keyword ":/example/home/janedoe/file.txt")}]
+
+    FilteredStatInfo]))
+
+;; FIXME: I moved the value descriptions into the schema definitions becuase of the same limitation that was encountered
+;; in PathsMap.
+(def DataIdsMap
+  (mu/closed-schema
+   [:map-of
+    [:keyword
+     {:description         "The iRODS data item's ID"
+      :json-schema/example :3dded710-1bd0-4541-9b1f-6b8c87e31f48}]
+
+    ;; We could use `:multi` with a dispatch function here, but `:or` will match the first schema that succeeds, which
+    ;; should be suitable for this schema.
+    [:or FileStatInfo DirStatInfo]]))
+
+;; FIXME: I moved the description for FilteredStatInfo into its definition becuase of the same limitation that was
+;; encountered in PathsMap.
+(def FilteredDataIdsMap
+  (mu/closed-schema
+   [:map-of
+    [:keyword
+     {:description         "The iRODS data item's ID"
+      :json-schema/example :5bab6167-df4a-4bff-a4cd-96dbe484755b}]
+
+    FilteredStatInfo]))
+
+(def StatusInfo
+  (mu/closed-schema
+   [:map
+    [:paths
+     {:optional    true
+      :description "Paths info"}
+     PathsMap]
+
+    [:ids
+     {:optional    true
+      :description "IDs info"}
+     DataIdsMap]]))
+
+(def FilteredStatusInfo
+  (mu/closed-schema
+   [:map
+    [:paths
+     {:optional    true
+      :description "Paths info"}
+     FilteredPathsMap]
+
+    [:ids
+     {:optional    true
+      :description "IDs info"}
+     FilteredDataIdsMap]]))
+
+;; Note: I omitted the StatResponsePathsMap, StatResponseIdsMap, and StatResponse schema definitions here because I
+;; believe that the possibility to add example values in Malli makes them unnecessary.
+
+(def StatErrorResponses
+(mu/update
+  ErrorResponseUnchecked
+  :error_code
+  add-enum-values
+  ce/ERR_DOES_NOT_EXIST
+  ce/ERR_NOT_READABLE
+  ce/ERR_NOT_WRITEABLE
+  ce/ERR_NOT_OWNER
+  ce/ERR_NOT_A_USER
+  ce/ERR_TOO_MANY_RESULTS))
+
+;; Note: I omitted StatResponses here because I think that Reitit handles schemas for different response codes a little
+;; differently. We can add support for that later.

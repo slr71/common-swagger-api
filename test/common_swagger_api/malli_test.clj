@@ -1,8 +1,24 @@
 (ns common-swagger-api.malli-test
-  (:require [clojure.test :refer [deftest testing is]]
-            [common-swagger-api.malli :as m]
-            [malli.core :as malli]
-            [malli.error :as me]))
+  (:require
+   [clojure.test :refer [are deftest is testing]]
+   [common-swagger-api.malli :as m]
+   [malli.core :as malli]
+   [malli.error :as me]
+   [malli.util :as mu]))
+
+(deftest test-add-enum-values
+  (testing "valid attempts to add values to an enumeration"
+   (are [expected schema vs] (mu/equals expected (apply m/add-enum-values schema vs))
+    [:enum :foo :bar] [:enum :foo] [:bar]
+    [:enum :foo :bar :baz] [:enum :foo] [:bar :baz]
+    [:enum :foo] [:enum :foo] []
+    [:enum {:description "test"} :foo :bar] [:enum {:description "test"} :foo] [:bar]))
+
+  (testing "property preservation when enumeration values are added"
+    (is (= {:description "test"} (malli/properties (m/add-enum-values [:enum {:description "test"} :foo] :bar)))))
+
+  (testing "schema type check"
+    (is (thrown? Exception (m/add-enum-values [:map [:foo :string]] :bar)))))
 
 (defn valid? [schema data]
   (malli/validate schema data))
@@ -26,7 +42,7 @@
                   {:user "ipctest"}))
       (is (valid? m/StandardUserQueryParams
                   {:user "john.doe"})))
-    
+
     (testing "invalid params"
       (is (not (valid? m/StandardUserQueryParams {})))
       (is (not (valid? m/StandardUserQueryParams {:user ""})))
@@ -39,7 +55,7 @@
       (is (valid? m/StatusParams {}))
       (is (valid? m/StatusParams {:expecting "apps"}))
       (is (valid? m/StatusParams {:expecting "analyses"})))
-    
+
     (testing "invalid params"
       (is (not (valid? m/StatusParams {:expecting ""})))
       (is (not (valid? m/StatusParams {:expecting "   "})))
@@ -59,7 +75,7 @@
                                    :offset 0
                                    :sort-field "name"
                                    :sort-dir "ASC"})))
-    
+
     (testing "invalid params"
       (is (not (valid? m/PagingParams {:limit 0})))
       (is (not (valid? m/PagingParams {:limit -1})))
@@ -82,7 +98,7 @@
                    :version "1.2.3"
                    :docs-url "http://example-api/docs"
                    :expecting "example-service"})))
-    
+
     (testing "invalid response"
       (is (not (valid? m/StatusResponse {})))
       (is (not (valid? m/StatusResponse
@@ -105,12 +121,12 @@
       (is (valid? m/ErrorResponse
                   {:error_code "ERR_NOT_FOUND"
                    :reason "The requested resource was not found"})))
-    
+
     (testing "invalid response"
       (is (not (valid? m/ErrorResponse {})))
       (is (not (valid? m/ErrorResponse {:error_code ""})))
       (is (not (valid? m/ErrorResponse {:error_code "   "})))
-      (is (not (valid? m/ErrorResponse 
+      (is (not (valid? m/ErrorResponse
                        {:error_code "ERR_NOT_FOUND"
                         :extra "field"}))))))
 
@@ -122,7 +138,7 @@
       (is (valid? m/ErrorResponseExists
                   {:error_code "ERR_EXISTS"
                    :reason "Resource already exists"})))
-    
+
     (testing "invalid response"
       (is (not (valid? m/ErrorResponseExists
                        {:error_code "ERR_NOT_FOUND"})))
@@ -170,7 +186,7 @@
       (is (valid? m/ErrorResponseUnchecked
                   {:error_code "ERR_UNCHECKED_EXCEPTION"
                    :reason {:details "Complex error object"}})))
-    
+
     (testing "invalid response"
       (is (not (valid? m/ErrorResponseUnchecked
                        {:error_code "ERR_NOT_FOUND"})))

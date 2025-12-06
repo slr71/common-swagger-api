@@ -1,7 +1,19 @@
 (ns common-swagger-api.malli
   (:require
    [clojure-commons.error-codes :as ce]
+   [malli.core :as m]
    [malli.util :as mu]))
+
+(defn add-enum-values
+  "Adds values to an existing enumeration form or schema, throwing an error if the form or schema does not appear to be
+   an enumeration type."
+  [schema & vs]
+  (when-not (= (m/type schema) :enum)
+    (throw (ex-info "provided schema is not an enum" {:schema schema})))
+  (as-> schema s
+    (if (m/schema? s) (m/form s) s)
+    (into s vs)
+    (m/schema s)))
 
 (def NonBlankString [:re "\\S+"])
 
