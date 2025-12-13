@@ -343,3 +343,236 @@
       :description         "The ID of the asynchronous task being used to track the sharing request"
       :json-schema/example #uuid "1536c7cb-c1e3-413d-aa28-7ee8ef448e2a"}
      :uuid]]))
+
+(def AnalysisUnsharingResponseElement
+  (mu/closed-schema
+   [:map
+    [:analysis_id
+     {:description         "The analysis ID"
+      :json-schema/example #uuid "11affd2c-7ca0-4873-beb8-a28aef9515b5"}
+     :uuid]
+
+    [:analysis_name
+     {:description         "The analysis name"
+      :json-schema/example "DuckDB client for Longitudinal Brain Development Study Data"}
+     :string]
+
+    [:ok
+     {:description         "A Boolpean flag indicating whether or not the request passed validation"
+      :json-schema/example true}
+     :boolean]
+
+    [:error
+     {:optional    true
+      :description "Information about any validation error that may have occurred"}
+     ErrorResponse]]))
+
+(def SubjectAnalysisUnsharingRequestElement
+  (mu/closed-schema
+   [:map
+    [:subject
+     {:description "The user or group identification."}
+     BaseSubject]
+
+    [:analyses
+     {:description         "The identifiers of the analyses to unshare"
+      :json-schema/example [#uuid "5267130a-9b52-43d2-9b62-f3b901d95e8c"
+                            #uuid "24b0847f-6eab-4c45-9253-0629b5e6fee3"]}
+     [:vector :uuid]]]))
+
+(def SubjectAnalysisUnsharingResponseElement
+  (mu/closed-schema
+   [:map
+    [:subject
+     {:description "The user or group identification."}
+     BaseSubject]
+
+    [:analyses
+     {:description "The list of analysis unsharing responses for the subject"}
+     [:vector AnalysisUnsharingResponseElement]]]))
+
+(def AnalysisUnsharingRequest
+  (mu/closed-schema
+   [:map
+    {:description "The analysis unsharing request."}
+    [:unsharing
+     {:description "The list of unsharing requests for individual subjects"}
+     [:vector SubjectAnalysisUnsharingRequestElement]]]))
+
+(def AnalysisUnsharingResponse
+  (mu/closed-schema
+   [:map
+    [:unsharing
+     {:description "The list of unsharing responses for individual subjects"}
+     [:vector SubjectAnalysisUnsharingResponseElement]]
+
+    [:asyncTaskID
+     {:description         "The ID of the asynchronous task being used to track the unsharing request"
+      :json-schema/example #uuid "834008d0-3d72-4b54-b868-561772fe5877"}
+     :uuid]]))
+
+(def ToolIdList
+  (mu/closed-schema
+   [:map
+    {:description "The Tool permission listing request."}
+    [:tools
+     {:description         "A List of Tool IDs"
+      :json-schema/example [#uuid "302975d2-f08d-4256-b04d-7dcf3c7f538c"
+                            #uuid "bfc36347-4ddb-41f5-b8e7-5b948719ba63"]}
+     [:vector :uuid]]]))
+
+(def ToolPermissionListElement
+  (mu/closed-schema
+   [:map
+    [:id
+     {:description         "The Tool ID"
+      :json-schema/example #uuid "371a6f9d-2069-4de2-9f2e-062d464197d1"}
+     :uuid]
+
+    [:name
+     {:description         "The Tool name"
+      :json-schema/example "JupyterLab Datascience"}
+     NonBlankString]
+
+    [:permissions
+     {:description "The list of subject permissions for the Tool"}
+     SubjectPermissionListElement]]))
+
+(def ToolPermissionListing
+  (mu/closed-schema
+   [:map
+    [:tools
+     {:description "The list of Tool permissions"}
+     [:vector ToolPermissionListElement]]]))
+
+(def ToolSharingRequestElement
+  (mu/closed-schema
+   [:map
+    [:tool_id
+     {:description         "The Tool ID"
+      :json-schema/example #uuid "ffa6a510-a9e9-45d5-8e59-9069ae3f3e23"}
+     :uuid]
+
+    [:permission
+     {:description         "The requested permission level"
+      :json-schema/example "write"}
+     ToolPermissionEnum]]))
+
+(def ToolSharingResponseElement
+  (mu/closed-schema
+   (mu/merge
+    ToolSharingRequestElement
+    [:map
+     [:tool_name
+      {:description         "The Tool name"
+       :json-schema/example "CloudShell"}
+      NonBlankString]
+
+     [:success
+      {:description         "A Boolean flag indicating whether the sharing request succeeded"
+       :json-schema/example true}
+      :boolean]
+
+     [:error
+      {:optional    true
+       :description "Information about any error that may have occurred"}
+      ErrorResponse]])))
+
+(def SubjectToolSharingRequestElement
+  (mu/closed-schema
+   [:map
+    [:subject
+     {:description "The user or group identification."}
+     BaseSubject]
+
+    [:tools
+     {:description "The list of Tool sharing requests for the subject"}
+     [:vector ToolSharingRequestElement]]]))
+
+(def SubjectToolSharingResponseElement
+  (mu/closed-schema
+   [:map
+    [:subject
+     {:description "The user or group identification."}
+     BaseSubject]
+
+    [:tools
+     {:description "The list of Tool sharing responses for the subject"}
+     [:vector ToolSharingResponseElement]]]))
+
+(def ToolSharingRequest
+  (mu/closed-schema
+   [:map
+    {:description "The Tool sharing request."}
+    [:sharing
+     {:description "The list of Tool sharing requests"}
+     [:vector SubjectToolSharingRequestElement]]]))
+
+(def ToolSharingResponse
+  (mu/closed-schema
+   [:map
+    [:sharing
+     {:description "The list of Tool sharing responses"}
+     [:vector SubjectToolSharingResponseElement]]]))
+
+(def ToolUnsharingResponseElement
+  (mu/closed-schema
+   [:map
+    [:tool_id
+     {:description         "The Tool ID"
+      :json-schema/example #uuid "10496d24-9a13-4dd8-8714-dd709734069b"}
+     :uuid]
+
+    [:tool_name
+     {:description         "The Tool name"
+      :json-schema/example "DuckDB Client"}
+     NonBlankString]
+
+    [:success
+     {:description         "A Boolean flag indicating whether the unsharing request succeeded"
+      :json-schema/example true}
+     :boolean]
+
+    [:error
+     {:optional    true
+      :description "Information about any error that may have occurred"}
+     ErrorResponse]]))
+
+(def SubjectToolUnsharingRequestElement
+  (mu/closed-schema
+   [:map
+    [:subject
+     {:description "The user or group identification."}
+     BaseSubject]
+
+    [:tools
+     {:description         "The identifiers of the Tools to unshare"
+      :json-schema/example [#uuid "c5d15f19-82d6-41d6-860e-c5529f46b8a6"
+                            #uuid "7fe2f86a-ab54-4386-a0eb-31d237484426"]}
+     [:vector :uuid]]]))
+
+(def SubjectToolUnsharingResponseElement
+  (mu/closed-schema
+   [:map
+    [:subject
+     {:description "The user or group identification."}
+     BaseSubject]
+
+    [:tools
+     {:description "The list of Tool unsharing responses for the subject"}
+     [:vector ToolUnsharingResponseElement]]]))
+
+(def ToolUnsharingRequest
+  (mu/closed-schema
+   [:map
+    {:description "The Tool unsharing request."}
+    [:unsharing
+     {:description "The list of unsharing requests for individual subjects"}
+     [:vector SubjectToolUnsharingRequestElement]]]))
+
+(def ToolUnsharingResponse
+  (mu/closed-schema
+   [:map
+    [:unsharing
+     {:description "The list of unsharing responses for individual subjects"}
+     [:vector SubjectToolUnsharingResponseElement]]]))
