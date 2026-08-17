@@ -6,11 +6,11 @@
   :deploy-repositories [["releases" :clojars]
                         ["snapshots" :clojars]]
   :dependencies [[org.clojure/clojure "1.12.5"]
-                 [cheshire "5.13.0"]
+                 [cheshire "6.2.0"]
                  [metosin/compojure-api "1.1.14"]
-                 [metosin/schema-tools "0.13.1"]
-                 [org.cyverse/clojure-commons "3.0.11"]
-                 [org.cyverse/heuristomancer "2.8.7"]
+                 [metosin/schema-tools "0.14.0"]
+                 [org.cyverse/clojure-commons "3.0.13"]
+                 [org.cyverse/heuristomancer "2.8.8"]
                  [org.flatland/ordered "1.15.12"]]
   :eastwood {:exclude-namespaces [common-swagger-api.schema.data.exists
                                   common-swagger-api.schema.data.tickets
